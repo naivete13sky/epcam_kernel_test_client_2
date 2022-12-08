@@ -52,6 +52,7 @@ class MyInput(object):
         for file in file_list:
             # 把特殊字符替换成‘-’，比如空格、(、)等。
             os.rename(os.path.join(folder_path, file),os.path.join(folder_path, file.replace(' ', '-').replace('(', '-').replace(')', '-')))
+            file = file.replace(' ', '-').replace('(', '-').replace(')', '-')
             # 把含有中文字符名称的文件改名成unknown1\unknown2等
             if StringMehtod.is_chinese(file):
                 suffix_of_file = os.path.splitext(file)[1]
