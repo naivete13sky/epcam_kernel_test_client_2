@@ -101,10 +101,10 @@ class MyInput(object):
                     print('need to set the para for drill excellon2'.center(190,'-'))
                     print('原来导入参数'.center(190,'-'))
                     print(result_each_file_identify)
-                    result_each_file_identify['parameters']['units'] = pd_job_layer_info_cuurent_layer['units_ep'].values[0]
-                    result_each_file_identify['parameters']['zeroes_omitted'] = pd_job_layer_info_cuurent_layer['zeroes_omitted_ep'].values[0]
-                    result_each_file_identify['parameters']['Number_format_integer'] = int(pd_job_layer_info_cuurent_layer['number_format_A_ep'].values[0])
-                    result_each_file_identify['parameters']['Number_format_decimal'] = int(pd_job_layer_info_cuurent_layer['number_format_B_ep'].values[0])
+                    result_each_file_identify['parameters']['units'] = pd_job_layer_info_cuurent_layer['units'].values[0]
+                    result_each_file_identify['parameters']['zeroes_omitted'] = pd_job_layer_info_cuurent_layer['zeroes_omitted'].values[0]
+                    result_each_file_identify['parameters']['Number_format_integer'] = int(pd_job_layer_info_cuurent_layer['number_format_A'].values[0])
+                    result_each_file_identify['parameters']['Number_format_decimal'] = int(pd_job_layer_info_cuurent_layer['number_format_B'].values[0])
                     result_each_file_identify['parameters']['tool_units'] = pd_job_layer_info_cuurent_layer['tool_units_ep'].values[0]
                     print('现在导入参数'.center(190, '-'))
                     print(result_each_file_identify)
