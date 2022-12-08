@@ -45,6 +45,7 @@ class MyInput(object):
         folder_path = self.folder_path
         # 开始识别文件夹中各个文件的类型，此方只识别单层文件夹中的内容
         file_list = [x for x in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, x))]
+        print('file_list:',file_list)
 
         unknown_index = 1
 

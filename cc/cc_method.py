@@ -171,7 +171,9 @@ class DMS():
                         # 删除压缩包
                         if os.path.exists(temp_compressed):
                             os.remove(temp_compressed)
-                        return os.listdir(temp_compressed_path)[0].lower()  + '_ep'
+                        # return os.listdir(temp_compressed_path)[0].lower()  + '_ep'
+                        # 料号名称设置为小写，不能有'.'
+                        return os.listdir(temp_compressed_path)[0].lower().replace('.', '') + '_ep'
 
                     if kwargs['decompress'] == 'tgz':
                         pass
