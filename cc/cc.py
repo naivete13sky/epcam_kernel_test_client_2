@@ -1,12 +1,10 @@
+import os
 
-
-
+from epkernel import Input, GUI
 from sqlalchemy import create_engine
 import pandas as pd
 
-
-
-
+from config import RunConfig
 
 
 def my_print():
@@ -32,7 +30,20 @@ def pp():
     print('abc')
 
 
+def open_job():
+    from epkernel import Configuration
+    Configuration.init(RunConfig.ep_cam_path)
+    Configuration.set_sys_attr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\sysattr'))
+    Configuration.set_user_attr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\userattr'))
 
+    job = 'nca11611_g2'
+    job_path = r'C:\cc\share\temp_3068_1670480974\g2'
+
+    # job = 'nca11611_g'
+    # job_path = r'C:\cc\share\temp_3068_1670481538\g\nca11611_g'
+
+    Input.open_job(job, job_path)
+    GUI.show_layer(job, 'orig', 'top')
 
 
 if __name__ == '__main__':
@@ -44,5 +55,6 @@ if __name__ == '__main__':
     # data1 =  df[(df['layer'] == 'Znn-2786693_.drl')]['units_ep'].values[0]
     # print(data1)
     # print(data1)
+    open_job()
 
 

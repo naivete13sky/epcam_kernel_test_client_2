@@ -1,10 +1,11 @@
 import pytest,os, time,json,shutil,sys
 from config import RunConfig
-from cc.cc_method import GetTestData,DMS,Print,getFlist
+from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
 from config_ep.epcam_cc_method import MyInput,MyOutput
 from config_g.g_cc_method import GInput
-from epkernel import Input, GUI
+from epkernel import Input, GUI,BASE
 from epkernel.Action import Information
+from epkernel.Edition import Layers
 
 
 @pytest.mark.input_output
@@ -13,9 +14,6 @@ class TestInputOutputBasicGerber274X:
     def test_input_output_gerber274x(self,job_id,prepare_test_job_clean_g):
         '''
         本用例测试Gerber274X（包括Excellon2）的导入与导出功能
-        fuck
-        fuck
-        fuck
         '''
 
         g = RunConfig.driver_g#拿到G软件
@@ -30,6 +28,7 @@ class TestInputOutputBasicGerber274X:
         temp_gerber_path = os.path.join(temp_path, 'compressed')
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
+        temp_g2_path = os.path.join(temp_path, 'g2')
 
         # ----------悦谱转图。先下载并解压原始gerber文件,拿到解压后的文件夹名称，此名称加上_ep就是我们要的名称。然后转图。-------------
         job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
@@ -118,6 +117,39 @@ class TestInputOutputBasicGerber274X:
         assert len(all_layers_list_job_g) == len(r['all_result_g'])
 
 
+
+
+
+        # ----------------------------------------开始用EP软件比图，g和g2--------------------------------------------------
+        all_result_ep_vs_g_g2 = {}
+        # 打开job_g
+        # 前面打开过的。直接show下看看
+        # GUI.show_layer(job_g, 'orig', 'top')
+
+        # 打开 job_g2
+        #先解压tgz
+        CompressTool.untgz(os.path.join(temp_g2_path, os.listdir(temp_g2_path)[0]),temp_g2_path)
+        Input.open_job(job_g2, temp_g2_path)
+        # GUI.show_layer(job_g2, 'orig', 'top')
+
+        # 开始用kernel比对
+        for each_layer_g in all_layers_list_job_g:
+            print('EP VS'.center(192,'-'))
+            ep_layer_compare_result = BASE.layer_compare_point(job_g, 'orig', each_layer_g, job_g2, 'orig', each_layer_g, 22860,True, True, 5080000)
+            ep_layer_compare_result = json.loads(ep_layer_compare_result)
+            print(len(ep_layer_compare_result['result']))
+            if len(ep_layer_compare_result['result']) > 0:
+                all_result_ep_vs_g_g2[each_layer_g] = '错误'
+                print('比对未通过！')
+            if len(ep_layer_compare_result['result']) == 0:
+                all_result_ep_vs_g_g2[each_layer_g] = '正常'
+
+        assert len(all_result_ep_vs_g_g2) == len(all_layers_list_job_g)
+
+
+
+
+
         # ----------------------------------------开始验证结果--------------------------------------------------------
 
         Print.print_with_delimiter('比对结果信息展示--开始')
@@ -131,6 +163,8 @@ class TestInputOutputBasicGerber274X:
         print('所有层：', data["all_result"])
         Print.print_with_delimiter('分割线', sign='-')
         print('G1转图的层：', data["all_result_g1"])
+        Print.print_with_delimiter('分割线', sign='-')
+        print('悦谱比图结果：', all_result_ep_vs_g_g2)
         Print.print_with_delimiter('比对结果信息展示--结束')
 
         Print.print_with_delimiter("断言--开始")
@@ -141,6 +175,10 @@ class TestInputOutputBasicGerber274X:
         assert data['g1_vs_total_result_flag'] == True
         for key in data['all_result_g1']:
             assert data['all_result_g1'][key] == "正常"
+
+        for key in all_result_ep_vs_g_g2:
+            assert all_result_ep_vs_g_g2[key] == "正常"
+
         Print.print_with_delimiter("断言--结束")
 
 @pytest.mark.output
@@ -172,7 +210,7 @@ class TestOutputGerber274X:
         #区分层别类型
         drill_layers = list(map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['drill'])))
         rout_layers = list(map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['rout'])))
-        print("fuckyou1124")
+
         print('drill_layers:',drill_layers)
         print('rout_layers:',rout_layers)
         common_layers = []
@@ -332,7 +370,8 @@ class TestOutputGerber274XParas():
         # 区分层别类型
         drill_layers = list(map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['drill'])))
         rout_layers = list(map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['rout'])))
-        print("fuckyou1124")
+
+
         print('drill_layers:', drill_layers)
         print('rout_layers:', rout_layers)
         common_layers = []
