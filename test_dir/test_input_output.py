@@ -143,7 +143,7 @@ class TestInputOutputBasicGerber274X:
                 all_result_ep_vs_g_g2[each_layer_g] = '错误'
                 print('错误！')
                 Layers.layer_compare(job_g, 'orig', each_layer_g, job_g2, 'orig', each_layer_g, 22860,True, True, each_layer_g + '-com', 5080000)
-                GUI.show_layer(job_g, 'orig', each_layer_g)
+                # GUI.show_layer(job_g, 'orig', each_layer_g)
             if len(ep_layer_compare_result['result']) == 0:
                 all_result_ep_vs_g_g2[each_layer_g] = '正常'
                 print('正常！')
