@@ -159,6 +159,11 @@ class MyOutput(object):
             self.para['mirrorX'] = infos_['mirrorX']
             self.para['mirrorY'] = infos_['mirrorY']
 
+            # excellon2的默认参数
+            self.para['numberFormatL'] = infos_['numberFormatL']
+            self.para['numberFormatR'] = infos_['numberFormatR']
+
+
     def set_para_customer(self,customer_para:dict):
         pass
         print('customer_para:',customer_para)
@@ -243,15 +248,21 @@ class MyOutput(object):
                 print(drill_layer)
                 Matrix.change_matrix_row(self.job, drill_layer, 'board', 'rout', drill_layer)
                 # GUI.show_layer(self.job, 'orig', drill_layer)
-                drill_info = Output.save_rout(self.job, step, drill_layer, drill_out_path, number_format_l=2,
-                                              number_format_r=4, zeroes=2, unit=0,
-                                              tool_unit=1, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,
-                                              break_arcs=False)
+                # drill_info = Output.save_rout(self.job, step, drill_layer, drill_out_path, number_format_l=2,
+                #                               number_format_r=4, zeroes=2, unit=0,
+                #                               tool_unit=1, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,
+                #                               break_arcs=False)
+                print("rout输出参数：",self.job, step, drill_layer, drill_out_path, self.para['numberFormatL'], self.para['numberFormatR'])
+                drill_info = BASE.rout2file(self.job, step, drill_layer,drill_out_path,number_format_l=self.para['numberFormatL'],number_format_r=self.para['numberFormatR'],
+                    zeroes=2,unit=0,tool_unit=1,x_scale=1,y_scale=1,x_anchor=0,y_anchor=0, partial_order = 0
+                    , num_in_x = 0, num_in_y = 0, order_type = 0, serial_no = 0, break_arcs = False)
+
+
             else:
                 Print.print_with_delimiter("我是drill啊")
                 Matrix.change_matrix_row(self.job, drill_layer, 'board', 'drill', drill_layer)
                 drill_info = Output.save_drill(self.job, step, drill_layer, drill_out_path, isMetric=False,
-                                               number_format_l=2, number_format_r=4, zeroes=2, unit=0, tool_unit=1,
+                                               number_format_l=self.para['numberFormatL'], number_format_r=self.para['numberFormatR'], zeroes=2, unit=0, tool_unit=1,
                                                x_scale=1, y_scale=1, x_anchor=0, y_anchor=0)
                 # drill_info = BASE.drill2file(self.job, step, drill_layer, drill_out_path, isMetric=False,
                 #                              number_format_l=2, number_format_r=4,

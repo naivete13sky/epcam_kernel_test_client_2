@@ -138,6 +138,7 @@ class TestInputOutputBasicGerber274X:
             print('层名称：',each_layer_g)
             ep_layer_compare_result = BASE.layer_compare_point(job_g, 'orig', each_layer_g, job_g2, 'orig', each_layer_g, 22860,True, True, 5080000)
             ep_layer_compare_result = json.loads(ep_layer_compare_result)
+            print(ep_layer_compare_result)
             print(len(ep_layer_compare_result['result']))
             if len(ep_layer_compare_result['result']) > 0:
                 all_result_ep_vs_g_g2[each_layer_g] = '错误'

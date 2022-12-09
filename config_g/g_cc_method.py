@@ -830,7 +830,7 @@ class G():
                         units = 'inch'
                         zeroes = 'none'
                         nf1 = "2"
-                        nf2 = "4"
+                        nf2 = "6"
                         tool_units = 'mm'
                     elif kwargs['drill_para'] == 'from_dms':
                         units=layer_e2.units_g.values[0].lower()
