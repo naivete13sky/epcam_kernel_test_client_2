@@ -121,35 +121,35 @@ class TestInputOutputBasicGerber274X:
 
 
         # ----------------------------------------开始用EP软件比图，g和g2--------------------------------------------------
-        all_result_ep_vs_g_g2 = {}
-        # 打开job_g
-        # 前面打开过的。直接show下看看
-        # GUI.show_layer(job_g, 'orig', 'top')
-
-        # 打开 job_g2
-        #先解压tgz
-        CompressTool.untgz(os.path.join(temp_g2_path, os.listdir(temp_g2_path)[0]),temp_g2_path)
-        Input.open_job(job_g2, temp_g2_path)
-        # GUI.show_layer(job_g2, 'orig', 'top')
-
-        # 开始用kernel比对
-        for each_layer_g in all_layers_list_job_g:
-            print('EP VS'.center(192,'-'))
-            print('层名称：',each_layer_g)
-            ep_layer_compare_result = BASE.layer_compare_point(job_g, 'orig', each_layer_g, job_g2, 'orig', each_layer_g, 22860,True, True, 5080000)
-            ep_layer_compare_result = json.loads(ep_layer_compare_result)
-            print(ep_layer_compare_result)
-            print(len(ep_layer_compare_result['result']))
-            if len(ep_layer_compare_result['result']) > 0:
-                all_result_ep_vs_g_g2[each_layer_g] = '错误'
-                print('错误！')
-                # Layers.layer_compare(job_g, 'orig', each_layer_g, job_g2, 'orig', each_layer_g, 22860,True, True, each_layer_g + '-com', 5080000)
-                # GUI.show_layer(job_g, 'orig', each_layer_g)
-            if len(ep_layer_compare_result['result']) == 0:
-                all_result_ep_vs_g_g2[each_layer_g] = '正常'
-                print('正常！')
-
-        assert len(all_result_ep_vs_g_g2) == len(all_layers_list_job_g)
+        # all_result_ep_vs_g_g2 = {}
+        # # 打开job_g
+        # # 前面打开过的。直接show下看看
+        # # GUI.show_layer(job_g, 'orig', 'top')
+        #
+        # # 打开 job_g2
+        # #先解压tgz
+        # CompressTool.untgz(os.path.join(temp_g2_path, os.listdir(temp_g2_path)[0]),temp_g2_path)
+        # Input.open_job(job_g2, temp_g2_path)
+        # # GUI.show_layer(job_g2, 'orig', 'top')
+        #
+        # # 开始用kernel比对
+        # for each_layer_g in all_layers_list_job_g:
+        #     print('EP VS'.center(192,'-'))
+        #     print('层名称：',each_layer_g)
+        #     ep_layer_compare_result = BASE.layer_compare_point(job_g, 'orig', each_layer_g, job_g2, 'orig', each_layer_g, 22860,True, True, 5080000)
+        #     ep_layer_compare_result = json.loads(ep_layer_compare_result)
+        #     print(ep_layer_compare_result)
+        #     print(len(ep_layer_compare_result['result']))
+        #     if len(ep_layer_compare_result['result']) > 0:
+        #         all_result_ep_vs_g_g2[each_layer_g] = '错误'
+        #         print('错误！')
+        #         # Layers.layer_compare(job_g, 'orig', each_layer_g, job_g2, 'orig', each_layer_g, 22860,True, True, each_layer_g + '-com', 5080000)
+        #         # GUI.show_layer(job_g, 'orig', each_layer_g)
+        #     if len(ep_layer_compare_result['result']) == 0:
+        #         all_result_ep_vs_g_g2[each_layer_g] = '正常'
+        #         print('正常！')
+        #
+        # assert len(all_result_ep_vs_g_g2) == len(all_layers_list_job_g)
 
 
 
@@ -169,8 +169,8 @@ class TestInputOutputBasicGerber274X:
         Print.print_with_delimiter('分割线', sign='-')
         print('G1转图的层：', data["all_result_g1"])
         Print.print_with_delimiter('分割线', sign='-')
-        print('悦谱比图结果：', all_result_ep_vs_g_g2)
-        Print.print_with_delimiter('比对结果信息展示--结束')
+        # print('悦谱比图结果：', all_result_ep_vs_g_g2)
+        # Print.print_with_delimiter('比对结果信息展示--结束')
 
         Print.print_with_delimiter("断言--开始")
         assert data['g_vs_total_result_flag'] == True
@@ -181,8 +181,8 @@ class TestInputOutputBasicGerber274X:
         for key in data['all_result_g1']:
             assert data['all_result_g1'][key] == "正常"
 
-        for key in all_result_ep_vs_g_g2:
-            assert all_result_ep_vs_g_g2[key] == "正常"
+        # for key in all_result_ep_vs_g_g2:
+        #     assert all_result_ep_vs_g_g2[key] == "正常"
 
         Print.print_with_delimiter("断言--结束")
 
