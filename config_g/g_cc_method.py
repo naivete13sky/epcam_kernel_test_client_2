@@ -1148,7 +1148,7 @@ class GInput(object):
                         self.para['units'] = 'inch'
                         self.para['zeroes'] = 'none'
                         self.para['nf1'] = "2"
-                        self.para['nf2'] = "4"
+                        self.para['nf2'] = "6"
                         self.para['tool_units'] = 'mm'
                         self.para['separator'] = 'nl'
 
