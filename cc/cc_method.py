@@ -58,7 +58,7 @@ class DMS():
         if os.path.exists(need_file_path) == False:  # 判断是否存在文件
 
             # 文件url
-            file_url = 'http://10.97.80.119:8081/media/files/{}'.format(os.path.basename(need_file_path))
+            file_url = 'http://10.97.80.119/media/files/{}'.format(os.path.basename(need_file_path))
 
             # 文件基准路径
             # basedir = os.path.abspath(os.path.dirname(__file__))
