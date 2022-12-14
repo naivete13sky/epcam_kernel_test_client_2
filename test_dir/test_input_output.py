@@ -59,6 +59,7 @@ class TestInputOutputBasicGerber274X:
         data['g_vs_total_result_flag'] = r['g_vs_total_result_flag']
         assert len(all_layers_list_job_g) == len(r['all_result_g'])
 
+        # time.sleep(1000)
         # ----------------------------------------开始测试输出gerber功能---------------------------------------------------
         customer_para = {}
         customer_para['numberFormatR'] = 6

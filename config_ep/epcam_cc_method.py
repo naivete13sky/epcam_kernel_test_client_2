@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import sys
 import time
 from pathlib import Path
 
@@ -93,11 +94,21 @@ class MyInput(object):
         #开始识别文件夹中各个文件的类型，此方只识别单层文件夹中的内容
         file_list = [x for x in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path,x))]
 
+        offsetFlag = False
+        offset1 = 0
+        offset2 = 0
+
         for each_file in file_list:
+
             result_each_file_identify = Input.file_identify(os.path.join(folder_path,each_file))
+            min_1 = result_each_file_identify['parameters']['min_numbers']['first']
+            min_2 = result_each_file_identify['parameters']['min_numbers']['second']
             #如果是孔的话，需要从DMS读取导入参数。是不是孔文件，以及相关参数信息都从DMS获取信息。孔参数信息是要人工确认过的，即层信息状态是published的。
             try:
                 pd_job_layer_info_cuurent_layer = self.pd_job_layer_info[(self.pd_job_layer_info['layer'] == each_file)]
+                print("layer_file_type_value:".center(192,'-'))
+                print(pd_job_layer_info_cuurent_layer['layer_file_type'].values[0])
+
                 if pd_job_layer_info_cuurent_layer['status'].values[0] ==  'published' and pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] ==  'excellon2':
                     print('need to set the para for drill excellon2'.center(190,'-'))
                     print('原来导入参数'.center(190,'-'))
@@ -109,11 +120,23 @@ class MyInput(object):
                     result_each_file_identify['parameters']['tool_units'] = pd_job_layer_info_cuurent_layer['tool_units_ep'].values[0]
                     print('现在导入参数'.center(190, '-'))
                     print(result_each_file_identify)
+
+                if pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'gerber274X' or pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'else':
+                    print("我不是孔类型")
+                    print('原来导入参数'.center(190, '-'))
+                    print(result_each_file_identify)
+                    if (offsetFlag == False) and (abs(min_1 - sys.maxsize) > 1e-6 and abs(min_2 - sys.maxsize) > 1e-6):
+                        offset1 = min_1
+                        offset2 = min_2
+                        offsetFlag = True
+                    result_each_file_identify['parameters']['offset_numbers'] = {'first': offset1, 'second': offset2}
+                    print('现在导入参数'.center(190, '-'))
+                    print(result_each_file_identify)
+
             except Exception as e:
                 print(e)
-
-
-            Input.file_translate(path=os.path.join(folder_path,each_file),job=job, step='orig', layer=each_file, param=result_each_file_identify)
+                print("有异常情况发生")
+            Input.file_translate(path=os.path.join(folder_path,each_file),job=job, step='orig', layer=each_file, param=result_each_file_identify['parameters'])
 
         #保存料号
         BASE.save_job_as(job, save_path)
