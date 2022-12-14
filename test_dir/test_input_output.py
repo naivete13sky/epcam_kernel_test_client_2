@@ -188,7 +188,7 @@ class TestInputOutputBasicGerber274X:
         Print.print_with_delimiter("断言--结束")
 
 @pytest.mark.output
-class TestOutputGerber274X:
+class aTestOutputGerber274X:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
     def test_output_gerber274x(self, job_id, prepare_test_job_clean_g):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
@@ -318,15 +318,12 @@ GerberOutputPara = namedtuple('GerberOutputPara',
 # 设置默认参数
 GerberOutputPara.__new__.__defaults__ = (0, 0, 1, 1, False, False, False, False,
                                          0, 0, 0, 0,
-                                         0, 0, False, False, 2, 4,
+                                         0, 0, False, False, 2, 6,
                                          2, 0)
 gerber_output_paras_to_test = (
-    GerberOutputPara(0, 0, 1, 1, False, False, False, False,
-                     0, 0, 0, 0,
-                     0, 0, False, False, 2, 4,
-                     2, 0),
-    GerberOutputPara(numberFormatR=6),
-    GerberOutputPara(numberFormatL=3),
+    GerberOutputPara(),#默认参数
+    # GerberOutputPara(numberFormatR=5),#自定义参数
+    # GerberOutputPara(numberFormatL=3),#自定义参数
 )
 
 def id_func(fixture_value):
