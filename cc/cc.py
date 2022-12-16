@@ -67,7 +67,7 @@ def input_gerber274x():
     # 创建一个空step
     Matrix.create_step(job, step)
 
-    result_each_file_identify = Input.file_identify(os.path.join(r'C:\Users\cheng.chen\Desktop\hige001a', r'BOTTOM.art'))
+    result_each_file_identify = Input.file_identify(os.path.join(r'C:\Users\cheng.chen\Desktop\dia91009', r'D910091101-GE-0.1-.G3'))
     print('result_each_file_identify:',result_each_file_identify)
 
     offsetFlag = False
@@ -98,8 +98,9 @@ def input_gerber274x():
     #     offsetFlag = True
     # file_param['offset_numbers'] = {'first': offset1, 'second': offset2}
     #re = Input.file_translate(os.path.join(r'C:\Users\cheng.chen\Desktop\hige001a', r'BOTTOM.art'), job, step, layer, result_each_file_identify)  # translate
+    print('now para',result_each_file_identify['parameters'])
 
-    Input.file_translate(path=os.path.join(r'C:\Users\cheng.chen\Desktop\hige001a',r'BOTTOM.art'), job=job, step='orig', layer=layer,
+    Input.file_translate(path=os.path.join(r'C:\Users\cheng.chen\Desktop\dia91009',r'D910091101-GE-0.1-.G3'), job=job, step='orig', layer=layer,
                          param=result_each_file_identify['parameters'])
 
     GUI.show_layer(job,step,layer)

@@ -38,6 +38,8 @@ class TestInputOutputBasicGerber274X:
         all_layers_list_job_ep = Information.get_layers(job_ep)
         # print('all_layers_list_job_ep:',all_layers_list_job_ep)
 
+        # time.sleep(1000)
+
         # --------------------------------下载G转图tgz，并解压好，获取到文件夹名称，作为g料号名称-------------------------------
         job_g = DMS().get_file_from_dms_db(temp_path, job_id, field='file_odb_g', decompress='tgz')
         Input.open_job(job_g, temp_g_path)#用悦谱CAM打开料号

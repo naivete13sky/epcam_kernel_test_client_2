@@ -98,11 +98,13 @@ class MyInput(object):
         offset1 = 0
         offset2 = 0
 
+
         for each_file in file_list:
 
             result_each_file_identify = Input.file_identify(os.path.join(folder_path,each_file))
             min_1 = result_each_file_identify['parameters']['min_numbers']['first']
             min_2 = result_each_file_identify['parameters']['min_numbers']['second']
+            print("orig min_1,min_2:",min_1,":",min_2)
             #如果是孔的话，需要从DMS读取导入参数。是不是孔文件，以及相关参数信息都从DMS获取信息。孔参数信息是要人工确认过的，即层信息状态是published的。
             try:
                 pd_job_layer_info_cuurent_layer = self.pd_job_layer_info[(self.pd_job_layer_info['layer'] == each_file)]
@@ -122,16 +124,20 @@ class MyInput(object):
                     print(result_each_file_identify)
 
                 if pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'gerber274X' or pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'else':
-                    print("我不是孔类型")
-                    print('原来导入参数'.center(190, '-'))
-                    print(result_each_file_identify)
-                    if (offsetFlag == False) and (abs(min_1 - sys.maxsize) > 1e-6 and abs(min_2 - sys.maxsize) > 1e-6):
-                        offset1 = min_1
-                        offset2 = min_2
-                        offsetFlag = True
-                    result_each_file_identify['parameters']['offset_numbers'] = {'first': offset1, 'second': offset2}
-                    print('现在导入参数'.center(190, '-'))
-                    print(result_each_file_identify)
+                    if result_each_file_identify["format"] == "Gerber274x":
+                        # print("hihihi1:", each_file)
+                        print("我不是孔类型")
+                        print('orig para'.center(190, '-'))
+                        print(result_each_file_identify)
+                        print("offsetFlag:", offsetFlag)
+                        if (offsetFlag == False) and (abs(min_1 - sys.maxsize) > 1e-6 and abs(min_2 - sys.maxsize) > 1e-6):
+                            # print("hihihi2:",each_file)
+                            offset1 = min_1
+                            offset2 = min_2
+                            offsetFlag = True
+                        result_each_file_identify['parameters']['offset_numbers'] = {'first': offset1, 'second': offset2}
+                        print('now para'.center(190, '-'))
+                        print(result_each_file_identify)
 
             except Exception as e:
                 print(e)
