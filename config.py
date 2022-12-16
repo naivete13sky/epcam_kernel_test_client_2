@@ -80,6 +80,7 @@ class RunConfig:
     config_g_input = r'config_g\config.json'
 
 
-    test_item = ['1','2','3','4','5','6','7']
+    # test_item = ['1','2','3','4','5','6','7']
+    test_item = ['1', '2', '3']
 
 

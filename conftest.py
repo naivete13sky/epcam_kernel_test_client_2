@@ -66,20 +66,16 @@ def pytest_runtest_makereport(item):
     extra = getattr(report, 'extra', [])
 
 
-    # cc
+    # <editor-fold desc="自定义结果存储">
     # if report.when == "call" and report.failed:
     if report.when == "call":
         try:
             with open(str(FAILURES_FILE), "a") as f:
-                if report.failed:
-                    f.write(report.nodeid + '-' + 'Failed' + "\n")
-                elif report.skipped:
-                    f.write(report.nodeid + '-' + 'Skipped' + "\n")
-                else:
-                    f.write(report.nodeid + '-' + '' + "\n")
+                f.write(str(report.nodeid)+ ':' + str(report.outcome)+"\n")
         except Exception as e:
             print("ERROR", e)
             pass
+    # </editor-fold>
 
 
 
