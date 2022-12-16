@@ -1,4 +1,9 @@
 import os,sys
+from pathlib import Path
+
+from _pytest.main import Session
+from _pytest.nodes import Item
+from _pytest.runner import CallInfo
 from py.xml import html
 from config import RunConfig
 # sys.path.append(RunConfig.epcam_python_interface_path)
@@ -33,6 +38,21 @@ def pytest_html_results_table_row(report, cells):
     cells.pop()
 
 
+
+
+# FAILURES_FILE = Path() / "failures.txt"
+FAILURES_FILE = Path(os.path.join(BASE_DIR,'test_report',"failures.txt"))
+
+@pytest.hookimpl()
+def pytest_sessionstart(session: Session):
+    print("自定义单独的报告存放位置")
+    if FAILURES_FILE.exists():
+        FAILURES_FILE.unlink()
+    FAILURES_FILE.touch()
+
+
+
+
 @pytest.mark.hookwrapper
 def pytest_runtest_makereport(item):
     """
@@ -44,6 +64,19 @@ def pytest_runtest_makereport(item):
     report = outcome.get_result()
     report.description = description_html(item.function.__doc__)
     extra = getattr(report, 'extra', [])
+
+
+    # cc
+    if report.when == "call" and report.failed:
+        try:
+            with open(str(FAILURES_FILE), "a") as f:
+                f.write(report.nodeid + "\n")
+        except Exception as e:
+            print("ERROR", e)
+            pass
+
+
+
     if report.when == 'call' or report.when == "setup":
         xfail = hasattr(report, 'wasxfail')
         if (report.skipped and xfail) or (report.failed and not xfail):
@@ -157,9 +190,14 @@ def prepare_test_job_clean_g():
 
 
 
+
+
+
+
+
 def pytest_configure(config):
     marker_list = [
-        'input_output','output','test','cc'
+        'input_output','output','test','cc','testcc'
     ]
     for markers in marker_list:
         config.addinivalue_line('markers',markers)

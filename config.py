@@ -78,3 +78,8 @@ class RunConfig:
 
     # g软件导入默认参数
     config_g_input = r'config_g\config.json'
+
+
+    test_item = ['1','2','3','4','5','6','7']
+
+

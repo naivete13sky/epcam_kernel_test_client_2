@@ -460,3 +460,19 @@ class TestOutputGerber274XParas():
             assert data['all_result_g'][key] == "正常"
 
         Print.print_with_delimiter("断言--结束")
+
+
+
+@pytest.mark.testcc
+@pytest.mark.parametrize('item',RunConfig.test_item)
+def test_cc1(item):
+    print(item)
+    time.sleep(5)
+    assert 1 == 2
+
+@pytest.mark.testcc
+@pytest.mark.parametrize('item',RunConfig.test_item)
+def test_cc2(item):
+    print(item)
+    time.sleep(5)
+    assert 1 == 1
