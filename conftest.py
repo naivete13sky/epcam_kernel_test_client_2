@@ -67,10 +67,16 @@ def pytest_runtest_makereport(item):
 
 
     # cc
-    if report.when == "call" and report.failed:
+    # if report.when == "call" and report.failed:
+    if report.when == "call":
         try:
             with open(str(FAILURES_FILE), "a") as f:
-                f.write(report.nodeid + "\n")
+                if report.failed:
+                    f.write(report.nodeid + '-' + 'Failed' + "\n")
+                elif report.skipped:
+                    f.write(report.nodeid + '-' + 'Skipped' + "\n")
+                else:
+                    f.write(report.nodeid + '-' + '' + "\n")
         except Exception as e:
             print("ERROR", e)
             pass
