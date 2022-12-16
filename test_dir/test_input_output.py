@@ -465,14 +465,14 @@ class TestOutputGerber274XParas():
 
 @pytest.mark.testcc
 @pytest.mark.parametrize('item',RunConfig.test_item)
-def test_cc1(item):
+def atest_cc1(item):
     print(item)
     time.sleep(3)
     assert 1 == 1
 
 @pytest.mark.testcc
 @pytest.mark.parametrize('item',RunConfig.test_item)
-def test_cc2(item):
+def atest_cc2(item):
     print(item)
     time.sleep(3)
     assert 1 == 2
