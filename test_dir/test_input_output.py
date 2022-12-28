@@ -346,8 +346,9 @@ def para_gerber_output(request):
 
 @pytest.mark.cc
 class TestOutputGerber274XParas():
+    @pytest.mark.parametrize('step_name',['orig','panel'])
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
-    def test_output_gerber274x(self, job_id, prepare_test_job_clean_g,para_gerber_output):
+    def test_output_gerber274x(self, job_id,step_name, prepare_test_job_clean_g,para_gerber_output):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
         print('分割线'.center(192, "-"))
         print(para_gerber_output)
@@ -390,20 +391,21 @@ class TestOutputGerber274XParas():
         customer_para['numberFormatL'] = para_gerber_output.numberFormatL
         customer_para['numberFormatR'] = para_gerber_output.numberFormatR
 
-        MyOutput(temp_path=temp_path, job=job, job_id=job_id, layer_info_from_obj='job_tgz_file',
+        MyOutput(temp_path=temp_path, job=job, job_id=job_id,step = step_name, layer_info_from_obj='job_tgz_file',
                  customer_para=customer_para)
 
         # ----------------------------------------开始用G软件input--------------------------------------------------------
-        ep_out_put_gerber_folder = os.path.join(temp_path, r'output_gerber', job, r'orig')
+        ep_out_put_gerber_folder = os.path.join(temp_path, r'output_gerber', job, step_name)
         job_g2 = os.listdir(temp_compressed_path)[0].lower() + '_g2'  # epcam输出gerber，再用g软件input。
-        step = 'orig'
+        # step = 'orig'
+        step = step_name
         file_path = os.path.join(temp_path, ep_out_put_gerber_folder)
         gerberList = getFlist(file_path)
         print(gerberList)
         g_temp_path = r'//vmware-host/Shared Folders/share/temp_{}_{}'.format(job_id, vs_time_g)
         gerberList_path = []
         for each in gerberList:
-            gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job, r'orig', each))
+            gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job, step_name, each))
         print(gerberList_path)
 
         temp_out_put_gerber_g_input_path = os.path.join(temp_path, 'g2')
@@ -437,7 +439,7 @@ class TestOutputGerber274XParas():
         # 以G转图为主来比对
         # G打开要比图的2个料号g和g2。g就是原始，g2是悦谱输出的gerber又input得到的
         r = g.layer_compare_dms(job_id=job_id, vs_time_g=vs_time_g, temp_path=temp_path,
-                                job1=job, all_layers_list_job1=all_layers_list_job, job2=job_g2,
+                                job1=job,step1=step_name, all_layers_list_job1=all_layers_list_job, job2=job_g2,step2=step_name,
                                 all_layers_list_job2=all_layers_list_job, adjust_position=True)
         data["all_result_g"] = r['all_result_g']
 

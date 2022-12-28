@@ -44,13 +44,14 @@ class G():
     def layer_compare_g_open_2_job(self, *args,**kwargs):
         Print.print_with_delimiter('comare_open_2_job')
         job1 = kwargs['job1']
-        step = kwargs['step']
+        step1 = kwargs['step1']
+        step2 = kwargs['step2']
         job2 = kwargs['job2']
         cmd_list = [
             'COM check_inout,mode=out,type=job,job={}'.format(job1),
             'COM clipb_open_job,job={},update_clipboard=view_job'.format(job1),
             'COM open_job,job={}'.format(job1),
-            'COM open_entity,job={},type=step,name={},iconic=no'.format(job1, step),
+            'COM open_entity,job={},type=step,name={},iconic=no'.format(job1, step1),
             'COM units,type=inch',
             'COM open_job,job={}'.format(job2),
         ]
@@ -453,7 +454,7 @@ class G():
                 return results
         time.sleep(1)
 
-    def layer_compare_dms(self,*args,job_id,vs_time_g,temp_path,job1,all_layers_list_job1,job2,all_layers_list_job2,adjust_position=False,**kwargs):
+    def layer_compare_dms(self,*args,job_id,vs_time_g,temp_path,job1,step1='orig',all_layers_list_job1,job2,step2='orig',all_layers_list_job2,adjust_position=False,**kwargs):
         global g_vs_total_result_flag
         adjust_position = adjust_position
 
@@ -468,7 +469,7 @@ class G():
 
 
         # G打开要比图的2个料号
-        self.layer_compare_g_open_2_job(job1=job1, step='orig', job2=job2)
+        self.layer_compare_g_open_2_job(job1=job1, step1=step1, job2=job2,step2=step2)
         g_compare_result_folder = job1 + '_compare_result'
         temp_g_compare_result_path = os.path.join(temp_path, g_compare_result_folder)
         if not os.path.exists(temp_g_compare_result_path):
@@ -489,8 +490,8 @@ class G():
 
 
                 map_layer = layer + '-com'
-                result = self.layer_compare_one_layer(job1=job1, step1='orig', layer1=layer, job2=job2,
-                                                   step2='orig', layer2=layer, layer2_ext='_copy', tol=tol,
+                result = self.layer_compare_one_layer(job1=job1, step1=step1, layer1=layer, job2=job2,
+                                                   step2=step2, layer2=layer, layer2_ext='_copy', tol=tol,
                                                    map_layer=map_layer, map_layer_res=map_layer_res,
                                                    result_path_remote=temp_path_remote_g_compare_result,
                                                    result_path_local=temp_path_local_g_compare_result,

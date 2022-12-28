@@ -148,11 +148,12 @@ class MyInput(object):
         BASE.save_job_as(job, save_path)
 
 class MyOutput(object):
-    def __init__(self,*,temp_path:str,job:str,job_id,layer_info_from_obj='dms',customer_para:dict):
+    def __init__(self,*,temp_path:str,job:str,job_id,step = 'orig',layer_info_from_obj='dms',customer_para:dict):
         pass
         self.temp_path = temp_path
         self.job = job
         self.job_id = job_id
+        self.step = step
         self.layer_info_from_obj = layer_info_from_obj
 
         self.get_current_job_layer_type(layer_info_from_obj)
@@ -238,7 +239,8 @@ class MyOutput(object):
             shutil.rmtree(file_path_file)  # 已存在gerber文件夹删除掉，再新建
         os.mkdir(file_path)
 
-        step = 'orig'
+        # step = 'orig'
+        step = self.step
         value = {}
         # 开始时间
         start_time = (int(time.time()))
