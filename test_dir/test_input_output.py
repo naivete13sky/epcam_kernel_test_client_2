@@ -55,7 +55,7 @@ class TestInputOutputBasicGerber274X:
         g.import_odb_folder(job_g_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         r = g.layer_compare_dms(job_id = job_id, vs_time_g = vs_time_g, temp_path = temp_path,
-                            job1 = job_g, all_layers_list_job1 = all_layers_list_job_g, job2 = job_ep, all_layers_list_job2 = all_layers_list_job_ep)
+                            job1 = job_g,step1 = 'orig', all_layers_list_job1 = all_layers_list_job_g, job2 = job_ep,step2 = 'orig', all_layers_list_job2 = all_layers_list_job_ep)
         data["all_result_g"] = r['all_result_g']
         data["all_result"] = r['all_result']
         data['g_vs_total_result_flag'] = r['g_vs_total_result_flag']
