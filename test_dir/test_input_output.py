@@ -38,6 +38,7 @@ class TestInputOutputBasicGerber274X:
         all_layers_list_job_ep = Information.get_layers(job_ep)
         # print('all_layers_list_job_ep:',all_layers_list_job_ep)
 
+        # GUI.show_layer(job_ep, 'orig', 'top')
         # time.sleep(1000)
 
         # --------------------------------下载G转图tgz，并解压好，获取到文件夹名称，作为g料号名称-------------------------------
