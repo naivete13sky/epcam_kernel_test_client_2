@@ -462,7 +462,7 @@ class G():
         data_g = {}
         g_vs_total_result_flag = True  # True表示最新一次G比对通过
         # 读取配置文件
-        with open(r'C:\cc\python\epwork\epcam_kernel_test_client2\config_g\config.json', encoding='utf-8') as f:
+        with open(r'C:\cc\python\epwork\epcam_kernel_test_client_2\config_g\config.json', encoding='utf-8') as f:
             cfg = json.load(f)
         tol = cfg['job_manage']['vs']['vs_tol_g']
         map_layer_res = cfg['job_manage']['vs']['map_layer_res']
