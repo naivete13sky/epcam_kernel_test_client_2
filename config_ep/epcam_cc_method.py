@@ -111,7 +111,9 @@ class MyInput(object):
                 print("layer_file_type_value:".center(192,'-'))
                 print(pd_job_layer_info_cuurent_layer['layer_file_type'].values[0])
 
-                if pd_job_layer_info_cuurent_layer['status'].values[0] ==  'published' and pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] ==  'excellon2':
+                if pd_job_layer_info_cuurent_layer['status'].values[0] ==  'published' and pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] ==  'excellon2' or \
+                         pd_job_layer_info_cuurent_layer['status'].values[0] == 'published' and pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'excellon1':
+
                     print('need to set the para for drill excellon2'.center(190,'-'))
                     print('原来导入参数'.center(190,'-'))
                     print(result_each_file_identify)
