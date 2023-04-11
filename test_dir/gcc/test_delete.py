@@ -13,7 +13,7 @@ class TestGraphicEditDelete:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Delete'))
     def testDelete (self, job_id, prepare_test_job_clean_g):
         '''
-        本用例测试Delete功能
+        本用例测试Delete删除物件功能
         '''
         g = RunConfig.driver_g  # 拿到G软件
 

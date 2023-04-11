@@ -160,7 +160,7 @@ def epcam():
     return driver_epcam
 
 # 加载g
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='session', autouse=False)
 def g():
     """
     全局定义epcam驱动
