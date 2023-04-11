@@ -1,9 +1,9 @@
-import pytest,os, time,json,shutil,sys
+import pytest, os, time, json, shutil, sys
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput,MyOutput
+from config_ep.epcam_cc_method import MyInput, MyOutput
 from config_g.g_cc_method import GInput
-from epkernel import Input, GUI,BASE
+from epkernel import Input, GUI, BASE
 from epkernel.Action import Information
 from epkernel.Edition import Layers
 
@@ -33,8 +33,8 @@ class TestInputOutputBasicGerber274X:
         # ----------悦谱转图。先下载并解压原始gerber文件,拿到解压后的文件夹名称，此名称加上_ep就是我们要的名称。然后转图。-------------
         job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
         # print('job_ep:',job_ep)
-        MyInput(folder_path = os.path.join(temp_gerber_path,os.listdir(temp_gerber_path)[0].lower()),
-                job = job_ep,step = r'orig',job_id = job_id,save_path = temp_ep_path)
+        MyInput(folder_path = os.path.join(temp_gerber_path, os.listdir(temp_gerber_path)[0].lower()),
+                job = job_ep, step = r'orig', job_id = job_id, save_path = temp_ep_path)
         all_layers_list_job_ep = Information.get_layers(job_ep)
         # print('all_layers_list_job_ep:',all_layers_list_job_ep)
 
@@ -56,7 +56,8 @@ class TestInputOutputBasicGerber274X:
         g.import_odb_folder(job_g_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         r = g.layer_compare_dms(job_id = job_id, vs_time_g = vs_time_g, temp_path = temp_path,
-                            job1 = job_g,step1 = 'orig', all_layers_list_job1 = all_layers_list_job_g, job2 = job_ep,step2 = 'orig', all_layers_list_job2 = all_layers_list_job_ep)
+                            job1 = job_g, step1 = 'orig', all_layers_list_job1 = all_layers_list_job_g, job2 = job_ep,
+                                step2 = 'orig', all_layers_list_job2 = all_layers_list_job_ep)
         data["all_result_g"] = r['all_result_g']
         data["all_result"] = r['all_result']
         data['g_vs_total_result_flag'] = r['g_vs_total_result_flag']
@@ -220,8 +221,8 @@ class aTestOutputGerber274X:
         drill_layers = list(map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['drill'])))
         rout_layers = list(map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['rout'])))
 
-        print('drill_layers:',drill_layers)
-        print('rout_layers:',rout_layers)
+        print('drill_layers:', drill_layers)
+        print('rout_layers:', rout_layers)
         common_layers = []
         for each in all_layers_list_job:
             if each not in drill_layers:
@@ -259,8 +260,8 @@ class aTestOutputGerber274X:
 
 
         GInput(job=job_g2, step=step, gerberList_path=gerberList_path, out_path=out_path, job_id=job_id,
-               drill_para='epcam_default',layer_info_from_obj='job_tgz_file',
-               layer_list=all_layers_list_job,gerber_layer_list=common_layers,drill_layer_list=drill_layers,rout_layer_list=rout_layers)
+               drill_para='epcam_default', layer_info_from_obj='job_tgz_file', layer_list=all_layers_list_job,
+               gerber_layer_list=common_layers, drill_layer_list=drill_layers, rout_layer_list=rout_layers)
         # 输出tgz到指定目录
         g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
 
@@ -349,7 +350,7 @@ def para_gerber_output(request):
 class TestOutputGerber274XParas():
     # @pytest.mark.parametrize('step_name',['orig','panel'])
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
-    def test_output_gerber274x(self, job_id, prepare_test_job_clean_g,para_gerber_output):
+    def test_output_gerber274x(self, job_id, g, prepare_test_job_clean_g, para_gerber_output):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
         print('分割线'.center(192, "-"))
         print(para_gerber_output)
@@ -374,10 +375,10 @@ class TestOutputGerber274XParas():
         Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
         all_layers_list_job = Information.get_layers(job)
         all_step_list_job = Information.get_steps(job)
-        step_name_list = ['orig','panel']
+        step_name_list = ['orig', 'panel']
         for step_name in step_name_list:
             if step_name in all_step_list_job:
-                print('测试Step：',step_name)
+                print('测试Step：', step_name)
                 print('all_layer_list_job:', all_layers_list_job)
                 # 区分层别类型
                 drill_layers = list(map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['drill'])))
@@ -397,7 +398,7 @@ class TestOutputGerber274XParas():
                 customer_para['numberFormatL'] = para_gerber_output.numberFormatL
                 customer_para['numberFormatR'] = para_gerber_output.numberFormatR
 
-                MyOutput(temp_path=temp_path, job=job, job_id=job_id,step = step_name, layer_info_from_obj='job_tgz_file',
+                MyOutput(temp_path=temp_path, job=job, job_id=job_id, step = step_name, layer_info_from_obj='job_tgz_file',
                          customer_para=customer_para)
 
                 # ----------------------------------------开始用G软件input--------------------------------------------------------
@@ -445,7 +446,7 @@ class TestOutputGerber274XParas():
                 # 以G转图为主来比对
                 # G打开要比图的2个料号g和g2。g就是原始，g2是悦谱输出的gerber又input得到的
                 r = g.layer_compare_dms(job_id=job_id, vs_time_g=vs_time_g, temp_path=temp_path,
-                                        job1=job,step1=step_name, all_layers_list_job1=all_layers_list_job, job2=job_g2,step2=step_name,
+                                        job1=job, step1=step_name, all_layers_list_job1=all_layers_list_job, job2=job_g2,step2=step_name,
                                         all_layers_list_job2=all_layers_list_job, adjust_position=True)
                 data["all_result_g"] = r['all_result_g']
 
@@ -482,7 +483,7 @@ def atest_cc1(item):
     assert 1 == 1
 
 @pytest.mark.testcc
-@pytest.mark.parametrize('item',RunConfig.test_item)
+@pytest.mark.parametrize('item', RunConfig.test_item)
 def atest_cc2(item):
     print(item)
     time.sleep(3)
