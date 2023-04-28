@@ -9,11 +9,11 @@ from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 from config_g.g_cc_method import G
 
-class TestGraphicEditDelete:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Delete'))
-    def testDelete (self, job_id, g, prepare_test_job_clean_g):
+class TestGraphicEditContour2pad:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Contour2pad'))
+    def testContour2pad (self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Delete删除物件功能
+        本用例测试Contour2pad铜皮转pad功能
         '''
         g = RunConfig.driver_g  # 拿到G软件
 
@@ -22,7 +22,7 @@ class TestGraphicEditDelete:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'bot']
+        layers = ['top', 'l3']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -40,13 +40,28 @@ class TestGraphicEditDelete:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 删除选中物件
-        Selection.select_feature_by_id(job_ep, step, 'top', [2525])
+        # 选取多个铜皮转换成pad然后删除所有pad
+        points_location = []
+        points_location.append([1 * 1000000, -1 * 1000000])
+        points_location.append([1 * 1000000, -5 * 1000000])
+        points_location.append([5 * 1000000, -5 * 1000000])
+        points_location.append([5 * 1000000, -1 * 1000000])      # 添加一个方形铜皮
+        Layers.add_surface(job_ep, step, ['top'], True, [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)
+        Selection.select_feature_by_id(job_ep, step, 'top', [8, 9, 13, 20, 2526])
+        Layers.contour2pad(job_ep, step, ['top'], 1*25400, 5*25400, 99999*25400, '+++')
+        Selection.set_featuretype_filter(True, False, False, False, False, False, True)
+        Selection.select_features_by_filter(job_ep, step, ['top'])
         Layers.delete_feature(job_ep, step, ['top'])
 
-        # 删除整层物件
+        # 添加圆surface，全部转为pad之后删除pad
+        Layers.add_round_surface(job_ep, step, ['bot'], True,
+                                 [{'.out_flag': '233'}, {'.pattern_fill': ''}], 0, 0, 35 * 25400)
+        Layers.contour2pad(job_ep, step, ['bot'], 1 * 25400, 5 * 25400, 99999 * 25400, '+++')
+        Selection.set_featuretype_filter(True, False, False, False, False, False, True)
+        Selection.select_features_by_filter(job_ep, step, ['bot'])
         Layers.delete_feature(job_ep, step, ['bot'])
 
+        GUI.show_layer(job_ep, step, 'bot')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 

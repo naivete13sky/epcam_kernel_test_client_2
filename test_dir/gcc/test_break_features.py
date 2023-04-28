@@ -9,11 +9,11 @@ from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 from config_g.g_cc_method import G
 
-class TestGraphicEditDelete:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Delete'))
-    def testDelete (self, job_id, g, prepare_test_job_clean_g):
+class TestGraphicEditBreak_features:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break'))
+    def testBreak_features (self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Delete删除物件功能
+        本用例测试Break_features删除物件功能
         '''
         g = RunConfig.driver_g  # 拿到G软件
 
@@ -22,7 +22,7 @@ class TestGraphicEditDelete:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'bot']
+        layers = ['top', 'l2']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -40,13 +40,28 @@ class TestGraphicEditDelete:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 删除选中物件
-        Selection.select_feature_by_id(job_ep, step, 'top', [2525])
-        Layers.delete_feature(job_ep, step, ['top'])
+        # 先添加文字然后再打散
+        attributes = [{'.text_88': ''}]
+        Layers.add_text(job_ep, step, ['top'], 'standard', '666', 200*25400, 200*25400, 20 * 25400,
+                        1 * 25400000, 2 * 25400000, True, 0, attributes, 45)
+        Layers.add_text(job_ep, step, ['top'], 'standard', '999', 200*25400, 200*25400, 20 * 25400,
+                        1 * 25400000, -1 * 25400000, True, 0, attributes, 0)
+        Selection.select_feature_by_id(job_ep, step, 'top', [2526])
+        Layers.break_features(job_ep, step, ['top'], 0)
+        Selection.select_feature_by_id(job_ep, step, 'top', [2526])
+        Layers.delete_feature(job_ep, step, ['top'])   # 删除打散之后的某个物件（用以证明物件被打散）
 
-        # 删除整层物件
-        Layers.delete_feature(job_ep, step, ['bot'])
+        # 整层打散
+        attributes = [{'.text_88': ''}]
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'abc', 200*25400, 200*25400, 20 * 25400,
+                        1 * 25400000, 2 * 25400000, True, 0, attributes, 45)
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'ABC', 200*25400, 200*25400, 20 * 25400,
+                        1 * 25400000, -1 * 25400000, True, 0, attributes, 0)
+        Layers.break_features(job_ep, step, ['l2'], 1)
+        Selection.select_feature_by_id(job_ep, step, 'l2', [907, 928])
+        Layers.delete_feature(job_ep, step, ['l2'])   # 删除打散之后的某个物件（用以证明物件被打散）
 
+        # GUI.show_layer(job_ep, step, 'top')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 

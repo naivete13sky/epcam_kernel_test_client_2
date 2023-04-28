@@ -11,7 +11,7 @@ from config_g.g_cc_method import G
 
 class TestGraphicEditResize:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Resize'))
-    def testResize(self, job_id, prepare_test_job_clean_g):
+    def testResize(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Resize功能
         '''

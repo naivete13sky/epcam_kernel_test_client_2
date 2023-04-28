@@ -9,11 +9,11 @@ from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 from config_g.g_cc_method import G
 
-class TestGraphicEditDelete:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Delete'))
-    def testDelete (self, job_id, g, prepare_test_job_clean_g):
+class TestGraphicEditLine2pad:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Line2pad'))
+    def testLine2pad (self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Delete删除物件功能
+        本用例测试Line2pad线转pad功能
         '''
         g = RunConfig.driver_g  # 拿到G软件
 
@@ -22,7 +22,7 @@ class TestGraphicEditDelete:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'bot']
+        layers = ['top', 'l3']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -40,13 +40,19 @@ class TestGraphicEditDelete:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 删除选中物件
-        Selection.select_feature_by_id(job_ep, step, 'top', [2525])
+        # 选取多条线转换然后删除所有pad
+        Selection.select_feature_by_id(job_ep, step, 'top', [1946, 1947, 1949, 1950, 1958])
+        Layers.line2pad(job_ep, step, ['top'])
+        Selection.set_featuretype_filter(True, False, False, False, False, False, True)
+        Selection.select_features_by_filter(job_ep, step, ['top'])
         Layers.delete_feature(job_ep, step, ['top'])
 
-        # 删除整层物件
-        Layers.delete_feature(job_ep, step, ['bot'])
+        # 整层转换然后删除所有pad
+        Layers.line2pad(job_ep, step, ['l3'])
+        Selection.select_features_by_filter(job_ep, step, ['l3'])
+        Layers.delete_feature(job_ep, step, ['l3'])
 
+        # GUI.show_layer(job_ep, step, 'top')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
