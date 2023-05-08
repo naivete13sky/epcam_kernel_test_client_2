@@ -14,7 +14,7 @@ from epkernel.Edition import Matrix
 class TestGraphicEditFeatureIndex:
     # @pytest.mark.Feature index
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Feature_index'))
-    def testFeatureIndex(self, job_id, prepare_test_job_clean_g):
+    def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试改变物件叠放顺序（编号）
         '''

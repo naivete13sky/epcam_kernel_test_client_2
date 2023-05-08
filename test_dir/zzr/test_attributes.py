@@ -14,7 +14,7 @@ from epkernel.Edition import Matrix
 class TestGraphicEditChangeAttributes:
     # @pytest.mark.Attributes
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Modify_attributes'))
-    def testChangeAttributes(self, job_id, prepare_test_job_clean_g):
+    def testChangeAttributes(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试改变物件属性
         '''

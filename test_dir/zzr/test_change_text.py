@@ -13,7 +13,7 @@ from config_g.g_cc_method import G
 class TestGraphicEditChangeText:
     # @pytest.mark.ChangeText
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Change_Text'))
-    def testChangeText(self, job_id, prepare_test_job_clean_g):
+    def testChangeText(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试改变文字(Change_Text)
         '''
