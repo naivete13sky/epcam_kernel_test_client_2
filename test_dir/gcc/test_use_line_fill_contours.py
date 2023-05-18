@@ -5,15 +5,15 @@ from config_ep.epcam_cc_method import MyInput, MyOutput
 from config_g.g_cc_method import GInput
 from epkernel import Input, GUI, BASE
 from epkernel.Action import Information, Selection
-from epkernel.Edition import Layers, Job, Matrix
+from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 from config_g.g_cc_method import G
 
-class TestGraphicEditCopy:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Copy'))
-    def testCopy(self, job_id, g, prepare_test_job_clean_g):
+class TestGraphicEditUse_line_fill_contours:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_line'))
+    def testUse_line_fill_contours (self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Copy功能
+        本用例测试Use_line_fill_contours填充功能
         '''
         g = RunConfig.driver_g  # 拿到G软件
 
@@ -22,10 +22,11 @@ class TestGraphicEditCopy:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l4', 'l5_1']
+        layers = ['top', 'l2', 'l3']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
+        print("temp_path:", temp_path)
         temp_compressed_path = os.path.join(temp_path, 'compressed')
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
@@ -39,45 +40,36 @@ class TestGraphicEditCopy:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 同层别原地复制极性反转
-        Selection.select_feature_by_id(job_ep, step, 'top', [2525])
-        Layers.copy2other_layer(job_ep, step, 'top', 'top', True, 0, 0, 0, 0, 0, 0, 0)
+        # 选中铜皮填充（角度不偏转）❤❤❤
+        Selection.select_feature_by_id(job_ep, step, 'top', [27])
+        Layers.use_line_fill_contours(job_ep, step, 'top', 10*25400, 10*25400, 4*25400, 0*25400, 0*25400, 0)
 
-        # 同层复制坐标偏移
-        Selection.select_feature_by_id(job_ep, step, 'l2', [840])
-        Layers.copy2other_layer(job_ep, step, 'l2', 'l2', False, 6000000, 2000000, 0, 0, 0, 0, 0)
+        # 整合正负极性铜皮填充（X、Y偏置，角度偏转45°）
+        Selection.set_featuretype_filter(True, True, False, True, False, False, False)
+        Selection.select_features_by_filter(job_ep, step, ['l2'])
+        Layers.contourize(job_ep, step, ['l2'], 6350, True, 3*25400, 1)
+        Selection.select_feature_by_id(job_ep, step, 'l2', [0])
+        Layers.use_line_fill_contours(job_ep, step, 'l2', 10*25400, 10*25400, 4*25400, 20*25400, 20*25400, 45)
 
-        # 同层水平镜像复制
+        # X、Y不偏置，角度偏转45°
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
-        Layers.copy2other_layer(job_ep, step, 'l3', 'l3', False, 0, 0, 1, 0, 0, 0, 0)
+        Layers.use_line_fill_contours(job_ep, step, 'l3', 10*25400, 10*25400, 4*25400, 0*25400, 0*25400, 45)
 
-        # 同层垂直镜像
-        Selection.select_feature_by_id(job_ep, step, 'l4', [0])
-        Layers.copy2other_layer(job_ep, step, 'l4', 'l4', False, 0, 0, 2, 0, 0, 0, 0)
-
-        # 旋转90度复制到新建层别
-        Matrix.create_layer(job_ep, 'l5_1')
-        Selection.select_feature_by_id(job_ep, step, 'l5', [0])
-        Layers.copy2other_layer(job_ep, step, 'l5', 'l5_1', False, 0, 0, 0, 0, 90, 0, 0)
-
-        # GUI.show_layer(job_ep, step, 'l5_1')
-
-        save_job(job_ep,temp_ep_path)
-
+        GUI.show_layer(job_ep, step, 'top')
+        save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
         # ----------------------------------------开始比图：G与EP---------------------------------------------------------
         print('比图--G转图VS悦谱转图'.center(190, '-'))
-        job_g_remote_path = r'\\vmware-host\Shared Folders\share/{}/g/{}'.format(
+        job_yg_remote_path = r'\\vmware-host\Shared Folders\share/{}/g/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_g)
-        print("job_yg_remote_path:", job_g_remote_path)
-        job_ep_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
+        print("job_yg_remote_path:", job_yg_remote_path)
+        job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
-        print("job_testcase_remote_path:", job_ep_remote_path)
-
+        print("job_testcase_remote_path:", job_case_remote_path)
         # 导入要比图的资料
-        g.import_odb_folder(job_g_remote_path)
-        g.import_odb_folder(job_ep_remote_path)
+        g.import_odb_folder(job_yg_remote_path)
+        g.import_odb_folder(job_case_remote_path)
 
         r = g.layer_compare_dms(job_id=job_id, vs_time_g=vs_time_g, temp_path=temp_path,
                                 job1=job_g, step1=step, all_layers_list_job1=layers, job2=job_ep, step2=step,
