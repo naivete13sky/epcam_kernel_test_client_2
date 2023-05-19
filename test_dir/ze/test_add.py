@@ -41,10 +41,10 @@ class TestGraphicAdd:
 
         # 1.增加文字
         attributes = [{'.text': '2'}]  # 定义文字属性
-        Layers.add_text(job_ep, step, ['l2'], 'standard', '66666', 200*25400, 200*25400, 20 * 25400,
+        Layers.add_text(job_ep, step, ['l2'], 'standard', '66666', 20*25400, 20*25400, 2 * 25400,
                         3*10000000, 4*10000000, True, 0, attributes, 45)
         # 2.增加线条
-        Layers.add_line(job_ep, step, ['l2'], 'r50', 10000000, 30000000, 30000000, 30000000,
+        Layers.add_line(job_ep, step, ['l2'], 'r5', 10000000, 30000000, 30000000, 30000000,
                         True, [{'.fiducial_name': '0'}, {'.area': ''}])
         #3.增加surface
         points_location = []
@@ -60,11 +60,10 @@ class TestGraphicAdd:
                        9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)
         #5增加弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
-        Layers.add_arc(job_ep, step, ['l2'], 'r10', 60 * 1000000, 25 * 1000000,
-                       60 * 1000000, 30 * 1000000, 60 * 1000000, 28 * 1000000, True, True, attributes)
+        Layers.add_arc(job_ep, step, ['l2'],'r7.874', 40*1000000, 25*1000000,
+        40*1000000, 31*1000000, 40*1000000, 28*1000000, True, True, attributes)
 
 
-        # GUI.show_layer(job_ep, step, 'l2')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -105,5 +104,6 @@ class TestGraphicAdd:
         assert data['g1_vs_total_result_flag'] == True
         for key in data['all_result_g1']:
             assert data['all_result_g1'][key] == "正常"
+
 
         Print.print_with_delimiter("断言--结束")

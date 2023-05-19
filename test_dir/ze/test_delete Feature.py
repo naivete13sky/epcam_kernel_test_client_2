@@ -22,7 +22,7 @@ class TestGraphicDelete_select:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['l2','l3','l4']  # 自定义比对的层
+        layers = ['l2','l3','l4','l5','l6']  # 自定义比对的层
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -57,7 +57,7 @@ class TestGraphicDelete_select:
         Selection.select_feature_by_id(job_ep, step, 'l5', [702])
         Selection.select_feature_by_id(job_ep, step, 'l6', [10])
         Layers.delete_feature(job_ep, step, ['l5', 'l6'])  # 删除所选物件
-        GUI.show_layer(job_ep, step, 'l6')
+
 
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)

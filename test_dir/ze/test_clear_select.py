@@ -52,7 +52,6 @@ class TestGraphicClear_select:
 
         #3.整层物件被选中时，使用清除选中功能
         Selection.select_features_by_filter(job_ep, step,['l4'])
-        Selection.set_featuretype_filter(True, True, True, True, True, True, True)
         Selection.clear_select(job_ep, step, 'l4')
         Layers.delete_feature(job_ep, step, ['l4'])  # 删除所选物件
 
@@ -62,7 +61,6 @@ class TestGraphicClear_select:
         Selection.select_feature_by_id(job_ep, step, 'l6', [10])
         Selection.clear_select(job_ep, step,)#清空指定工作单元下所有层别选中状态
         Layers.delete_feature(job_ep,step,['l5','l6'])# 删除所选物件
-
 
 
         save_job(job_ep, temp_ep_path)

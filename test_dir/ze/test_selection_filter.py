@@ -9,11 +9,11 @@ from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
 from config_g.g_cc_method import G
 
-class TestGraphicReverse_select:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Reverse_select'))
-    def testReverse_select(self, job_id, g, prepare_test_job_clean_g):
+class TestGraphicSelection_filter:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Selection_filter'))
+    def testSelection_filter(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Reverse_select功能
+        本用例测试Selection_filter功能
         '''
         g = RunConfig.driver_g  # 拿到G软件
 
@@ -22,7 +22,7 @@ class TestGraphicReverse_select:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['l2', 'l3', 'l4']  # 自定义比对的层
+        layers = ['l1','l2','l3','l4']  # 自定义比对的层
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -39,20 +39,47 @@ class TestGraphicReverse_select:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        #1.没有选中物件时，使用反选功能
-        Selection.reverse_select(job_ep, step, 'l2')
-        Layers.delete_feature(job_ep, step,['l2']) #删除所选物件
+        #1.用筛选器选中整层物件，然后删除它
+        Selection.select_features_by_filter(job_ep, step, ['l1'])#选中整层物件
+        Layers.delete_feature(job_ep, step, ['l1'])  # 删除所选物件
 
-        #2.有选中的物件时，使用反选功能
-        Selection.select_feature_by_id(job_ep, step, 'l3', [0,697],)
-        Selection.reverse_select(job_ep, step, 'l3')
+        #2.用筛选器选中所有负极性物件，然后删除它
+        Selection.set_featuretype_filter(False,True, True, True, True, True, True)#选中所有负极性物件
+        Selection.select_features_by_filter(job_ep, step, ['l2'])
+        Layers.delete_feature(job_ep, step, ['l2'])  # 删除所选物件
+
+        #3.用筛选器选中所有正极性物件，然后删除它
+        Selection.set_featuretype_filter(True, False, True, True, True, True, True)  # 选中所有正极性物件
+        Selection.select_features_by_filter(job_ep, step, ['l3'])
         Layers.delete_feature(job_ep, step, ['l3'])  # 删除所选物件
 
-        #3.整层物件被选中时，使用反选功能
+      #4.手动添加文字、线、surface、pad、弧线,然后删除surface属性外的物件
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l4'], 'standard', '66666', 20 * 25400, 20 * 25400, 2 * 25400,
+                        3 * 10000000, 4 * 10000000, True, 0, attributes, 45)
 
-        Selection.select_features_by_filter(job_ep, step,['l4'])
-        Selection.reverse_select(job_ep, step, 'l4')
+        Layers.add_line(job_ep, step, ['l4'], 'r5', 10000000, 30000000, 30000000, 30000000,
+                        True, [{'.fiducial_name': '0'}, {'.area': ''}])
+
+        points_location = []
+        points_location.append([50 * 1000000, 25 * 1000000])
+        points_location.append([55 * 1000000, 25 * 1000000])
+        points_location.append([55 * 1000000, 36 * 1000000])
+        points_location.append([50 * 1000000, 36 * 1000000])
+        points_location.append([50 * 1000000, 25 * 1000000])
+        Layers.add_surface(job_ep, step, ['l4'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)#添加surface
+
+        Layers.add_pad(job_ep, step, ['l4'], "s100", 25400000, 25400000, True,
+                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)#添加pad
+
+        attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
+        Layers.add_arc(job_ep, step, ['l4'], 'r7.874', 40 * 1000000, 25 * 1000000,
+                       40 * 1000000, 31 * 1000000, 40 * 1000000, 28 * 1000000, True, True, attributes)#添加ARC
+        Selection.set_featuretype_filter(True, True, True, False, True, True, True)  # 用筛选器只留surface
+        Selection.select_features_by_filter(job_ep, step, ['l4'])# 用筛选器除了surface其他属性全选
         Layers.delete_feature(job_ep, step, ['l4'])  # 删除所选物件
+
 
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
