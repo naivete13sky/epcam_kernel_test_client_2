@@ -112,8 +112,7 @@ class MyInput(object):
                 print(pd_job_layer_info_cuurent_layer['layer_file_type'].values[0])
 
                 if pd_job_layer_info_cuurent_layer['status'].values[0] ==  'published' and pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] ==  'excellon2' or \
-                         pd_job_layer_info_cuurent_layer['status'].values[0] == 'published' and pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'excellon1':
-
+                        pd_job_layer_info_cuurent_layer['status'].values[0] ==  'published' and pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] ==  'excellon1':
                     print('need to set the para for drill excellon2'.center(190,'-'))
                     print('原来导入参数'.center(190,'-'))
                     print(result_each_file_identify)
@@ -125,7 +124,9 @@ class MyInput(object):
                     print('现在导入参数'.center(190, '-'))
                     print(result_each_file_identify)
 
-                if pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'gerber274X' or pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'else':
+                if pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'gerber274X' \
+                        or pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'else' \
+                        or pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'dxf':
                     if result_each_file_identify["format"] == "Gerber274x":
                         # print("hihihi1:", each_file)
                         print("我不是孔类型")
@@ -138,8 +139,16 @@ class MyInput(object):
                             offset2 = min_2
                             offsetFlag = True
                         result_each_file_identify['parameters']['offset_numbers'] = {'first': offset1, 'second': offset2}
-                        print('now para'.center(190, '-'))
+                    elif result_each_file_identify["format"] == "DXF":
+                        # print("hihihi1:", each_file)
+                        print("我是dxf呀")
+                        print('dxf para'.center(190, '-'))
                         print(result_each_file_identify)
+                        if pd_job_layer_info_cuurent_layer['status'].values[0] == 'published':
+                            result_each_file_identify['parameters']['units'] = pd_job_layer_info_cuurent_layer['units'].values[0]
+                        result_each_file_identify['parameters']['scale'] = 1  # 改参数在kernel1.9版本中添加
+                    print('now para'.center(190, '-'))
+                    print(result_each_file_identify)
 
             except Exception as e:
                 print(e)
