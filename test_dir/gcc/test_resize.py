@@ -1,20 +1,18 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input, GUI
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicEditResize:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Resize'))
     def testResize(self, job_id, g, prepare_test_job_clean_g):
-        '''
-        本用例测试Resize功能
-        '''
+
+        '''本用例测试Resize功能'''
+
         g = RunConfig.driver_g  # 拿到G软件
 
         data = {}  # 存放比对结果信息
@@ -22,7 +20,7 @@ class TestGraphicEditResize:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'  # 定义需要执行比对的step名
-        layers = ['top', 'l2', 'l3', 'l4']
+        layers = ['top', 'l2', 'l3', 'l4', 'comp']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -37,12 +35,12 @@ class TestGraphicEditResize:
 
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 选中物件涨
-        Selection.select_feature_by_id(job_ep, step, 'top', [2525])
-        Layers.resize_global(job_ep, step, ['top'], 0, 100 * 25400)
+        # 选中pad、line、surface物件涨大
+        Selection.select_feature_by_id(job_ep, step, 'top', [9, 36, 58, 1457, 2525])
+        Layers.resize_global(job_ep, step, ['top'], 0, 10 * 25400)
 
-        # 整层物件缩
-        Layers.resize_global(job_ep, step, ['l2'], 1, -80 * 25400)
+        # 整层物件缩小
+        Layers.resize_global(job_ep, step, ['l2'], 1, -5 * 25400)
 
         # 涨弧
         Selection.select_feature_by_id(job_ep, step, 'l3', [2360, 2376])
@@ -50,10 +48,20 @@ class TestGraphicEditResize:
 
         # 涨外框线
         Selection.select_feature_by_id(job_ep, step, 'l4', [910, 911, 912, 913, 914, 915, 916, 917, 918, 919, 920, 921,
-                                                            922, 923, 924, 925, 926, 927, 928, 929])  # 选中外框线
+                                                            922, 923, 924, 925, 926, 927, 928, 929])
         Layers.resize_polyline(job_ep, step, ['l4'], 30*25400, True)
 
-        # GUI.show_layer(job_ep, step, 'l4')
+        # 缩小特殊pad导致物件消失的BUG
+        Selection.set_include_symbol_filter(['i274x.macro138.d138_inc_1.5'])    # 第一个属性物件
+        Selection.select_features_by_filter(job_ep, step, ['comp'])
+        Layers.resize_global(job_ep, step, ['comp'], 0, -38100)
+        Selection.set_include_symbol_filter(['construct_inc_1.5'])    # 第二个属性物件
+        Selection.select_features_by_filter(job_ep, step, ['comp'])
+        Layers.resize_global(job_ep, step, ['comp'], 0, -38100)
+        Selection.reset_selection()     # 重置筛选
+        Selection.reset_select_filter()
+
+        # GUI.show_layer(job_ep, step, 'comp')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -65,7 +73,8 @@ class TestGraphicEditResize:
         job_ep_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_ep_remote_path)
-        # # 导入要比图的资料
+
+        # 导入要比图的资料
         g.import_odb_folder(job_g_remote_path)
         g.import_odb_folder(job_ep_remote_path)
 

@@ -1,20 +1,17 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
 
 class TestGraphicEditChangesymbols:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Change'))
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Change_symbols'))
     def testChange_symbols (self, job_id, g, prepare_test_job_clean_g):
-        '''
-        本用例测试Change_symbols功能
-        '''
+
+        '''本用例测试Change_symbols功能'''
+
         g = RunConfig.driver_g  # 拿到G软件
 
         data = {}  # 存放比对结果信息
@@ -42,14 +39,25 @@ class TestGraphicEditChangesymbols:
 
         # 圆pad变长方行pad
         Selection.select_feature_by_id(job_ep, step, 'top', [1951, 2525])
-        Layers.change_feature_symbols(job_ep, step, ['top'], 'rect200x500', False)
+        Layers.change_feature_symbols(job_ep, step, ['top'], 'rect50x100', False)
 
         # 多层多物件
         Selection.set_include_symbol_filter(['r196.85', 'r8'])
         Selection.select_features_by_filter(job_ep, step, ['l2', 'l3'])
-        Layers.change_feature_symbols(job_ep, step, ['l2', 'l3'], 'r150', False)
+        Layers.change_feature_symbols(job_ep, step, ['l2', 'l3'], 'r15', False)
+        Selection.reset_selection()
+        Selection.reset_select_filter()
 
-        GUI.show_layer(job_ep, step, 'top')
+        # 改变圆弧symbol大小
+        Selection.select_feature_by_id(job_ep, step, 'l4', [922, 926, 910, 914])
+        Layers.change_feature_symbols(job_ep, step, ['l4'], 'r10', False)
+
+        # 重置symbol角度
+        Layers.add_pad(job_ep, step, ['l5'], 's50', 2*2540000, -2*2540000, True, 9, [], 45)
+        Selection.select_feature_by_id(job_ep, step, 'l5', [1897])
+        Layers.change_feature_symbols(job_ep, step, ['l5'], 's100', True)
+
+        # GUI.show_layer(job_ep, step, 'l5')
 
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
@@ -62,6 +70,7 @@ class TestGraphicEditChangesymbols:
         job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_case_remote_path)
+
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_case_remote_path)

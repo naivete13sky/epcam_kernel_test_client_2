@@ -1,20 +1,18 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicEditContour2pad:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Contour2pad'))
     def testContour2pad (self, job_id, g, prepare_test_job_clean_g):
-        '''
-        本用例测试Contour2pad铜皮转pad功能
-        '''
+
+        '''本用例测试Contour2pad铜皮转pad功能'''
+
         g = RunConfig.driver_g  # 拿到G软件
 
         data = {}  # 存放比对结果信息
@@ -22,7 +20,7 @@ class TestGraphicEditContour2pad:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l3']
+        layers = ['top', 'bot', 'gtl', 'top+++', 'bot+++', 'gtl+++']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -52,6 +50,8 @@ class TestGraphicEditContour2pad:
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['top'])
         Layers.delete_feature(job_ep, step, ['top'])
+        Selection.reset_selection()     # 重置筛选
+        Selection.reset_select_filter()
 
         # 添加圆surface，全部转为pad之后删除pad
         Layers.add_round_surface(job_ep, step, ['bot'], True,
@@ -60,8 +60,14 @@ class TestGraphicEditContour2pad:
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['bot'])
         Layers.delete_feature(job_ep, step, ['bot'])
+        Selection.reset_selection()     # 重置筛选
+        Selection.reset_select_filter()
 
-        GUI.show_layer(job_ep, step, 'bot')
+        # 铜皮转pad导致物件变形的BUG
+        Selection.select_feature_by_id(job_ep, step, 'gtl', [70])
+        Layers.contour2pad(job_ep, step, ['gtl'], 1*25400, 5*25400, 99999*25400, '+++')
+
+        # GUI.show_layer(job_ep, step, 'gtl')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -73,6 +79,7 @@ class TestGraphicEditContour2pad:
         job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_case_remote_path)
+
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_case_remote_path)
