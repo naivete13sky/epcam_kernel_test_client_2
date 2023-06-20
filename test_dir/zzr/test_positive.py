@@ -17,13 +17,14 @@ class TestGraphicEditPositivePolarity:
         '''
         本用例测试极性反转功能
         '''
+
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
         vs_time_g = str(int(time.time()))  # 比对时间
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'net'  # 定义需要执行比对的step名
-        layers = ['l1', 'l2', 'l3','l4','l5']  # 定义需要比对的层
+        layers = ['l1', 'l6', 'l7', 'l8', 'l7+1', 'l8+1', 'l2', 'l3','l4','l4+1','l5','l1+1','l6+1','l2+1']  # 定义需要比对的层
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -37,26 +38,65 @@ class TestGraphicEditPositivePolarity:
         # --------------------------------下载yg转图tgz，并解压好，获取到文件夹名称，作为g料号名称-------------------------------
         # 原稿料号
         job_yg = DMS().get_file_from_dms_db(temp_path, job_id, field='file_odb_g', decompress='tgz')
+
         # 用悦谱CAM打开料号
         Input.open_job(job_case, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        #1.整层资料极性反向转换
+        #1.整层正负资料极性反向转换为负（Invert）
         Layers.change_polarity(job_case, step, ['l1'], 2, 1)
 
-        #2.整层资料正极性反转负极性,转正极性
+        #2整层负资料极性反向转换为正（Invert）
+        Layers.change_polarity(job_case, step, ['l6'], 2, 1)
+
+        #3单选正物件极性反转为负（Invert）
+        Selection.select_feature_by_id(job_case, step, 'l7', [2])
+        Layers.change_polarity(job_case, step, ['l7'], 2, 0)
+
+        # 4单选负物件极性反转为正（Invert）
+        Selection.select_feature_by_id(job_case, step, 'l8', [20])
+        Layers.change_polarity(job_case, step, ['l8'], 2, 0)
+
+        #5多选负物件极性反转为正（Invert）
+        Selection.select_feature_by_id(job_case, step, 'l7+1', [42,44,38])
+        Layers.change_polarity(job_case, step, ['l7+1'], 2, 0)
+
+        #6多选正物件极性反转为正（Invert）
+        Selection.select_feature_by_id(job_case, step, 'l8+1', [289,563,621,840,0])
+        Layers.change_polarity(job_case, step, ['l8+1'], 2, 0)
+
+        #7.整层资料正极性反转负极性,转正极性(Negative,Positive)
         Layers.change_polarity(job_case, step, ['l2'], 1, 1)
         Layers.change_polarity(job_case, step, ['l2'], 0, 1)
 
-        #3.多选物件极性反转
+        #8多选物件正极性反转
         Selection.select_feature_by_id(job_case, step, 'l3', [603,430])
         Layers.change_polarity(job_case, step, ['l3'], 2, 0)
-        #4.单选物件正极性反转负极性
+
+        #9单选物件正极性反转负极性
         Selection.select_feature_by_id(job_case, step, 'l4', [866])
         Layers.change_polarity(job_case, step, ['l4'], 1, 0)
 
-        #5.单选物件负极性反转正极性
+        #10单选物件负极性反转负极性
+        Selection.select_feature_by_id(job_case, step, 'l4+1', [39])
+        Layers.change_polarity(job_case, step, ['l4+1'], 1, 0)
+
+        #11.单选物件负极性反转正极性（Positive）
         Selection.select_feature_by_id(job_case, step, 'l5', [39])
         Layers.change_polarity(job_case, step, ['l5'], 0, 0)
+
+        #12多选物件负极性反转正极性（Positive）
+        Selection.select_feature_by_id(job_case, step, 'l1+1', [39,40,42,45])
+        Layers.change_polarity(job_case, step, ['l1+1'], 0, 0)
+
+        #13整层负极性反转正极性（Positive）
+        Selection.select_feature_by_id(job_case, step, 'l6+1', [39, 40, 42, 45])
+        Layers.change_polarity(job_case, step, ['l6+1'], 0, 1)
+
+        #14多选正极性反转正极性（Positive）
+        Selection.select_feature_by_id(job_case, step, 'l2+1', [496, 530, 838])
+        Layers.change_polarity(job_case, step, ['l2+1'], 0, 0)
+
+
 
         save_job(job_case, temp_ep_path)
         # GUI.show_layer(job_case,step,'l5')

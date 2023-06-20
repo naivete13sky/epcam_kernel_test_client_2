@@ -25,8 +25,8 @@ class TestGraphicEditChangeAttributes:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
-        # layers = ['l1', 'l2', 'l3','l4','l5']  # 定义需要比对的层
-        layers = ['drl1-10']
+        layers = ['drl1-10+1', 'l4+1', 'l5+1','l1+1','l6+1', 'l7+1', 'l7-neg']  # 定义需要比对的层
+        # layers = ['l2+1']
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
         temp_compressed_path = os.path.join(temp_path, 'compressed')
@@ -43,17 +43,74 @@ class TestGraphicEditChangeAttributes:
         # 用悦谱CAM打开料号
         Input.open_job(job_case, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        #1.物件改变属性,筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层
-        Layers.modify_attributes(job_case, step, ['drl1-10'], 1, [{".drill": "via"}])
-        Selection.set_attribute_filter(0, [{'.drill': 'via'}])
-        Selection.select_features_by_filter(job_case, step, ['drl1-10'])
+        #1.整层物件替换属性,筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层）,1为替换，pass
+        Layers.modify_attributes(job_case, step, ['drl1-10'], 1, [{".smd":""}])
+        Selection.set_attribute_filter(0, [{".smd":""}])          #设置筛选器属性
+        Selection.select_features_by_filter(job_case, step, ['drl1-10'])      #选中满足以上条件的物件
         Matrix.create_layer(job_case, 'drl1-10+1')
         Layers.copy_other(job_case, step, 'drl1-10', 'drl1-10+1', False, 0, 0, 0, 0, 0, 0, 0)
 
 
+        #2.单选物件替换属性，筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层），1为替换，pass
+        Selection.select_feature_by_id(job_case, step, 'l4', [623])
+        Layers.modify_attributes(job_case, step, ['l4'], 1, [{".fiducial_name": "trace"}])
+        Selection.set_attribute_filter(0, [{".fiducial_name": "trace"}])
+        Selection.select_features_by_filter(job_case, step, ['l4'])
+        Matrix.create_layer(job_case, 'l4+1')
+        Layers.copy_other(job_case, step, 'l4', 'l4+1', False, 0, 0, 0, 0, 0, 0, 0)
+        # GUI.show_layer(job_case, step, 'l4+1')
+
+
+        # 3.多选物件替换属性，筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层），1为替换，pass
+        Selection.select_feature_by_id(job_case, step, 'l5', [1351,1805,65,611])
+        Layers.modify_attributes(job_case, step, ['l5'], 1, [{".AOI_ALIGN": ""}])
+        Selection.set_attribute_filter(0, [{".AOI_ALIGN": ""}])
+        Selection.select_features_by_filter(job_case, step, ['l5'])
+        Matrix.create_layer(job_case, 'l5+1')
+        Layers.copy_other(job_case, step, 'l5', 'l5+1', False, 0, 0, 0, 0, 0, 0, 0)
+        # GUI.show_layer(job_case, step, 'l5+1')
+
+
+        # 4.单选物件添加属性，筛选器选中该属性的物件，copy复制到目标层,0为添加,pass
+        Selection.select_feature_by_id(job_case, step, 'l1', [2418])
+        Layers.modify_attributes(job_case, step, ['l1'], 0, [{".2nd_drill":""}])
+        Selection.set_attribute_filter(0,[{".2nd_drill":""},{'.pattern_fill':''}])
+        Selection.select_features_by_filter(job_case, step, ['l1'])
+        Matrix.create_layer(job_case, 'l1+1')
+        Layers.copy_other(job_case, step, 'l1', 'l1+1', False, 0, 0, 0, 0, 0, 0, 0)
+        # GUI.show_layer(job_case, step, 'l1+1')
+
+
+        # 5.多选物件添加属性，筛选器选中该属性的物件，copy复制到目标层,0为添加,pass
+        Selection.select_feature_by_id(job_case, step, 'l6', [624,622,288,333,366])
+        Layers.modify_attributes(job_case, step, ['l6'], 0, [{".copper_weight": "1"}])
+        Selection.set_attribute_filter(0, [{".copper_weight": "1"}])
+        Selection.select_features_by_filter(job_case, step, ['l6'])
+        Matrix.create_layer(job_case, 'l6+1')
+        Layers.copy_other(job_case, step, 'l6', 'l6+1', False, 0, 0, 0, 0, 0, 0, 0)
+        GUI.show_layer(job_case, step, 'l6+1')
+
+        # 6.整层物件添加属性，筛选器选中该属性的物件，copy复制到目标层,0为添加,pass
+        Layers.modify_attributes(job_case, step, ['l7'], 0, [{".generated_net_point": "gasket"}])
+        Selection.set_attribute_filter(0, [{".generated_net_point": "gasket"}])
+        Selection.select_features_by_filter(job_case, step, ['l7'])
+        Matrix.create_layer(job_case, 'l7+1')
+        Layers.copy_other(job_case, step, 'l7', 'l7+1', False, 0, 0, 0, 0, 0, 0, 0)
+        GUI.show_layer(job_case, step, 'l7+1')
+
+        # 7.整层负极性物件添加属性，筛选器选中该属性的物件，反转极性为正,0为添加,pass
+        Layers.modify_attributes(job_case, step, ['l7'], 0, [{".burry_drill": ""}])
+        Selection.set_attribute_filter(0, [{".burry_drill": ""}])
+        Selection.select_features_by_filter(job_case, step, ['l7-neg'])
+        Layers.change_polarity(job_case, step, ['l7-neg'], 0, 1)
+        Selection.reset_select_filter()
+        Selection.reset_selection()
+        GUI.show_layer(job_case, step, 'l7-neg')
+
+
 
         save_job(job_case, temp_ep_path)
-        GUI.show_layer(job_case,step,'drl1-10')
+        # GUI.show_layer(job_case,step,'drl1-10')
 
         # ----------------------------------------开始比图：G与EP---------------------------------------------------------
         print('比图--G转图VS悦谱转图'.center(190, '-'))
