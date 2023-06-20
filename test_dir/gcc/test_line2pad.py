@@ -1,13 +1,11 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input, GUI
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicEditLine2pad:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Line2pad'))
@@ -22,7 +20,7 @@ class TestGraphicEditLine2pad:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l3']
+        layers = ['top', 'l2', 'l3']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -40,19 +38,34 @@ class TestGraphicEditLine2pad:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 选取多条线转换然后删除所有pad
+        # 选取多条线段转pad
         Selection.select_feature_by_id(job_ep, step, 'top', [1946, 1947, 1949, 1950, 1958])
         Layers.line2pad(job_ep, step, ['top'])
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['top'])
         Layers.delete_feature(job_ep, step, ['top'])
+        Selection.reset_selection()  # 重置筛选
+        Selection.reset_select_filter()
 
-        # 整层转换然后删除所有pad
+        # 添加线段（起点与终点重合）后转pad
+        Layers.add_line(job_ep, step, ['l2'], 'r200', 2 * 2540000, -2 * 2540000, 2 * 2540000, -2 * 2540000, True, [])
+        Selection.select_feature_by_id(job_ep, step, 'l2', [907])
+        Layers.line2pad(job_ep, step, ['l2'])
+        Selection.set_featuretype_filter(True, False, False, False, False, False, True)
+        Selection.select_features_by_filter(job_ep, step, ['l2'])
+        Layers.delete_feature(job_ep, step, ['l2'])
+        Selection.reset_selection()  # 重置筛选
+        Selection.reset_select_filter()
+
+        # 整层转pad
         Layers.line2pad(job_ep, step, ['l3'])
+        Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['l3'])
         Layers.delete_feature(job_ep, step, ['l3'])
+        Selection.reset_selection()  # 重置筛选
+        Selection.reset_select_filter()
 
-        # GUI.show_layer(job_ep, step, 'top')
+        # GUI.show_layer(job_ep, step, 'l2')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -64,6 +77,7 @@ class TestGraphicEditLine2pad:
         job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_case_remote_path)
+
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_case_remote_path)

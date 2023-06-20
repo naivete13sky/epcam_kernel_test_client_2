@@ -1,13 +1,11 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input, GUI
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicEditBreak_features:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break'))
@@ -22,7 +20,7 @@ class TestGraphicEditBreak_features:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2']
+        layers = ['top', 'l2', 'l3']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -51,7 +49,7 @@ class TestGraphicEditBreak_features:
         Selection.select_feature_by_id(job_ep, step, 'top', [2526])
         Layers.delete_feature(job_ep, step, ['top'])   # 删除打散之后的某个物件（用以证明物件被打散）
 
-        # 整层打散
+        # 添加文字然后整层打散
         attributes = [{'.text_88': ''}]
         Layers.add_text(job_ep, step, ['l2'], 'standard', 'abc', 200*25400, 200*25400, 20 * 25400,
                         1 * 25400000, 2 * 25400000, True, 0, attributes, 45)
@@ -61,7 +59,14 @@ class TestGraphicEditBreak_features:
         Selection.select_feature_by_id(job_ep, step, 'l2', [907, 928])
         Layers.delete_feature(job_ep, step, ['l2'])   # 删除打散之后的某个物件（用以证明物件被打散）
 
-        # GUI.show_layer(job_ep, step, 'top')
+        # 添加usersymbol打散拆分
+        Layers.add_pad(job_ep, step, ['l3'], 'i274x.macro11', 2 * 2540000, -2 * 2540000, True, 0, [], 0)
+        Layers.add_pad(job_ep, step, ['l3'], 'i274x.macro14', 3 * 2540000, -2 * 2540000, True, 0, [], 0)
+        Layers.break_features(job_ep, step, ['l3'], 1)
+        Selection.select_feature_by_id(job_ep, step, 'l3', [2398, 2445])
+        Layers.delete_feature(job_ep, step, ['l3'])  # 删除打散之后的某个物件（用以证明物件被打散）
+
+        # GUI.show_layer(job_ep, step, 'l3')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -73,6 +78,7 @@ class TestGraphicEditBreak_features:
         job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_case_remote_path)
+
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_case_remote_path)
