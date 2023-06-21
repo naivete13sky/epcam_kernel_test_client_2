@@ -1,13 +1,10 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input, GUI
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
 
 class TestGraphicEditUse_pattern_fill_contours:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_pattern'))
@@ -22,7 +19,7 @@ class TestGraphicEditUse_pattern_fill_contours:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6']
+        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'bot']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -42,31 +39,40 @@ class TestGraphicEditUse_pattern_fill_contours:
 
         # 指定符号填充铜皮（拆分删除框外元素，且奇数行偏移）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'top', [27])
-        Layers.use_pattern_fill_contours(job_ep, step, 'top', 'bfr6', 10*25400, 10*25400,
-                                         True, False, False, False, 0*25400, False, 5*25400, 0*25400)
+        Layers.use_pattern_fill_contours(job_ep, step, 'top', 'bfr8', 10*25400, 10*25400,
+                                         True, False, False, False, 1*25400, False, 5*25400, 0*25400)
 
         # 指定符号填充铜皮（切除位于边框上的基本元素，创建轮廓化的铜面，且偶数行偏移）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'l2', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'bfr6', 10*25400, 10*25400,
-                                         False, True, False, False, 0*25400, False, 0*25400, 5*25400)
+        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'bfr8', 10*25400, 10*25400,
+                                         False, True, False, False, 1*25400, False, 0*25400, 5*25400)
 
         # 指定符号填充铜皮（将原点设置为基准点）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l3', 'bfr6', 10*25400, 10*25400,
-                                         False, False, True, False, 0, False, 0*25400, 0*25400)
+        Layers.use_pattern_fill_contours(job_ep, step, 'l3', 'bfr8', 10*25400, 10*25400,
+                                         False, False, True, False, 1*25400, False, 0*25400, 0*25400)
 
         # 指定符号填充铜皮（铜皮轮廓化）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'l4', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l4', 'bfr6', 10*25400, 10*25400,
+        Layers.use_pattern_fill_contours(job_ep, step, 'l4', 'di10x10', 10*25400, 10*25400,
                                          False, False, False, True, 2*25400, False, 0*25400, 0*25400)
 
         # 指定符号填充铜皮（铜皮轮廓化并转换轮廓线极性）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'l5', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l5', 'bfr6', 10*25400, 10*25400,
+        Layers.use_pattern_fill_contours(job_ep, step, 'l5', 'di10x10', 10*25400, 10*25400,
                                          False, False, False, True, 2*25400, True, 0*25400, 0*25400)
+        Selection.set_featuretype_filter(False, True, False, False, False, True, False)
+        Selection.select_features_by_filter(job_ep, step, ['l5'])   # 负极性外框线不可见，再次转换极性
+        Layers.change_polarity(job_ep, step, ['l5'], 2, 0)
+        Selection.reset_selection()     # 重置筛选
+        Selection.reset_select_filter()
 
+        # 指定符号填充负极性铜皮（切除位于边框上的基本元素，创建轮廓化的铜面）❤❤❤
+        Selection.select_feature_by_id(job_ep, step, 'bot', [34, 38])
+        Layers.use_pattern_fill_contours(job_ep, step, 'bot', 'di10x10', 10*25400, 10*25400,
+                                         False, True, False, True, 2*25400, False, 0*25400, 0*25400)
 
-        GUI.show_layer(job_ep, step, 'l2')
+        # GUI.show_layer(job_ep, step, 'bot')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -78,6 +84,7 @@ class TestGraphicEditUse_pattern_fill_contours:
         job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_case_remote_path)
+
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_case_remote_path)
