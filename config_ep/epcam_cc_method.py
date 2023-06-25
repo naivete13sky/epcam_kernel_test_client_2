@@ -19,8 +19,8 @@ from config_ep.epcam import epcam
 from cc.cc_method import StringMehtod,DMS,Print
 
 Configuration.init(RunConfig.ep_cam_path)
-Configuration.set_sys_attr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\sysattr'))
-Configuration.set_user_attr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\userattr'))
+Configuration.set_sysattr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\sysattr'))
+Configuration.set_userattr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\userattr'))
 
 def f1():
     pass
@@ -303,9 +303,12 @@ class MyOutput(object):
             else:
                 Print.print_with_delimiter("我是drill啊")
                 Matrix.change_matrix_row(self.job, drill_layer, 'board', 'drill', drill_layer)
-                drill_info = Output.save_drill(self.job, step, drill_layer, drill_out_path, isMetric=False,
-                                               number_format_l=self.para['numberFormatL'], number_format_r=self.para['numberFormatR'], zeroes=2, unit=0, tool_unit=1,
-                                               x_scale=1, y_scale=1, x_anchor=0, y_anchor=0)
+                drill_info = Output.save_excellon2(self.job, step, drill_layer, drill_out_path,
+                                                   number_format_l=self.para['numberFormatL'], number_format_r=self.para['numberFormatR'], zeroes=2, unit=0,
+                                                   tool_unit=1, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0)
+                # drill_info = Output.save_drill(self.job, step, drill_layer, drill_out_path, isMetric=False,
+                #                                number_format_l=self.para['numberFormatL'], number_format_r=self.para['numberFormatR'], zeroes=2, unit=0, tool_unit=1,
+                #                                x_scale=1, y_scale=1, x_anchor=0, y_anchor=0)
                 # drill_info = BASE.drill2file(self.job, step, drill_layer, drill_out_path, isMetric=False,
                 #                              number_format_l=2, number_format_r=4,
                 #                              zeroes=2, unit=0, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,

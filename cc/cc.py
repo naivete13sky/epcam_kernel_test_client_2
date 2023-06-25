@@ -36,8 +36,8 @@ def pp():
 def open_job():
     from epkernel import Configuration
     Configuration.init(RunConfig.ep_cam_path)
-    Configuration.set_sys_attr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\sysattr'))
-    Configuration.set_user_attr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\userattr'))
+    Configuration.set_sysattr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\sysattr'))
+    Configuration.set_userattr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\userattr'))
 
     job = 'nca11611_g2'
     job_path = r'C:\cc\share\temp_3068_1670480974\g2'
@@ -54,8 +54,8 @@ def input_gerber274x():
     print("abc")
     from epkernel import Configuration
     Configuration.init(RunConfig.ep_cam_path)
-    Configuration.set_sys_attr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\sysattr'))
-    Configuration.set_user_attr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\userattr'))
+    Configuration.set_sysattr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\sysattr'))
+    Configuration.set_userattr_path(os.path.join(RunConfig.ep_cam_path, r'config\attr_def\userattr'))
 
     job = 'test'
     step = 'orig'

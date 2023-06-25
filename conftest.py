@@ -147,8 +147,8 @@ def epcam():
     if RunConfig.driver_type == "epcam":
         from epkernel import Configuration
         Configuration.init(RunConfig.ep_cam_path)
-        Configuration.set_sys_attr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\sysattr'))
-        Configuration.set_user_attr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\userattr'))
+        Configuration.set_sysattr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\sysattr'))
+        Configuration.set_userattr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\userattr'))
 
         driver_epcam = None
 
