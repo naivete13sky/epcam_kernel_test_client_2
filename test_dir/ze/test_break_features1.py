@@ -1,11 +1,13 @@
-import pytest, os, time
+import pytest, os, time, json, shutil, sys
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print
-from epkernel import Input, GUI
-from epkernel.Action import Selection
+from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
+from config_ep.epcam_cc_method import MyInput, MyOutput
+from config_g.g_cc_method import GInput
+from epkernel import Input, GUI, BASE
+from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-
+from config_g.g_cc_method import G
 
 class TestGraphicEditBreak_features:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break'))
@@ -20,7 +22,7 @@ class TestGraphicEditBreak_features:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2', 'l3']
+        layers = ['smt', 'l1','l2','l3','l4','l5']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -38,35 +40,70 @@ class TestGraphicEditBreak_features:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 先添加文字然后再打散
-        attributes = [{'.text_88': ''}]
-        Layers.add_text(job_ep, step, ['top'], 'standard', '666', 200*25400, 200*25400, 20 * 25400,
-                        1 * 25400000, 2 * 25400000, True, 0, attributes, 45)
-        Layers.add_text(job_ep, step, ['top'], 'standard', '999', 200*25400, 200*25400, 20 * 25400,
-                        1 * 25400000, -1 * 25400000, True, 0, attributes, 0)
-        Selection.select_feature_by_id(job_ep, step, 'top', [2526])
-        Layers.break_features(job_ep, step, ['top'], 0)
-        Selection.select_feature_by_id(job_ep, step, 'top', [2526])
-        Layers.delete_feature(job_ep, step, ['top'])   # 删除打散之后的某个物件（用以证明物件被打散）
 
-        # 添加文字然后整层打散
+        # 1.先添加多个文字，然后选择其中一个打散
         attributes = [{'.text_88': ''}]
-        Layers.add_text(job_ep, step, ['l2'], 'standard', 'abc', 200*25400, 200*25400, 20 * 25400,
+        Layers.add_text(job_ep, step, ['l1'], 'standard', '666', 200*25400, 200*25400, 20 * 25400,
                         1 * 25400000, 2 * 25400000, True, 0, attributes, 45)
-        Layers.add_text(job_ep, step, ['l2'], 'standard', 'ABC', 200*25400, 200*25400, 20 * 25400,
+        Layers.add_text(job_ep, step, ['l1'], 'standard', '999', 200*25400, 200*25400, 20 * 25400,
+                        1 * 25400000, -1 * 25400000, True, 0, attributes, 0)
+        Selection.select_feature_by_id(job_ep, step, 'l1', [2526])
+        Layers.break_features(job_ep, step, ['l1'], 0)#打散文字666
+        Selection.select_feature_by_id(job_ep, step, 'l1', [2539,2553])#选中已打散的物件和未打散的物件
+        Layers.delete_feature(job_ep, step, ['l1'])   # 已打散的文字只删除部分，未打散的文字被整个删除
+
+
+        #2.整层打散
+        attributes = [{'.text_88': ''}]
+        Layers.add_text(job_ep, step, ['l2'], 'standard', '123', 200*25400, 200*25400, 20 * 25400,
+                        1 * 25400000, 2 * 25400000, True, 0, attributes, 45)
+        Layers.add_text(job_ep, step, ['l2'], 'standard', '456', 200*25400, 200*25400, 20 * 25400,
                         1 * 25400000, -1 * 25400000, True, 0, attributes, 0)
         Layers.break_features(job_ep, step, ['l2'], 1)
-        Selection.select_feature_by_id(job_ep, step, 'l2', [907, 928])
+        Selection.select_feature_by_id(job_ep, step, 'l2', [908,927])
         Layers.delete_feature(job_ep, step, ['l2'])   # 删除打散之后的某个物件（用以证明物件被打散）
 
-        # 添加usersymbol打散拆分
-        Layers.add_pad(job_ep, step, ['l3'], 'i274x.macro11', 2 * 2540000, -2 * 2540000, True, 0, [], 0)
-        Layers.add_pad(job_ep, step, ['l3'], 'i274x.macro14', 3 * 2540000, -2 * 2540000, True, 0, [], 0)
-        Layers.break_features(job_ep, step, ['l3'], 1)
-        Selection.select_feature_by_id(job_ep, step, 'l3', [2398, 2445])
-        Layers.delete_feature(job_ep, step, ['l3'])  # 删除打散之后的某个物件（用以证明物件被打散）
+        #3.多层打散
+        attributes = [{'.text_88': ''}]
+        Layers.add_text(job_ep, step, ['l3'], 'standard', '333', 200 * 25400, 200 * 25400, 20 * 25400,
+                        1 * 25400000, 2 * 25400000, True, 0, attributes, 45)
+        Layers.add_text(job_ep, step, ['l4'], 'standard', '234', 200 * 25400, 200 * 25400, 20 * 25400,
+                        1 * 25400000, -1 * 25400000, True, 0, attributes, 0)
+        Layers.break_features(job_ep, step, ['l3','l4'], 1)
+        Selection.select_feature_by_id(job_ep, step, 'l3', [2380])
+        Selection.select_feature_by_id(job_ep, step, 'l4', [937])
+        Layers.delete_feature(job_ep, step, ['l3','l4'])  # 删除多层中打散之后的某个物件（用以证明物件被打散）
 
-        # GUI.show_layer(job_ep, step, 'l3')
+        #4.打散特殊焊盘
+        Layers.add_pad(job_ep, step, ['smt'], "macro11", 25400000, 25400000, True,
+                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}],90)#添加一个特殊焊盘（macro11），镜像并翻转90度
+        Selection.select_feature_by_id(job_ep, step, 'smt', [801])
+        Layers.break_features(job_ep, step, ['smt'], 0)  # 选中并打散该垫盘
+        Selection.select_feature_by_id(job_ep, step, 'smt', [814]) #选中已打散焊盘的部分物件
+        Layers.delete_feature(job_ep, step, ['smt'])  #打散后的焊盘的部分物件被删除
+
+
+        #5.验证不能打散的物件类型（反用例）
+        Layers.add_line(job_ep, step, ['l5'], 'r5', 10000000, 30000000, 30000000, 30000000,
+                        True, [{'.fiducial_name': '0'}, {'.area': ''}])#增加线
+        points_location = []
+        points_location.append([50 * 1000000, 25 * 1000000])
+        points_location.append([55 * 1000000, 25 * 1000000])
+        points_location.append([55 * 1000000, 36 * 1000000])
+        points_location.append([50 * 1000000, 36 * 1000000])
+        points_location.append([50 * 1000000, 25 * 1000000])
+        Layers.add_surface(job_ep, step, ['l5'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)#添加面
+        Layers.add_pad(job_ep, step, ['l5'], "s100", 25400000, 25400000, True,
+                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)#添加普通焊盘
+        attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
+        Layers.add_arc(job_ep, step, ['l5'], 'r7.874', 40 * 1000000, 25 * 1000000,
+               40 * 1000000, 31 * 1000000, 40 * 1000000, 28 * 1000000, True, True, attributes)#添加弧
+        Layers.break_features(job_ep, step, ['l5'], 1)#打散整层物件
+        Selection.select_feature_by_id(job_ep, step, 'l5', [1897, 1898,1899,1900])#选中添加的线、面、pad、弧
+        Layers.delete_feature(job_ep, step, ['l5'])  # 全部被删除证明没有被打散
+        #GUI.show_layer(job_ep, step, 'l5')
+
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -78,7 +115,6 @@ class TestGraphicEditBreak_features:
         job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_case_remote_path)
-
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_case_remote_path)

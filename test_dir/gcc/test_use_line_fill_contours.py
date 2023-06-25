@@ -1,13 +1,11 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input, GUI
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicEditUse_line_fill_contours:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_line'))
@@ -22,7 +20,7 @@ class TestGraphicEditUse_line_fill_contours:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2', 'l3']
+        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -40,22 +38,36 @@ class TestGraphicEditUse_line_fill_contours:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 选中铜皮填充（角度不偏转）❤❤❤
+        # 选中铜皮填充（线宽5，间距10）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'top', [27])
-        Layers.use_line_fill_contours(job_ep, step, 'top', 10*25400, 10*25400, 4*25400, 0*25400, 0*25400, 0)
+        Layers.use_line_fill_contours(job_ep, step, 'top', 10*25400, 10*25400, 5*25400, 0*25400, 0*25400, 0)
 
-        # 整合正负极性铜皮填充（X、Y偏置，角度偏转45°）
+        # 整合正负极性铜皮填充（线宽5，间距10，X、Y偏置，角度偏转45°）
         Selection.set_featuretype_filter(True, True, False, True, False, False, False)
         Selection.select_features_by_filter(job_ep, step, ['l2'])
         Layers.contourize(job_ep, step, ['l2'], 6350, True, 3*25400, 1)
         Selection.select_feature_by_id(job_ep, step, 'l2', [0])
-        Layers.use_line_fill_contours(job_ep, step, 'l2', 10*25400, 10*25400, 4*25400, 20*25400, 20*25400, 45)
+        Layers.use_line_fill_contours(job_ep, step, 'l2', 10*25400, 10*25400, 5*25400, 20*25400, 20*25400, 45)
+        Selection.reset_selection()     # 重置筛选
+        Selection.reset_select_filter()
 
-        # X、Y不偏置，角度偏转45°
+        # 选中物件填充（线宽5，角度偏转45°）
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
-        Layers.use_line_fill_contours(job_ep, step, 'l3', 10*25400, 10*25400, 4*25400, 0*25400, 0*25400, 45)
+        Layers.use_line_fill_contours(job_ep, step, 'l3', 10*25400, 10*25400, 5*25400, 0*25400, 0*25400, 45)
 
-        GUI.show_layer(job_ep, step, 'top')
+        # 选中负极性铜皮填充（线宽5，X、Y偏置，角度偏转45°）
+        Selection.select_feature_by_id(job_ep, step, 'l4', [237])
+        Layers.use_line_fill_contours(job_ep, step, 'l4', 10*25400, 10*25400, 5*25400, 0*25400, 0*25400, 45)
+
+        # 选中铜皮填充（线宽10）
+        Selection.select_feature_by_id(job_ep, step, 'l5', [1])
+        Layers.use_line_fill_contours(job_ep, step, 'l5', 10*25400, 10*25400, 10*25400, 0*25400, 0*25400, 45)
+
+        # 选中铜皮填充（线宽10，间距1）
+        Selection.select_feature_by_id(job_ep, step, 'l6', [0, 1, 2])
+        Layers.use_line_fill_contours(job_ep, step, 'l6', 1*25400, 1*25400, 10*25400, 0*25400, 0*25400, 45)
+
+        # GUI.show_layer(job_ep, step, 'l6')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -67,6 +79,7 @@ class TestGraphicEditUse_line_fill_contours:
         job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_case_remote_path)
+
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_case_remote_path)

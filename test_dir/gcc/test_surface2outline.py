@@ -1,13 +1,11 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input, GUI
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicEditSurface2outline:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Surface2outline'))
@@ -22,7 +20,7 @@ class TestGraphicEditSurface2outline:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2']
+        layers = ['top', 'l2', 'l3', 'l4']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -40,14 +38,20 @@ class TestGraphicEditSurface2outline:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 单层铜皮转外框线
+        # 单层铜皮转外框线，线宽为0
         Selection.select_feature_by_id(job_ep, step, 'top', [27])
-        Layers.surface2outline(job_ep, step, ['top'], 5*25400)
+        Layers.surface2outline(job_ep, step, ['top'], 0)
 
-        # 多层铜皮转外框线
+        # 多层铜皮转外框线，线宽为2
         Selection.set_featuretype_filter(True, False, False, True, False, False, False)
         Selection.select_features_by_filter(job_ep, step, ['l2', 'l3'])
-        Layers.surface2outline(job_ep, step, ['l2', 'l3'], 5*25400)
+        Layers.surface2outline(job_ep, step, ['l2', 'l3'], 2*25400)
+        Selection.reset_selection()     # 重置筛选
+        Selection.reset_select_filter()
+
+        # 负极性铜皮转外框线，线宽为20
+        Selection.select_feature_by_id(job_ep, step, 'l4', [237])
+        Layers.surface2outline(job_ep, step, ['l4'], 10*25400)
 
         # GUI.show_layer(job_ep, step, 'top')
         save_job(job_ep, temp_ep_path)
@@ -61,6 +65,7 @@ class TestGraphicEditSurface2outline:
         job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_case_remote_path)
+
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_case_remote_path)

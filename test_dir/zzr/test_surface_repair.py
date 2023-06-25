@@ -8,14 +8,15 @@ from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
 from config_g.g_cc_method import G
+from epkernel.Edition import Matrix
 
-# @pytest.mark.Polarity
-class TestGraphicEditPositivePolarity:
-    # @pytest.mark.PositivePolarity
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Polarity'))
-    def testPolarity(self, job_id, g, prepare_test_job_clean_g):
+# @pytest.mark.Remove Copper Wire
+class TestGraphicEditRemove_Copper_Wire:
+    # @pytest.mark.Feature index
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Surface_repair'))
+    def testRemove_Copper_Wire(self, job_id, prepare_test_job_clean_g):
         '''
-        本用例测试极性反转功能
+        本用例测试改变物件叠放顺序（编号）
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -23,9 +24,9 @@ class TestGraphicEditPositivePolarity:
         vs_time_g = str(int(time.time()))  # 比对时间
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
-        step = 'net'  # 定义需要执行比对的step名
-        layers = ['l1', 'l6', 'l7', 'l8', 'l7+1', 'l8+1', 'l2', 'l3','l4','l4+1','l5','l1+1','l6+1','l2+1']  # 定义需要比对的层
-
+        step = 'prepare'  # 定义需要执行比对的step名
+        layers = ['l1','l2','l3']  # 定义需要比对的层
+        # layers = ['drl1-10']
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
         temp_compressed_path = os.path.join(temp_path, 'compressed')
@@ -42,64 +43,17 @@ class TestGraphicEditPositivePolarity:
         # 用悦谱CAM打开料号
         Input.open_job(job_case, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        #1.整层正负资料极性反向转换为负（Invert）
-        Layers.change_polarity(job_case, step, ['l1'], 2, 1)
+        # 1.整层surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为False
+        Layers.surface_repair(job_case, step, ['l1'], 1, 127000, 0, False)
 
-        #2整层负资料极性反向转换为正（Invert）
-        Layers.change_polarity(job_case, step, ['l6'], 2, 1)
+        # 2.整层surface去尖角，模式：1-remove tip
+        Layers.surface_repair(job_case, step, ['l2'], 1, 152400, 1, False)
 
-        #3单选正物件极性反转为负（Invert）
-        Selection.select_feature_by_id(job_case, step, 'l7', [2])
-        Layers.change_polarity(job_case, step, ['l7'], 2, 0)
-
-        # 4单选负物件极性反转为正（Invert）
-        Selection.select_feature_by_id(job_case, step, 'l8', [20])
-        Layers.change_polarity(job_case, step, ['l8'], 2, 0)
-
-        #5多选负物件极性反转为正（Invert）
-        Selection.select_feature_by_id(job_case, step, 'l7+1', [42,44,38])
-        Layers.change_polarity(job_case, step, ['l7+1'], 2, 0)
-
-        #6多选正物件极性反转为正（Invert）
-        Selection.select_feature_by_id(job_case, step, 'l8+1', [289,563,621,840,0])
-        Layers.change_polarity(job_case, step, ['l8+1'], 2, 0)
-
-        #7.整层资料正极性反转负极性,转正极性(Negative,Positive)
-        Layers.change_polarity(job_case, step, ['l2'], 1, 1)
-        Layers.change_polarity(job_case, step, ['l2'], 0, 1)
-
-        #8多选物件正极性反转
-        Selection.select_feature_by_id(job_case, step, 'l3', [603,430])
-        Layers.change_polarity(job_case, step, ['l3'], 2, 0)
-
-        #9单选物件正极性反转负极性
-        Selection.select_feature_by_id(job_case, step, 'l4', [866])
-        Layers.change_polarity(job_case, step, ['l4'], 1, 0)
-
-        #10单选物件负极性反转负极性
-        Selection.select_feature_by_id(job_case, step, 'l4+1', [39])
-        Layers.change_polarity(job_case, step, ['l4+1'], 1, 0)
-
-        #11.单选物件负极性反转正极性（Positive）
-        Selection.select_feature_by_id(job_case, step, 'l5', [39])
-        Layers.change_polarity(job_case, step, ['l5'], 0, 0)
-
-        #12多选物件负极性反转正极性（Positive）
-        Selection.select_feature_by_id(job_case, step, 'l1+1', [39,40,42,45])
-        Layers.change_polarity(job_case, step, ['l1+1'], 0, 0)
-
-        #13整层负极性反转正极性（Positive）
-        Selection.select_feature_by_id(job_case, step, 'l6+1', [39, 40, 42, 45])
-        Layers.change_polarity(job_case, step, ['l6+1'], 0, 1)
-
-        #14多选正极性反转正极性（Positive）
-        Selection.select_feature_by_id(job_case, step, 'l2+1', [496, 530, 838])
-        Layers.change_polarity(job_case, step, ['l2+1'], 0, 0)
-
-
+        # # 3.整层surface去尖角，模式：0-Simplify(简易栅格化),圆角化处理为ture，UI和API结果不一致。
+        # Layers.surface_repair(job_case, step, ['l3'], 1, 127000, 1, True)
 
         save_job(job_case, temp_ep_path)
-        # GUI.show_layer(job_case,step,'l5')
+        GUI.show_layer(job_case,step,'l1')
 
         # ----------------------------------------开始比图：G与EP---------------------------------------------------------
         print('比图--G转图VS悦谱转图'.center(190, '-'))
