@@ -11,7 +11,10 @@ class TestGraphicEditResize:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Resize'))
     def testResize(self, job_id, g, prepare_test_job_clean_g):
 
-        '''本用例测试Resize功能'''
+        '''
+        本用例测试Resize功能
+        ID: 11941
+        '''
 
         g = RunConfig.driver_g  # 拿到G软件
 

@@ -10,9 +10,12 @@ from epkernel.Output import save_job
 class TestGraphicEditSurface2outline:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Surface2outline'))
     def testSurface2outline (self, job_id, g, prepare_test_job_clean_g):
+
         '''
         本用例测试Surface2outline功能
+        ID: 17806
         '''
+
         g = RunConfig.driver_g  # 拿到G软件
 
         data = {}  # 存放比对结果信息

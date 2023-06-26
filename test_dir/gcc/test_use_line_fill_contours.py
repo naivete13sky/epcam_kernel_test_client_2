@@ -10,9 +10,12 @@ from epkernel.Output import save_job
 class TestGraphicEditUse_line_fill_contours:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_line'))
     def testUse_line_fill_contours (self, job_id, g, prepare_test_job_clean_g):
+
         '''
         本用例测试Use_line_fill_contours填充功能
+        ID: 17867
         '''
+
         g = RunConfig.driver_g  # 拿到G软件
 
         data = {}  # 存放比对结果信息
