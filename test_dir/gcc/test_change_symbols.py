@@ -76,7 +76,7 @@ class TestGraphicEditChangesymbols:
         预期：图形未发生变更，和执行前一样
         执行场景数：3个
         '''
-        layers = ['top_all','top_line_pad_arc','top_surface_text']#top层中五种物件都存在，l2层中存在line、pad、arc三种物件，l3层中存在surface、text两种物件
+        layers = ['top_all','top_line_pad_arc','top_surface_text']#top_all层中五种物件都存在，top_line_pad_arc层中存在line、pad、arc三种物件，top_surface_text层中存在surface、text两种物件
         for layer in layers:
             print("=layer=:",layer)
             Layers.change_feature_symbols(job_ep, step, [layer],'r220',False)
