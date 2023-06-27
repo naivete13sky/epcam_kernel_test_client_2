@@ -13,7 +13,7 @@ class TestGraphicReverse_select:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Reverse_select'))
     def testReverse_select(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Reverse_select功能
+        本用例测试Reverse_select功能（ID：12811）
         '''
         g = RunConfig.driver_g  # 拿到G软件
 

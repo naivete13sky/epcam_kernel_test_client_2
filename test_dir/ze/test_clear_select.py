@@ -13,7 +13,7 @@ class TestGraphicClear_select:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Clear_select'))
     def testClear_select(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Clear_select功能
+        本用例测试Clear_select功能（ID：13935）
         '''
         g = RunConfig.driver_g  # 拿到G软件
 
