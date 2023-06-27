@@ -23,7 +23,7 @@ class TestGraphicEditResize:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'  # 定义需要执行比对的step名
-        layers = ['top', 'l2', 'l3', 'l4', 'comp']
+        layers = ['top', 'l2', 'l3', 'l4', 'comp', 'symbol_type']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -54,7 +54,7 @@ class TestGraphicEditResize:
                                                             922, 923, 924, 925, 926, 927, 928, 929])
         Layers.resize_polyline(job_ep, step, ['l4'], 30*25400, True)
 
-        # 缩小特殊pad导致物件消失的BUG
+        # 缩小特殊pad(user symbol)导致物件消失的BUG
         Selection.set_include_symbol_filter(['i274x.macro138.d138_inc_1.5'])    # 第一个属性物件
         Selection.select_features_by_filter(job_ep, step, ['comp'])
         Layers.resize_global(job_ep, step, ['comp'], 0, -38100)
@@ -64,7 +64,10 @@ class TestGraphicEditResize:
         Selection.reset_selection()     # 重置筛选
         Selection.reset_select_filter()
 
-        # GUI.show_layer(job_ep, step, 'comp')
+        # 涨大多种symbol
+        Layers.resize_global(job_ep, step, ['symbol_type'], 1, 20 * 25400)
+
+        # GUI.show_layer(job_ep, step, 'symbol_type')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
