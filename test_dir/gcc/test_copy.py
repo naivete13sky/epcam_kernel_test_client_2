@@ -12,9 +12,12 @@ from config_g.g_cc_method import G
 class TestGraphicEditCopy:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Copy'))
     def testCopy(self, job_id, g, prepare_test_job_clean_g):
+
         '''
         本用例测试Copy功能
+        ID: 11839
         '''
+
         g = RunConfig.driver_g  # 拿到G软件
 
         data = {}  # 存放比对结果信息

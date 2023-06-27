@@ -10,9 +10,12 @@ from epkernel.Output import save_job
 class TestGraphicEditContourize:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Contourize'))
     def testContourize(self, job_id, g, prepare_test_job_clean_g):
+
         '''
         本用例测试Contourize整合铜皮功能
+        ID: 17805
         '''
+
         g = RunConfig.driver_g  # 拿到G软件
 
         data = {}  # 存放比对结果信息
