@@ -47,53 +47,30 @@ class TestPretreatment:
 
         if (job_id == 11633):
             """-----------修改层别名称，定义层别属性，重新排序-----------"""
+            new_attribute = {
+                        '0114-1240-1-10.drl': ['board','drill', 'drl1-10', 1, 18],
+                        'bottom.art': ['board','signal','bot', 1, 15],
+                        'bot_mask.art': ['board','solder_mask','smb', 1, 15],
+                        'bot_past.art': ['board','solder_paste','spb', 1, 15],
+                        'bot_silk.art': ['board', 'silk_screen', 'ssb', 1, 14],
+                        'drill.art': ['misc', 'signal', 'map', 1, 18],
+                        'top.art': ['board', 'signal', 'top', 9, 1],
+                        'top_mask.art': ['board', 'solder_mask', 'smt', 14, 1],
+                        'top_past.art': ['board', 'solder_paste', 'spt', 15, 1],
+                        'top_silk.art': ['board', 'silk_screen', 'sst', 18, 2],
+                        'layer2.art': ['board', 'signal', 'l2', 5, 5],
+                        'layer3.art': ['board', 'signal', 'l3', 6, 6],
+                        'layer4.art': ['board', 'signal', 'l4', 7, 7],
+                        'layer5.art': ['board', 'signal', 'l5', 8, 8],
+                        'layer6.art': ['board', 'signal', 'l6', 9, 9],
+                        'layer7.art': ['board', 'signal', 'l7', 10, 10],
+                        'layer8.art': ['board', 'signal', 'l8', 11, 11],
+                        'layer9.art': ['board', 'signal', 'l9', 12, 12]
+                        }
             for layer_name in all_layers_list_job_ep:
-                if layer_name == '0114-1240-1-10.drl':
-                    Matrix.change_matrix_row(job_ep, '0114-1240-1-10.drl', 'board', 'drill', 'drl1-10', True)
-                    Matrix.move_layer(job_ep, 1, 18)
-                elif layer_name == 'bottom.art':
-                    Matrix.change_matrix_row(job_ep,'bottom.art','board','signal','bot',True)
-                    Matrix.move_layer(job_ep, 1, 15)
-                elif layer_name == 'bot_mask.art':
-                    Matrix.change_matrix_row(job_ep,'bot_mask.art','board','solder_mask','smb',True)
-                    Matrix.move_layer(job_ep, 1, 15)
-                elif layer_name == 'bot_past.art':
-                    Matrix.change_matrix_row(job_ep,'bot_past.art','board','solder_paste','spb',True)
-                    Matrix.move_layer(job_ep, 1, 15)
-                elif layer_name == 'bot_silk.art':
-                    Matrix.change_matrix_row(job_ep,'bot_silk.art','board','silk_screen','ssb',True)
-                    Matrix.move_layer(job_ep, 1, 15)
-                elif layer_name == 'drill.art':
-                    Matrix.change_matrix_row(job_ep,'drill.art','misc','signal','map',True)
-                    Matrix.move_layer(job_ep, 1, 18)
-                elif layer_name == 'top.art':
-                    Matrix.change_matrix_row(job_ep, 'top.art', 'board', 'signal', 'top', True)
-                    Matrix.move_layer(job_ep, 9, 1)
-                elif layer_name == 'top_mask.art':
-                    Matrix.change_matrix_row(job_ep,'top_mask.art','board','solder_mask','smt',True)
-                    Matrix.move_layer(job_ep, 14, 1)
-                elif layer_name == 'top_past.art':
-                    Matrix.change_matrix_row(job_ep, 'top_past.art', 'board', 'solder_paste', 'spt', True)
-                    Matrix.move_layer(job_ep, 15, 1)
-                elif layer_name == 'top_silk.art':
-                    Matrix.change_matrix_row(job_ep,'top_silk.art','board','silk_screen','sst',True)
-                    Matrix.move_layer(job_ep, 18, 1)
-                elif layer_name == 'layer2.art':
-                    Matrix.change_matrix_row(job_ep, 'layer2.art', 'board', 'signal', 'l2', True)
-                elif layer_name == 'layer3.art':
-                    Matrix.change_matrix_row(job_ep, 'layer3.art', 'board', 'signal', 'l3', True)
-                elif layer_name == 'layer4.art':
-                    Matrix.change_matrix_row(job_ep, 'layer4.art', 'board', 'signal', 'l4', True)
-                elif layer_name == 'layer5.art':
-                    Matrix.change_matrix_row(job_ep, 'layer5.art', 'board', 'signal', 'l5', True)
-                elif layer_name == 'layer6.art':
-                    Matrix.change_matrix_row(job_ep, 'layer6.art', 'board', 'signal', 'l6', True)
-                elif layer_name == 'layer7.art':
-                    Matrix.change_matrix_row(job_ep, 'layer7.art', 'board', 'signal', 'l7', True)
-                elif layer_name == 'layer8.art':
-                    Matrix.change_matrix_row(job_ep, 'layer8.art', 'board', 'signal', 'l8', True)
-                elif layer_name == 'layer9.art':
-                    Matrix.change_matrix_row(job_ep, 'layer9.art', 'board', 'signal', 'l9', True)
+                Matrix.change_matrix_row(job_ep, layer_name, new_attribute[layer_name][0], new_attribute[layer_name][1], new_attribute[layer_name][2], True)
+                Matrix.move_layer(job_ep, new_attribute[layer_name][3], new_attribute[layer_name][4])
+            # GUI.show_matrix(job_ep)
 
             """"----------定原点（没有专门的函数，可以试用move2same_layer代替）----------"""
 
