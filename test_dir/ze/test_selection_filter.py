@@ -13,7 +13,7 @@ class TestGraphicSelection_filter:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Selection_filter'))
     def testSelection_filter(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Selection_filter功能
+        本用例测试Selection_filter功能（ID:13912）
         '''
         g = RunConfig.driver_g  # 拿到G软件
 

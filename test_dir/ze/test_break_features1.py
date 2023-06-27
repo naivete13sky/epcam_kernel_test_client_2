@@ -13,7 +13,7 @@ class TestGraphicEditBreak_features:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break'))
     def testBreak_features (self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Break_features删除物件功能
+        本用例测试Break_features删除物件功能（ID：17486）
         '''
         g = RunConfig.driver_g  # 拿到G软件
 

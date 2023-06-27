@@ -11,7 +11,10 @@ class TestGraphicEditContour2pad:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Contour2pad'))
     def testContour2pad (self, job_id, g, prepare_test_job_clean_g):
 
-        '''本用例测试Contour2pad铜皮转pad功能'''
+        '''
+        本用例测试Contour2pad铜皮转pad功能
+        ID: 17155
+        '''
 
         g = RunConfig.driver_g  # 拿到G软件
 

@@ -13,7 +13,7 @@ class TestGraphicAdd:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Add'))
     def testAdd(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Add功能
+        本用例测试Add功能（ID：12812）
         '''
         g = RunConfig.driver_g  # 拿到G软件
 
