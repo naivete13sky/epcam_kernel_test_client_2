@@ -14,10 +14,10 @@ from epkernel.Edition import Matrix
 class TestGraphicEditRemove_Copper_Wire:
     # @pytest.mark.Feature index
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Surface_repair'))
-    def testRemove_Copper_Wire(self, job_id, prepare_test_job_clean_g):
+    def testRemove_Copper_Wire(self, job_id, g,prepare_test_job_clean_g):
         '''
-        本用例测试改变物件叠放顺序（编号）
-        '''
+            id:15168,本用例测试改变物件叠放顺序（编号）
+            '''
 
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
@@ -25,8 +25,9 @@ class TestGraphicEditRemove_Copper_Wire:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
-        layers = ['l1','l2','l3']  # 定义需要比对的层
-        # layers = ['drl1-10']
+        layers = ['l1', 'l1-c', 'l2', 'l2-c', 'l4', 'l4-c', 'l10', 'l10-c', 'l3', 'l3-c', 'l5', 'l5-c',
+                  'l6', 'l6-c', 'l7', 'l7-c']  # 定义需要比对的层
+        # layers = ['l7-c']
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
         temp_compressed_path = os.path.join(temp_path, 'compressed')
@@ -43,17 +44,65 @@ class TestGraphicEditRemove_Copper_Wire:
         # 用悦谱CAM打开料号
         Input.open_job(job_case, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        # 1.整层surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为False
+        # 1.整层surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为False，pass
         Layers.surface_repair(job_case, step, ['l1'], 1, 127000, 0, False)
 
-        # 2.整层surface去尖角，模式：1-remove tip
+        # 2.整层surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为True,pass
+        Layers.surface_repair(job_case, step, ['l1-c'], 1, 50800, 0, True)
+
+        # 3.整层surface去尖角，模式：1-remove tip,圆角化为False，pass
         Layers.surface_repair(job_case, step, ['l2'], 1, 152400, 1, False)
 
-        # # 3.整层surface去尖角，模式：0-Simplify(简易栅格化),圆角化处理为ture，UI和API结果不一致。
-        # Layers.surface_repair(job_case, step, ['l3'], 1, 127000, 1, True)
+        # 4.整层surface去尖角，模式：1-remove tip,圆角化为True,pass
+        Layers.surface_repair(job_case, step, ['l2-c'], 1, 177800, 1, True)
 
+        # 5.整层surface去尖角，模式：2-bridge,圆角化为False,pass
+        Layers.surface_repair(job_case, step, ['l4'], 1, 127000, 2, False)
+
+        # 6.整层surface去尖角，模式：2-bridge,圆角化为True,pass
+        Layers.surface_repair(job_case, step, ['l4-c'], 1, 127000, 2, True)
+
+        # 7.整层surface去尖角，模式：3-fix sliver,圆角化为False,pass
+        Layers.surface_repair(job_case, step, ['l10'], 1, 152400, 3, False)
+
+        # 8.整层surface去尖角，模式：3-fix sliver,圆角化为False,pass
+        Layers.surface_repair(job_case, step, ['l10-c'], 1, 152400, 3, True)
+
+        # 9.单选surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为False,pass
+        Selection.select_feature_by_id(job_case, step, 'l3', [2293])
+        Layers.surface_repair(job_case, step, ['l3'], 0, 101600, 0, False)
+
+        # 10.单选surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为True,pass
+        Selection.select_feature_by_id(job_case, step, 'l3-c', [2279, 2288, 2262, 2278])
+        Layers.surface_repair(job_case, step, ['l3-c'], 0, 152400, 0, True)
+
+        # 11.单选surface去尖角，模式：1-remove tip,圆角化为False,pass
+        Selection.select_feature_by_id(job_case, step, 'l5', [1810, 1809, 1796, 1808])
+        Layers.surface_repair(job_case, step, ['l5'], 0, 152400, 1, False)
+
+        # 12.单选surface去尖角，模式：1-remove tip,圆角化为True,pass
+        Selection.select_feature_by_id(job_case, step, 'l5-c', [1810, 1809, 1796, 1807])
+        Layers.surface_repair(job_case, step, ['l5-c'], 0, 152400, 1, True)
+
+        # 13.单选surface去尖角，模式：2-bridge,圆角化为False,pass
+        Selection.select_feature_by_id(job_case, step, 'l6', [16])
+        Layers.surface_repair(job_case, step, ['l6'], 0, 127000, 2, False)
+
+        # 14.单选surface去尖角，模式：2-bridge,圆角化为True,pass
+        Selection.select_feature_by_id(job_case, step, 'l6-c', [15, 14])
+        Layers.surface_repair(job_case, step, ['l6-c'], 0, 127000, 2, True)
+
+        # 15.单选surface去尖角，模式：3-fix sliver,圆角化为False,pass
+        Selection.select_feature_by_id(job_case, step, 'l7', [2139, 2137])
+        Layers.surface_repair(job_case, step, ['l7'], 0, 101600, 3, False)
+
+        # 16.单选surface去尖角，模式：3-fix sliver,圆角化为True,pass
+        Selection.select_feature_by_id(job_case, step, 'l7-c', [2140, 2116, 2137])
+        Layers.surface_repair(job_case, step, ['l7-c'], 0, 101600, 3, True)
+
+        # GUI.show_layer(job_case, step, 'l7-c')
         save_job(job_case, temp_ep_path)
-        GUI.show_layer(job_case,step,'l1')
+        # GUI.show_layer(job_case,step,'l1')
 
         # ----------------------------------------开始比图：G与EP---------------------------------------------------------
         print('比图--G转图VS悦谱转图'.center(190, '-'))
