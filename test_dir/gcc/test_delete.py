@@ -1,13 +1,11 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input, GUI
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicEditDelete:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Delete'))
@@ -48,8 +46,14 @@ class TestGraphicEditDelete:
         Layers.delete_feature(job_ep, step, ['top'])
 
         # 删除整层物件
-        Layers.delete_feature(job_ep, step, ['bot'])
+        Layers.delete_feature(job_ep, step, ['l2'])
 
+        # 删除多层选中物件
+        Selection.select_feature_by_id(job_ep, step, 'l3', [0])
+        Selection.select_feature_by_id(job_ep, step, 'l4', [0])
+        Layers.delete_feature(job_ep, step, ['l3', 'l4'])
+
+        # GUI.show_layer(job_ep, step, 'l3')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -61,6 +65,7 @@ class TestGraphicEditDelete:
         job_case_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
         print("job_testcase_remote_path:", job_case_remote_path)
+
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_case_remote_path)
