@@ -7,13 +7,13 @@ from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 
 
-class TestGraphicEditDelete:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Delete'))
-    def testDelete (self, job_id, g, prepare_test_job_clean_g):
+class TestGraphicEditOutline2surface:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Outline2surface'))
+    def testOutline2surface(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Delete删除物件功能
-        ID: 11630
+        本用例测试Outline2surface功能
+        ID: 18584
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -23,7 +23,7 @@ class TestGraphicEditDelete:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'bot']
+        layers = ['top', 'l2', 'l3', 'l4']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -41,17 +41,18 @@ class TestGraphicEditDelete:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 删除选中物件
-        Selection.select_feature_by_id(job_ep, step, 'top', [2525])
-        Layers.delete_feature(job_ep, step, ['top'])
+        # 选中闭合的线段集转换为实心铜面
+        Selection.select_feature_by_id(job_ep, step, 'top', [2526, 2527, 2528, 2529, 2530])
+        Layers.outline2surface(job_ep, step, ['top'], False)
 
-        # 删除整层物件
-        Layers.delete_feature(job_ep, step, ['l2'])
+        # 不选中闭合的线段集转换为实心铜面
+        Layers.outline2surface(job_ep, step, ['l2'], False)
 
-        # 删除多层选中物件
-        Selection.select_feature_by_id(job_ep, step, 'l3', [0])
-        Selection.select_feature_by_id(job_ep, step, 'l4', [0])
-        Layers.delete_feature(job_ep, step, ['l3', 'l4'])
+        # 不选中闭合的线段集转换为实心铜面，并转为pad
+        Layers.outline2surface(job_ep, step, ['l3'], True)
+        Selection.set_featuretype_filter(True, False, False, False, False, False, True)
+        Selection.select_features_by_filter(job_ep, step, ['l3'])
+        Layers.delete_feature(job_ep, step, ['l3'])     # 筛选所有pad删除，以证明铜皮转换pad成功
 
         # GUI.show_layer(job_ep, step, 'l3')
         save_job(job_ep, temp_ep_path)
