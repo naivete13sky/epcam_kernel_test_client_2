@@ -350,24 +350,32 @@ class Pretreatment(object):
 
     # 修改层别名称，属性，排序
     def change_layer_attribute(self,attributes:dict):
+        """
+        修改层别名称，属性，排序
+        # 字典格式
+        attrbutes:
+        [
+        'layer_name'(string,原稿层名):['board'(string,新的层别属性)，'signal'(string,新的层别类型)，'new_name'(string,新的层名)，new_row(int,新的层别顺序)]
+        ]
+        """
         pass
         all_layers_list_job_ep = Information.get_layers(self.job)
-        for layer_name in all_layers_list_job_ep:
-            # 修改层别名称，定义层别属性
-            Matrix.change_matrix_row(
-                self.job,
-                layer_name,
-                attributes[layer_name][0],
-                attributes[layer_name][1],
-                attributes[layer_name][2],
-                True
-            )
-            # 层排序
-            Matrix.move_layer(
-                self.job,
-                attributes[layer_name][3],
-                attributes[layer_name][4]
-            )
+        try:
+            for layer_name in all_layers_list_job_ep:
+                # 修改层别名称，定义层别属性
+                Matrix.change_matrix_row(self.job,layer_name,attributes[layer_name][0],attributes[layer_name][1],attributes[layer_name][2],True)
+                # 获取层别信息
+                informations = Information.get_layer_information(self.job)
+                # 遍历层别信息
+                for information in informations:
+                    # 如果informations中的层名等于atrributes字典中的层名，获取该层名在information中的row值
+                    if information['name'] == attributes[layer_name][2]:
+                        # 获取information中的row值
+                        row = information['row']
+                        # 重新排序
+                        Matrix.move_layer(self.job, row, attributes[layer_name][3])
+        except Exception as e:
+            print("错误异常：",e)
 
     # 复制一个新的step，并创建一个新层
     def copy2step(self, step_old, step_new, layer_new):

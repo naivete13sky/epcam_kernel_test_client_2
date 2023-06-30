@@ -1,7 +1,8 @@
 import pytest,os, time,json,shutil,sys
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput,MyOutput,Pretreatment
+from config_ep.epcam_cc_method import MyInput,MyOutput
+from config_ep.epcam_jerry_method import Pretreatment
 from config_g.g_cc_method import GInput
 from epkernel import Input, GUI,BASE,Guide,Analysis
 from epkernel.Action import Information,Selection
@@ -45,31 +46,31 @@ class TestPretreatment:
 
         step_orig = 'orig'
 
-
         pretreatment = Pretreatment(job = job_ep)
         if (job_id == 11633):
             """-----------修改层别名称，定义层别属性，重新排序-----------"""
             #定义新的层别名称，属性，层别顺序
             new_layer_attribute = {
-                        '0114-1240-1-10.drl': ['board','drill', 'drl1-10', 1, 18],
-                        'bottom.art': ['board','signal','bot', 1, 15],
-                        'bot_mask.art': ['board','solder_mask','smb', 1, 15],
-                        'bot_past.art': ['board','solder_paste','spb', 1, 15],
-                        'bot_silk.art': ['board', 'silk_screen', 'ssb', 1, 14],
-                        'drill.art': ['misc', 'signal', 'map', 1, 18],
-                        'top.art': ['board', 'signal', 'top', 9, 1],
-                        'top_mask.art': ['board', 'solder_mask', 'smt', 14, 1],
-                        'top_past.art': ['board', 'solder_paste', 'spt', 15, 1],
-                        'top_silk.art': ['board', 'silk_screen', 'sst', 18, 2],
-                        'layer2.art': ['board', 'signal', 'l2', 5, 5],
-                        'layer3.art': ['board', 'signal', 'l3', 6, 6],
-                        'layer4.art': ['board', 'signal', 'l4', 7, 7],
-                        'layer5.art': ['board', 'signal', 'l5', 8, 8],
-                        'layer6.art': ['board', 'signal', 'l6', 9, 9],
-                        'layer7.art': ['board', 'signal', 'l7', 10, 10],
-                        'layer8.art': ['board', 'signal', 'l8', 11, 11],
-                        'layer9.art': ['board', 'signal', 'l9', 12, 12]
-                        }
+                '0114-1240-1-10.drl': ['board', 'drill', 'drl1-10', 18],
+                'bottom.art': ['board', 'signal', 'bot', 17],
+                'bot_mask.art': ['board', 'solder_mask', 'smb', 17],
+                'bot_past.art': ['board', 'solder_paste', 'spb', 17],
+                'bot_silk.art': ['board', 'silk_screen', 'ssb', 16],
+                'drill.art': ['misc', 'signal', 'map', 18],
+                'top.art': ['board', 'signal', 'top', 1],
+                'top_mask.art': ['board', 'solder_mask', 'smt', 1],
+                'top_past.art': ['board', 'solder_paste', 'spt', 1],
+                'top_silk.art': ['board', 'silk_screen', 'sst', 2],
+                'layer2.art': ['board', 'signal', 'l2', 5],
+                'layer3.art': ['board', 'signal', 'l3', 6],
+                'layer4.art': ['board', 'signal', 'l4', 7],
+                'layer5.art': ['board', 'signal', 'l5', 8],
+                'layer6.art': ['board', 'signal', 'l6', 9],
+                'layer7.art': ['board', 'signal', 'l7', 10],
+                'layer8.art': ['board', 'signal', 'l8', 11],
+                'layer9.art': ['board', 'signal', 'l9', 12]
+            }
+
             # 修改层别名称，属性，排序
             pretreatment.change_layer_attribute(new_layer_attribute)
             # GUI.show_matrix(job_ep)
@@ -86,13 +87,14 @@ class TestPretreatment:
             layer = 'top'
             indexs = [1940, 1941, 1942, 1943, 1944, 1945, 1946, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955,
                          1956, 1957, 1958, 1959]
-            # pretreatment.create_profile(step_net, layer, outline, ['ids'], [], indexs, [])
             # 根据index选中外框线
             pretreatment.select_feature_type(step_net, layer, ['ids'], [], indexs, [])
+            # GUI.show_layer(job_ep,step_net,layer)
             # 将选中的外框线复制到outline层
             Layers.copy2other_layer(job_ep, step_net, layer, outline, False, 0, 0, 0, 0, 0, 0, 0)
             # 选中outline层的外框线
-            pretreatment.select_feature_type(step_net, outline, ['filter'], [], [], [])
+            Selection.set_featuretype_filter(1, 1, 1, 1, 1, 1, 1)
+            Selection.select_features_by_filter(job_ep, step_net, [outline])
             # 创建profile线
             Layers.create_profile(job_ep, step_net, outline)
             # GUI.show_layer(job_ep,step_net,outline)
@@ -272,137 +274,88 @@ class TestPretreatment:
             # Input.file_identify()
             save_job(job_ep, temp_ep_path)
 
-        elif (job_id == 15892):
+        elif (job_id == 15892):# 未写好
             """-----------修改层别名称，定义层别属性，重新排序-----------"""
-            new_attribute = {
-                '0114-1240-1-10.drl': ['board', 'drill', 'drl1-10', 1, 18],
-                'bottom.art': ['board', 'signal', 'bot', 1, 15],
-                'bot_mask.art': ['board', 'solder_mask', 'smb', 1, 15],
-                'bot_past.art': ['board', 'solder_paste', 'spb', 1, 15],
-                'bot_silk.art': ['board', 'silk_screen', 'ssb', 1, 14],
-                'drill.art': ['misc', 'signal', 'map', 1, 18],
-                'top.art': ['board', 'signal', 'top', 9, 1],
-                'top_mask.art': ['board', 'solder_mask', 'smt', 14, 1],
-                'top_past.art': ['board', 'solder_paste', 'spt', 15, 1],
-                'top_silk.art': ['board', 'silk_screen', 'sst', 18, 2],
-                'layer2.art': ['board', 'signal', 'l2', 5, 5],
-                'layer3.art': ['board', 'signal', 'l3', 6, 6],
-                'layer4.art': ['board', 'signal', 'l4', 7, 7],
-                'layer5.art': ['board', 'signal', 'l5', 8, 8],
-                'layer6.art': ['board', 'signal', 'l6', 9, 9],
-                'layer7.art': ['board', 'signal', 'l7', 10, 10],
-                'layer8.art': ['board', 'signal', 'l8', 11, 11],
-                'layer9.art': ['board', 'signal', 'l9', 12, 12]
+            # 定义新的层名和属性字典
+            new_layer_attribute = {
+                'bottom.art': ['board', 'signal', 'bot', 15],
+                'drill-1-6.art': ['misc', 'signal', 'map', 15],
+                'dual720pdisp_p0-1-6.drl': ['board', 'drill', 'drl1-6', 14],
+                'l2_gnd1.art': ['board', 'signal', 'l2', 1],
+                'l3_sig.art': ['board', 'signal', 'l3', 2],
+                'l4_pwr2.art': ['board', 'signal', 'l4', 3],
+                'l5_gnd2.art': ['board', 'signal', 'l5', 4],
+                'outline.art': ['misc', 'signal', 'outline', 15],
+                'paste_bot.art': ['board', 'solder_paste', 'spb', 12],
+                'paste_top.art': ['board', 'solder_paste', 'spt', 1],
+                'silk_bot.art': ['board', 'silk_screen', 'ssb', 11],
+                'silk_top.art': ['board', 'silk_screen', 'sst', 2],
+                'solder_bot.art': ['board', 'solder_mask', 'smb', 10],
+                'solder_top.art': ['board', 'solder_mask', 'smt', 3],
+                'top.art': ['board', 'signal', 'top', 4]
             }
-            for layer_name in all_layers_list_job_ep:
-                # 修改层别名称，定义层别属性
-                Matrix.change_matrix_row(job_ep, layer_name, new_attribute[layer_name][0], new_attribute[layer_name][1],
-                                         new_attribute[layer_name][2], True)
-                # 层排序
-                Matrix.move_layer(job_ep, new_attribute[layer_name][3], new_attribute[layer_name][4])
-            # GUI.show_matrix(job_ep)
+            # 修改层别名称和属性
+            pretreatment.change_layer_attribute(new_layer_attribute)
+            GUI.show_matrix(job_ep)
 
-            for layer_name in all_layers_list_job_ep:
-                if layer_name == 'bottom.art':
-                    Matrix.change_matrix_row(job_ep, 'bottom.art', 'board', 'signal', 'bot', True)
-                    Matrix.move_layer(job_ep, 1, 11)
-                elif layer_name == 'drill-1-6.art':
-                    Matrix.change_matrix_row(job_ep, 'drill-1-6.art', 'misc', 'signal', 'map', True)
-                    Matrix.move_layer(job_ep, 1, 15)
-                elif layer_name == 'dual720pdisp_p0-1-6.drl':
-                    Matrix.change_matrix_row(job_ep, 'dual720pdisp_p0-1-6.drl', 'board', 'drill', 'drl1-6', True)
-                    Matrix.move_layer(job_ep, 1, 14)
-                elif layer_name == 'l2_gnd1.art':
-                    Matrix.change_matrix_row(job_ep, 'l2_gnd1.art', 'board', 'signal', 'l2', True)
-                    Matrix.move_layer(job_ep, 1, 5)
-                elif layer_name == 'l3_sig.art':
-                    Matrix.change_matrix_row(job_ep, 'l3_sig.art', 'board', 'signal', 'l3', True)
-                    Matrix.move_layer(job_ep, 1, 5)
-                elif layer_name == 'l4_pwr2.art':
-                    Matrix.change_matrix_row(job_ep, 'l4_pwr2.art', 'board', 'signal', 'l4', True)
-                    Matrix.move_layer(job_ep, 1, 5)
-                elif layer_name == 'l5_gnd2.art':
-                    Matrix.change_matrix_row(job_ep, 'l5_gnd2.art', 'board', 'signal', 'l5', True)
-                    Matrix.move_layer(job_ep, 1, 5)
-                elif layer_name == 'outline.art':
-                    Matrix.change_matrix_row(job_ep, 'outline.art', 'misc', 'signal', 'outline', True)
-                    Matrix.move_layer(job_ep, 5, 15)
-                elif layer_name == 'paste_bot.art':
-                    Matrix.change_matrix_row(job_ep, 'paste_bot.art', 'board', 'solder_paste', 'spb', True)
-                    Matrix.move_layer(job_ep, 5, 10)
-                elif layer_name == 'paste_top.art':
-                    Matrix.change_matrix_row(job_ep, 'paste_top.art', 'board', 'solder_paste', 'spt', True)
-                    Matrix.move_layer(job_ep, 5, 1)
-                elif layer_name == 'silk_bot.art':
-                    Matrix.change_matrix_row(job_ep, 'silk_bot.art', 'board', 'silk_screen', 'ssb', True)
-                    Matrix.move_layer(job_ep, 7, 9)
-                elif layer_name == 'silk_top.art':
-                    Matrix.change_matrix_row(job_ep, 'silk_top.art', 'board', 'silk_screen', 'sst', True)
-                    Matrix.move_layer(job_ep, 7, 2)
-                elif layer_name == 'solder_bot.art':
-                    Matrix.change_matrix_row(job_ep, 'solder_bot.art', 'board', 'solder_mask', 'smb', True)
-                    Matrix.move_layer(job_ep, 10, 8)
-                elif layer_name == 'solder_top.art':
-                    Matrix.change_matrix_row(job_ep, 'solder_top.art', 'board', 'solder_mask', 'smt', True)
-                    Matrix.move_layer(job_ep, 11, 3)
-                elif layer_name == 'top.art':
-                    Matrix.change_matrix_row(job_ep, 'top.art', 'board', 'signal', 'top', True)
-                    Matrix.move_layer(job_ep, 15, 4)
+
             """"----------定原点（没有专门的函数，可以试用move2same_layer代替）----------"""
+            # 获取新的层名
             layers = Information.get_layers(job_ep)
+            #
             Selection.select_features_by_filter(job_ep,step_orig,layers)
             Layers.move2same_layer(job_ep,step_orig,layers,0,-5000000)
             # BASE.show_layer(job_ep,step_orig,'outline')
-
-            """----------复制orig到step----------"""
-            step_net = 'net'
-            step_name = Matrix.copy_step(job_ep, step_orig)
-            Matrix.change_matrix_column(job_ep, step_name, step_net)
-            outline = 'outline+1'
-            Matrix.create_layer(job_ep, outline, -1)
-            # GUI.show_matrix(job_ep)
-
-            # 获取outline层外框线
-            # Selection.se
-            ret = BASE.classify_polyline(job_ep, step_net, 'outline')
-            info = json.loads(ret)['paras']['polygons']
-            indexList = []
-            items = [6, 7, 8, 9, 10, 11, 12, 13]
-            for item in info:
-                if item[0]['feature_index'] in items:
-                    pattern = re.compile(r''''feature_index': \d+,''')  # 正则
-                    result = pattern.findall(str(item))
-                    pattern2 = re.compile(r'''\d+''')
-                    for each in result:
-                        result2 = pattern2.findall(each)
-                        indexList.append(int(result2[0]))
-                    break
-            # 将top层的外框线选中
-            Selection.select_feature_by_id(job_ep, step_net, 'outline', indexList)
-            # GUI.show_layer(job_ep, step_net, 'outline')
-            # 将选中的外框线复制到outline层
-            Layers.copy2other_layer(job_ep, step_net, 'outline', outline, False, 0, 0, 0, 0, 0, 0, 0)
-            # GUI.show_layer(job_ep, step_net, outline)
-
-            """-----------创建profile线-----------"""
-            # 打开筛选器
-            Selection.set_featuretype_filter(1, 1, 1, 1, 1, 1, 1)
-            # 根据筛选器设置条件选中物件
-            Selection.select_features_by_filter(job_ep, step_net, [outline])
-            # 创建profile线
-            Layers.create_profile(job_ep, step_net, outline)
-            # GUI.show_layer(job_ep,step_net,outline)
-
-            """--------去除版外杂物----------"""
-            layers = ['spt','sst','smt','top','l2','l3','l4','l5','bot','smb','ssb','spb','drl1-6']
-            Layers.clip_area_use_profile(job_ep, step_net, layers, False, False, 0, 1, 1, 1, 1, 1)
-            # GUI.show_layer(job_ep, step_net, 'spt')
-            for layer in layers:
-                if layer != 'drl1-10':
-                    Selection.select_feature_by_point(job_ep, step_net, layer, 0 * 1000000, 2 * 1000000)
-                    if(Information.has_selected_features(job_ep, step_net, layer)) == True :
-                        Layers.delete_feature(job_ep, step_net, [layer])
-                        GUI.show_layer(job_ep, step_net, layer)
+            #
+            # """----------复制orig到step----------"""
+            # step_net = 'net'
+            # step_name = Matrix.copy_step(job_ep, step_orig)
+            # Matrix.change_matrix_column(job_ep, step_name, step_net)
+            # outline = 'outline+1'
+            # Matrix.create_layer(job_ep, outline, -1)
+            # # GUI.show_matrix(job_ep)
+            #
+            # # 获取outline层外框线
+            # # Selection.se
+            # ret = BASE.classify_polyline(job_ep, step_net, 'outline')
+            # info = json.loads(ret)['paras']['polygons']
+            # indexList = []
+            # items = [6, 7, 8, 9, 10, 11, 12, 13]
+            # for item in info:
+            #     if item[0]['feature_index'] in items:
+            #         pattern = re.compile(r''''feature_index': \d+,''')  # 正则
+            #         result = pattern.findall(str(item))
+            #         pattern2 = re.compile(r'''\d+''')
+            #         for each in result:
+            #             result2 = pattern2.findall(each)
+            #             indexList.append(int(result2[0]))
+            #         break
+            # # 将top层的外框线选中
+            # Selection.select_feature_by_id(job_ep, step_net, 'outline', indexList)
+            # # GUI.show_layer(job_ep, step_net, 'outline')
+            # # 将选中的外框线复制到outline层
+            # Layers.copy2other_layer(job_ep, step_net, 'outline', outline, False, 0, 0, 0, 0, 0, 0, 0)
+            # # GUI.show_layer(job_ep, step_net, outline)
+            #
+            # """-----------创建profile线-----------"""
+            # # 打开筛选器
+            # Selection.set_featuretype_filter(1, 1, 1, 1, 1, 1, 1)
+            # # 根据筛选器设置条件选中物件
+            # Selection.select_features_by_filter(job_ep, step_net, [outline])
+            # # 创建profile线
+            # Layers.create_profile(job_ep, step_net, outline)
+            # # GUI.show_layer(job_ep,step_net,outline)
+            #
+            # """--------去除版外杂物----------"""
+            # layers = ['spt','sst','smt','top','l2','l3','l4','l5','bot','smb','ssb','spb','drl1-6']
+            # Layers.clip_area_use_profile(job_ep, step_net, layers, False, False, 0, 1, 1, 1, 1, 1)
+            # # GUI.show_layer(job_ep, step_net, 'spt')
+            # for layer in layers:
+            #     if layer != 'drl1-10':
+            #         Selection.select_feature_by_point(job_ep, step_net, layer, 0 * 1000000, 2 * 1000000)
+            #         if(Information.has_selected_features(job_ep, step_net, layer)) == True :
+            #             Layers.delete_feature(job_ep, step_net, [layer])
+            #             GUI.show_layer(job_ep, step_net, layer)
 
             #         Layers.delete_feature(job_ep, step_net, [layer])
             # # 获取sst、ssb层所有
