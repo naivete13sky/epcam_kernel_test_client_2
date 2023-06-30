@@ -15,7 +15,7 @@ class TestGraphicEditChangeText:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Change_Text'))
     def testChangeText(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试改变文字(Change_Text)
+        id:18585,本用例测试改变文字(Change_Text)
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -24,8 +24,8 @@ class TestGraphicEditChangeText:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
-        layers = ['sst','spt','smt','l1','l2','l3','l4','l5','l6']  # 定义需要比对的层
-        # layers = ['l4']
+        layers = ['sst','spt','smt','l1','spt-1','sst-1','l2','smt-1','l3','l4','l5','l6','l1-1' ,'l2-1','l3-1']  # 定义需要比对的层
+        # layers = ['l2-1','l3-1']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -51,7 +51,7 @@ class TestGraphicEditChangeText:
         Layers.change_text(job_case, step, ['spt'], 'g', 'simple', 2540000,
                            2540000, 762000, True, 0, 0)
 
-        # 3.整层修改文字信息且为正极性,字体类型为seven_seg，不镜像旋转角度45
+        # 3.整层修改文字信息且为正极性,字体类型为seven_seg，旋转角度45
         Layers.change_text(job_case, step, ['smt'], 'W', 'seven_seg', 5080000,
                            5080000, 609600, True, 0, 45)
 
@@ -59,32 +59,54 @@ class TestGraphicEditChangeText:
         Layers.change_text(job_case, step, ['l1'], 'M', 'canned_67', 7620000,
                            7620000, 609600, True, 1, 90)
 
-        # 5.整层修改文字信息且为负极性,字体类型为canned_57,角度旋转45度并镜像，然后整层资料极性反向转换
+        # 5.整层修改文字信息且为正极性,字体类型为suntak_date,镜像
+        Layers.change_text(job_case, step, ['spt-1'], '$$DD', 'suntak_date', 3810000,
+                           2540000, 508000, True, 1, 0)
+
+        # 6.整层默认原始文字信息且为正极性,字体类型为canned_57,角度旋转360
+        Layers.change_text(job_case, step, ['sst-1'], '', 'canned_57', 3810000,
+                           2540000, 508000, True, 0, 360)
+        # GUI.show_layer(job_case, step, 'sst-1')
+
+        # 7.整层修改文字信息且为负极性,字体类型为canned_57,角度旋转45度并镜像，然后整层资料极性反向转换
         Layers.change_text(job_case, step, ['l2'], '$$MM', 'canned_57', 2540000,
                            2540000, 304800, False, 1, 45)
         Layers.change_polarity(job_case, step, ['l2'], 2, 1)
 
-        # 5.整层修改文字信息且为负极性,字体类型为suntak_date并镜像
-        Layers.change_text(job_case, step, ['l3'], '$$DD', 'suntak_date', 5080000,
-                           5080000, 609600, False, 1, 0)
-        Layers.change_polarity(job_case, step, ['l3'], 2, 1)
+        # 8.整层默认原始文字信息且为负极性,字体类型为simple,极性为正
+        Layers.change_text(job_case, step, ['smt-1'], '', 'simple', 5080000,
+                           5080000, 762000, True, 0, 0)
+        # GUI.show_layer(job_case, step, 'smt-1')
 
-        # 6.单选文字修改信息且为正极性,字体类型为standard，镜像并角度旋转45度
+        # 9.整层修改文字信息且为负极性,字体类型为suntak_date并镜像
+        Layers.change_text(job_case, step, ['l3'], '$$DD', 'suntak_date', 5080000,
+                           5080000, 609600, True, 1, 0)
+
+        # 10.单选文字修改信息且为正极性,字体类型为standard，镜像并角度旋转45度
         Selection.select_feature_by_id(job_case, step, 'l4', [52])
         Layers.change_text(job_case, step, ['l4'], '$$DATE-MMDDYYYY', 'standard', 5080000,
                            5080000, 609600, True, 1, 45)
 
-        # 7.单选文字修改信息转为负极性,字体类型为seven_seg，镜像并旋转角度，然后转极性为正。
+        # 11.单选文字修改信息转为负极性,字体类型为canned_67,镜像并旋转角度
+        Selection.select_feature_by_id(job_case, step, 'l6', [52, 23, 40, 25])
+        Layers.change_text(job_case, step, ['l6'], '$$LAYER', 'canned_67', 5080000,
+                           5080000, 762000, False, 1, 45)
+
+        # 12.单选文字修改信息转为负极性,字体类型为seven_seg，镜像并旋转角度，然后转极性为正。
         Selection.select_feature_by_id(job_case, step, 'l5', [26])
         Layers.change_text(job_case, step, ['l5'], '$$YY', 'seven_seg', 5080000,
                            5080000, 762000, False, 1, 45)
         Selection.select_feature_by_id(job_case, step, 'l5', [26])
         Layers.change_polarity(job_case, step, ['l5'], 2, 0)
 
-        # 8.单选文字修改信息转为负极性,字体类型为canned_67,镜像并旋转角度
-        Selection.select_feature_by_id(job_case, step, 'l6', [52,23,40,25])
-        Layers.change_text(job_case, step, ['l6'], '$$LAYER', 'canned_67', 5080000,
-                           5080000, 762000, False, 1, 45)
+        # 13.验证多选负极性文字转换为正，字体类型为 “standard”
+        Selection.select_feature_by_id(job_case, step, 'l1-1', [0, 1, 2, 40,48])
+        Layers.change_text(job_case, step, ['l1-1'], 'test', 'standard', 5080000,
+                           5080000, 762000, True, 0, 0)
+
+        # 14.验证多层改变字体，极性为正，镜像并角度旋转15°
+        Layers.change_text(job_case, step, ['l2-1','l3-1'], '$$MM', 'seven_seg', 5080000,
+                           3810000, 635000, True, 1, 15)
 
         # GUI.show_layer(job_case, step, 'l4')
         save_job(job_case, temp_ep_path)
