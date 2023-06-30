@@ -1,7 +1,7 @@
 import pytest,os, time,json,shutil,sys
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput,MyOutput
+from config_ep.epcam_cc_method import MyInput,MyOutput,Pretreatment
 from config_g.g_cc_method import GInput
 from epkernel import Input, GUI,BASE,Guide,Analysis
 from epkernel.Action import Information,Selection
@@ -13,7 +13,7 @@ class TestPretreatment:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Pretreatment'))
     def test_pretreatment(self, job_id, g, prepare_test_job_clean_g):
         '''
-        id:11633,本用例测试Gerber274X自动化模拟人工做料，到前处理
+        id:11633,15892本用例测试Gerber274X自动化模拟人工做料，到前处理
         '''
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
@@ -45,9 +45,12 @@ class TestPretreatment:
 
         step_orig = 'orig'
 
+
+        pretreatment = Pretreatment(job = job_ep)
         if (job_id == 11633):
             """-----------修改层别名称，定义层别属性，重新排序-----------"""
-            new_attribute = {
+            #定义新的层别名称，属性，层别顺序
+            new_layer_attribute = {
                         '0114-1240-1-10.drl': ['board','drill', 'drl1-10', 1, 18],
                         'bottom.art': ['board','signal','bot', 1, 15],
                         'bot_mask.art': ['board','solder_mask','smb', 1, 15],
@@ -67,244 +70,183 @@ class TestPretreatment:
                         'layer8.art': ['board', 'signal', 'l8', 11, 11],
                         'layer9.art': ['board', 'signal', 'l9', 12, 12]
                         }
-            for layer_name in all_layers_list_job_ep:
-                Matrix.change_matrix_row(job_ep, layer_name, new_attribute[layer_name][0], new_attribute[layer_name][1], new_attribute[layer_name][2], True)
-                Matrix.move_layer(job_ep, new_attribute[layer_name][3], new_attribute[layer_name][4])
+            # 修改层别名称，属性，排序
+            pretreatment.change_layer_attribute(new_layer_attribute)
             # GUI.show_matrix(job_ep)
 
             """"----------定原点（没有专门的函数，可以试用move2same_layer代替）----------"""
 
-            """----------复制orig到step----------"""
+            """----------复制orig到net，并创建一个ouline层----------"""
             step_net = 'net'
-            step_name =  Matrix.copy_step(job_ep,step_orig)
-            Matrix.change_matrix_column(job_ep,step_name,step_net)
             outline = 'outline'
-            Matrix.create_layer(job_ep,outline,-1)
+            pretreatment.copy2step(step_orig, step_net, outline)
             # GUI.show_matrix(job_ep)
 
-            #获取top层外框线
-            ret = BASE.classify_polyline(job_ep, step_net, 'top')
-            info = json.loads(ret)['paras']['polygons']
-            indexList = []
-            items = [1940, 1941, 1942, 1943, 1944, 1945, 1946, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955,
-                     1956, 1957, 1958, 1959]
-            for item in info:
-                if item[0]['feature_index'] in items:
-                    pattern = re.compile(r''''feature_index': \d+,''')  # 正则
-                    result = pattern.findall(str(item))
-                    pattern2 = re.compile(r'''\d+''')
-                    for each in result:
-                        result2 = pattern2.findall(each)
-                        indexList.append(int(result2[0]))
-                    break
-            #将top层的外框线选中
-            Selection.select_feature_by_id(job_ep, step_net, 'top', indexList)
-            # GUI.show_layer(job_ep, step_net, 'top')
-            #将选中的外框线复制到outline层
-            Layers.copy2other_layer(job_ep,step_net,'top',outline,False,0,0,0,0,0,0,0)
-            # GUI.show_layer(job_ep, step_net, outline)
-
-            """-----------创建profile线-----------"""
-            #打开筛选器
-            Selection.set_featuretype_filter(1,1,1,1,1,1,1)
-            #根据筛选器设置条件选中物件
-            Selection.select_features_by_filter(job_ep,step_net,['outline'])
-            #创建profile线
-            Layers.create_profile(job_ep, step_net, 'outline')
-            # GUI.show_layer(job_ep,step_net,'outline')
+            """----------获取外框线，复制到outline层，创建profile线----------"""
+            layer = 'top'
+            indexs = [1940, 1941, 1942, 1943, 1944, 1945, 1946, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955,
+                         1956, 1957, 1958, 1959]
+            # pretreatment.create_profile(step_net, layer, outline, ['ids'], [], indexs, [])
+            # 根据index选中外框线
+            pretreatment.select_feature_type(step_net, layer, ['ids'], [], indexs, [])
+            # 将选中的外框线复制到outline层
+            Layers.copy2other_layer(job_ep, step_net, layer, outline, False, 0, 0, 0, 0, 0, 0, 0)
+            # 选中outline层的外框线
+            pretreatment.select_feature_type(step_net, outline, ['filter'], [], [], [])
+            # 创建profile线
+            Layers.create_profile(job_ep, step_net, outline)
+            # GUI.show_layer(job_ep,step_net,outline)
 
             """--------去除板外杂物----------"""
-            layers = ['spt','smt','top','l2','l3','l4','l5','l6','l7','l8','l9','bot','smb','spb','drl1-10']
-            #clip_area功能，删除板外杂物
-            Layers.clip_area_use_profile(job_ep,step_net,layers,0,0,0,1,1,1,1,0)
-            # GUI.show_layer(job_ep, step_net, 'spt')
-            #选中执行层中的指定坐标物件，并执行删除
-            for layer in layers:
-                if layer != 'drl1-10':
-                    locations = [4 * 1000000, 21.5 * 1000000], [2 * 1000000, 20.9 * 1000000], [2 * 1000000, 17.7 * 1000000], [2 * 1000000, 16.5 * 1000000] \
-                        , [2 * 1000000, 6 * 1000000], [2 * 1000000, 4.8 * 1000000], [2 * 1000000, 1.1 * 1000000], [4 * 1000000, 0.25 * 1000000], [3.67 * 1000000, 1 * 1000000]
-                    #连续选中物件
-                    Selection.set_selection(False,True,True,True,True,True)
-                    for location_x, location_y in locations:
-                        Selection.select_feature_by_point(job_ep, step_net, layer, location_x, location_y)
-                    #判断是否有物件选中，有选中执行删除
-                    if Information.has_selected_features(job_ep, step_net, layer):
-                        Layers.delete_feature(job_ep, step_net, [layer])
-                        # GUI.show_layer(job_ep, step_net, layer)
-                    else:
-                        print("没有选中物件！")
-                    Selection.reset_selection()
+            layers = []
+            # 获取所有board属性层别
+            board_layers = Information.get_board_layers(job_ep)
+            # 获取所有drill类型层别
+            drl_layers = Information.get_drill_layers(job_ep)
+            # 获取所有silk类型的层别
+            silk_layers = Information.get_silkscreen_layers(job_ep)
+            # 遍历所有board属性层别
+            for layer in board_layers:
+                # 如果层别不在drill类型和silk screen类型中就添加到layers中
+                if layer not in drl_layers and layer not in silk_layers:
+                    layers.append(layer)
+            # 执行clip_area功能删除板外的杂物
+            Layers.clip_area_use_profile(job_ep, step_net, layers, 0, 0, 0, 1, 1, 1, 1, 0)
+            # GUI.show_layer(job_ep, step_net, layers[0])
 
-            # 获取sst、ssb层外框线
-            layers = ['sst','ssb']
+            # 定义物件坐标数组手动删除板外剩余杂物
+            locations = [4 * 1000000, 21.5 * 1000000], [2 * 1000000, 20.9 * 1000000], [2 * 1000000, 17.7 * 1000000], [2 * 1000000, 16.5 * 1000000], \
+                  [2 * 1000000, 6 * 1000000], [2 * 1000000, 4.8 * 1000000], [2 * 1000000, 1.1 * 1000000], [4 * 1000000,0.25 * 1000000], [3.67 * 1000000, 1 * 1000000]
+            # 定义sst层物件index数组
+            sstIndexs = [3744, 3745, 3746, 3747, 3748, 3749, 3750, 3751, 3752, 3753, 3754, 3755, 3756, 3757,
+                      3758, 3759, 3760, 3761, 3762, 3763, 3766, 3765, 3764]
+            # 定义ssb层物件index数组
+            ssbIndexs = [4870, 4871, 4872, 4873, 4874, 4875, 4876, 4877, 4878, 4879, 4880, 4881, 4882, 4883, 4884,
+                      4885, 4886, 4887, 4888, 4889]
+            # 定义框选范围
+            points = []
+            points.append([68 * 1000000, -15 * 1000000])
+            points.append([68 * 1000000, -11 * 1000000])
+            points.append([85 * 1000000, -11 * 1000000])
+            points.append([85 * 1000000, -15 * 1000000])
+
+            # 设置连续选中物件
             Selection.set_selection(False, True, True, True, True, True)
+            # 根据物件坐标选中线路层、防焊层、锡膏层物件
             for layer in layers:
-                if layer == 'sst':
-                    sstIds = [3744, 3745, 3746, 3747, 3748, 3749, 3750, 3751, 3752, 3753, 3754, 3755, 3756, 3757,
-                               3758, 3759, 3760, 3761, 3762, 3763, 3766, 3765, 3764]
-                    Selection.select_feature_by_id(job_ep,step_net,layer,sstIds)
-                elif layer == 'ssb':
-                    ssbIds = [4870, 4871, 4872, 4873, 4874, 4875, 4876, 4877, 4878, 4879, 4880, 4881, 4882, 4883, 4884,
-                               4885, 4886, 4887, 4888, 4889]
-                    Selection.select_feature_by_id(job_ep, step_net, layer, ssbIds)
+                pretreatment.select_feature_type(step_net, layer, ['locations'], locations, [], [])
+            # GUI.show_layer(job_ep, step_net, layer)
 
-                points = []
-                points.append([68 * 1000000, -15 * 1000000])
-                points.append([68 * 1000000, -11 * 1000000])
-                points.append([85 * 1000000, -11 * 1000000])
-                points.append([85 * 1000000, -15 * 1000000])
-                Selection.select_feature_by_polygon(job_ep, step_net, layer, points)
+            # 根据物件index和框选范围选中sst层和ssb层物件
+            ids = []
+            for layer in silk_layers:
+                if layer == 'sst':
+                    ids = sstIndexs
+                elif layer == 'ssb':
+                    ids = ssbIndexs
+                pretreatment.select_feature_type(step_net, layer, ['ids','points'], [], ids, points)
+                layers.append(layer)
+            # GUI.show_layer(job_ep, step_net, layer)
+
+            # 判断如有物件选中，则执行删除
             if Information.has_selected_features(job_ep,step_net,layer):
                 Layers.delete_feature(job_ep, step_net, layers)
             else:
                 print("没有选中物件！")
+            # 重置连续选中
             Selection.reset_selection()
             # GUI.show_layer(job_ep, step_net, layer)
 
             """"----------将线路层正、负片合并----------"""
-            layers = ['top','l2','l3','l4','l5','l6','l7','l8','l9','bot']
-            # 设置筛选器物件类型，选中所有负极性物件
-            Selection.set_featuretype_filter(0, 1, 1, 1, 1, 1, 1)
-            Selection.select_features_by_filter(job_ep,step_net,layers)
-            # 设置筛选器物件类型，选中所有征集性surface
-            Selection.set_featuretype_filter(1, 0, 0, 1, 0, 0, 0)
-            Selection.select_features_by_filter(job_ep, step_net, layers)
-            # 执行congtourize，将正、负片合并
-            Layers.contourize(job_ep,step_net,layers,6350,True,7620,0)
-            # 重置筛选器
-            Selection.reset_select_filter()
+            # 获取所有线路层
+            signal_layers = Information.get_signal_layers(job_ep)
+            # 将线路层正、负片合并
+            pretreatment.signal_layers_contourize(step_net, signal_layers)
 
             """----------孔层定属性----------"""
-            # 自动定义孔层属性
-            layers = ['drl1-10']
-            drill_plated = 'drill-plated'
-            drill_via = 'drill-via'
-            Matrix.create_layer(job_ep, drill_plated, -1)
-            Matrix.create_layer(job_ep, drill_via, -1)
-
-            BASE.auto_classify_attribute(job_ep,step_net,layers)
-            #按物件属性copy，验证
-            Selection.set_attribute_filter(0,[{'.drill':'plated'}])
-            Selection.select_features_by_filter(job_ep, step_net, layers)
-            Layers.copy2other_layer(job_ep, step_net, 'drl1-10', drill_plated, False, 0, 0, 0, 0, 0, 0, 0)
-            Selection.reset_select_filter()
-            Selection.set_attribute_filter(0, [{'.drill': 'via'}])
-            Selection.select_features_by_filter(job_ep, step_net, layers)
-            Layers.copy2other_layer(job_ep, step_net, 'drl1-10', drill_via, False, 0, 0, 0, 0, 0, 0, 0)
-            Selection.reset_select_filter()
+            # 定义孔层属性(如果有错误属性需要手动修改)
+            BASE.auto_classify_attribute(job_ep,step_net,drl_layers)
             # GUI.show_layer(job_ep, step_net, drill_plated)
 
             """将防焊层非pad物件转成pad"""
-            # 设置筛选器物件类型，选中smt和smb层的非pad物件
-            layers = ['smt','smb']
-            Selection.set_featuretype_filter(1,1,1,1,1,1,0)
-            Selection.select_features_by_filter(job_ep,step_net,layers)
-            # 执行contour2pad，将surface转成pad
-            Layers.contour2pad(job_ep,step_net,layers,1*25400,5*25400,99999*25400,'+++')
-            # 重置筛选器
-            Selection.reset_select_filter()
+            # 获取所有防焊层
+            solder_mask_layers = Information.get_soldermask_layers(job_ep)
+            # 将防焊层非pad物件转成pad
+            pretreatment.solder_mask_layers2pad(step_net, solder_mask_layers)
             # GUI.show_layer(job_ep,step_net,'smt')
 
             """检查外层SMD PAD"""
-            layers = ['top','bot']
+            # 获取所有外层
+            out_layers = Information.get_outer_layers(job_ep)
+            # 定义物件index字典
             ids = {'top':2403, 'bot':1305}
-            #将指定的arc转成line
-            for layer in layers:
-                print("=ids[layer]=",ids[layer])
-                Selection.select_feature_by_id(job_ep, step_net, layer, [ids[layer]])
-                # GUI.show_layer(job_ep, step_net, layer)
-                if Information.has_selected_features(job_ep, step_net, layer):
-                    # GUI.show_layer(job_ep, step_net, layer)
-                    Layers.arc2lines(job_ep, step_net, layers, 1, True)
-                    # GUI.show_layer(job_ep, step_net, layer)
-                else:
-                    print("没有选中物件！")
-
-            #将指定的line转成surface
+            # 定义框选范围
             points = []
             points.append([58.25 * 1000000, 19.60 * 1000000])
             points.append([57.57 * 1000000, 20.14 * 1000000])
             points.append([57.97 * 1000000, 20.87 * 1000000])
             points.append([58.77 * 1000000, 20.66 * 1000000])
             points.append([58.81 * 1000000, 20.01 * 1000000])
-            for layer in layers:
-                Selection.select_feature_by_polygon(job_ep,step_net,layer,points)
-                if Information.has_selected_features(job_ep, step_net, layer):
-                    # GUI.show_layer(job_ep, step_net, layer)
-                    Layers.contourize(job_ep, step_net, [layer], 6350, True, 7620, 1)
-                    # GUI.show_layer(job_ep, step_net, layer)
-                else:
-                    print("没有选中物件！")
 
-            #将指定的surface转成pad
-            for layer in layers:
-                Selection.select_feature_by_id(job_ep, step_net, layer, [ids[layer]])
-                if Information.has_selected_features(job_ep, step_net, layer):
-                    # GUI.show_layer(job_ep, step_net, layer)
-                    Layers.contour2pad(job_ep, step_net, [layer], 1 * 25400, 5 * 25400, 99999 * 25400, '+++')
-                    # GUI.show_layer(job_ep, step_net, layer)
-                else:
-                    print("没有选中物件！")
-
-            # GUI.show_layer(job_ep, step_net, 'bot+++')
+            for layer in out_layers:
+                # 将指定的arc转成line
+                pretreatment.change_symbol(step_net, layer, ['arc'], ['ids'], [], [ids[layer]], [])
+                # 将指定的line转成surface
+                pretreatment.change_symbol(step_net, layer, ['line'], ['points'], [], [], points)
+                # 将指定的surface转成pad
+                pretreatment.change_symbol(step_net, layer, ['surface'], ['ids'], [], [ids[layer]], [])
+            # GUI.show_layer(job_ep, step_net, layer)
 
             """----------复制net到pre----------"""
             step_pre = 'pre'
-            Matrix.copy_step(job_ep, step_net)
-            Matrix.change_matrix_column(job_ep, 'net+1', step_pre)
-            # BASE.save_job(job_ep)
-            # Matrix.create_layer(job_ep, 'outline', -1)
+            outline = ''
+            pretreatment.copy2step(step_net, step_pre, outline)
             # GUI.show_matrix(job_ep)
 
-            """---------线路层自动定属性,手动检查是否定正确----------"""
+
+            """---------线路层自动定属性,手动修改错误属性----------"""
             # 自动定义线路层属性
-            layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'bot']
-            BASE.auto_classify_attribute(job_ep, step_pre, layers)
-            # GUI.show_matrix(job_ep)
+            BASE.auto_classify_attribute(job_ep, step_pre, signal_layers)
             #修改错误属性
-            for layer in layers:
+            attribute = []
+            ids = []
+            for layer in signal_layers:
                 if layer == 'top':
                     ids = [668, 671, 669, 670, 667]
-                    Selection.select_feature_by_id(job_ep, step_pre, layer, ids)
-                    if Information.has_selected_features(job_ep, step_pre, layer):
-                        # GUI.show_layer(job_ep, step_pre, layer)
-                        BASE.modify_attributes(job_ep, step_pre, [layer], 1,[{'.fiducial_name': 'cle'}, {'.smd': ''}])
-                        # GUI.show_layer(job_ep, step_pre, layer)
-                    else:
-                        print("没有选中物件！")
+                    attribute = [{'.fiducial_name': 'cle'}, {'.smd': ''}]
                 elif layer == 'bot':
                     ids = [104, 105, 106, 107, 154, 183, 204, 205]
-                    Selection.select_feature_by_id(job_ep, step_pre, layer, ids)
-                    if Information.has_selected_features(job_ep, step_pre, layer):
-                        # GUI.show_layer(job_ep, step_pre, layer)
-                        BASE.modify_attributes(job_ep, step_pre, [layer], 1, [{'.via': 'pad'}])
-                        # GUI.show_layer(job_ep, step_pre, layer)
-                    else:
-                        print("没有选中物件！")
+                    attribute = [{'.via': 'pad'}]
+                else:
+                    ids = []
+                # 修改top和bot层错误属性
+                pretreatment.change_attribute(step_pre, layer, attribute, ['ids'], [], ids, [])
 
             """----------孔层补偿----------"""
-            layers = ['drl1-10']
             #via孔补偿2条,npt孔补偿2条，pt孔补偿4条，补完取刀径值（看刀径表）
             Selection.reset_select_filter()
             # Selection.set_featuretype_filter(1, 0, 0, 0, 0, 0, 1)
-            Selection.set_include_symbol_filter(['r7.87'])
-            Selection.select_features_by_filter(job_ep, step_pre, layers)
-            Layers.resize_global(job_ep, step_pre, layers, 0, 1.973 * 25400)
-            Selection.reset_select_filter()
-            # Selection.set_featuretype_filter(1, 0, 0, 0, 0, 0, 1)
-            Selection.set_include_symbol_filter(['r19.681','r102.358'])
-            Selection.select_features_by_filter(job_ep, step_pre, layers)
-            Layers.resize_global(job_ep, step_pre, layers, 0, 3.941 * 25400)
-            Selection.reset_select_filter()
-            Selection.set_include_symbol_filter(['r19.685'])
-            Selection.select_features_by_filter(job_ep, step_pre, layers)
-            Layers.resize_global(job_ep, step_pre, layers, 0, 3.937 * 25400)
+            feature_items = ['r7.87', 'r19.681', 'r102.358', 'r19.685']
+            resize = 0
+            for item in feature_items:
+                if item in ['r7.87']:
+                    Selection.set_include_symbol_filter([item])
+                    resize = 1.973 * 25400
+                elif item in ['r19.681','r102.358']:
+                    Selection.set_include_symbol_filter([item])
+                    resize = 3.941 * 25400
+                elif item in ['r19.685']:
+                    Selection.set_include_symbol_filter([item])
+                    resize = 3.937 * 25400
+                Selection.select_features_by_filter(job_ep, step_pre, drl_layers)
+                Layers.resize_global(job_ep, step_pre, drl_layers, 0, resize)
             Selection.reset_select_filter()
             # GUI.show_layer(job_ep, step_pre, 'drl1-10')
 
-            layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'bot', 'drl1-10']
-            for layer in layers:
-                BASE.split_layer_with_attribute(job_ep, step_pre, layer)
+            # 将线路层和孔层按照属性分层，验证自动定属性是否正确
+            for layer in board_layers:
+                if layer not in signal_layers or layer not in solder_mask_layers:
+                    BASE.split_layer_with_attribute(job_ep, step_pre, layer)
             # GUI.show_layer(job_ep, step_pre, 'top')
 
 
@@ -330,8 +272,36 @@ class TestPretreatment:
             # Input.file_identify()
             save_job(job_ep, temp_ep_path)
 
-        elif (job_id == 0):
+        elif (job_id == 15892):
             """-----------修改层别名称，定义层别属性，重新排序-----------"""
+            new_attribute = {
+                '0114-1240-1-10.drl': ['board', 'drill', 'drl1-10', 1, 18],
+                'bottom.art': ['board', 'signal', 'bot', 1, 15],
+                'bot_mask.art': ['board', 'solder_mask', 'smb', 1, 15],
+                'bot_past.art': ['board', 'solder_paste', 'spb', 1, 15],
+                'bot_silk.art': ['board', 'silk_screen', 'ssb', 1, 14],
+                'drill.art': ['misc', 'signal', 'map', 1, 18],
+                'top.art': ['board', 'signal', 'top', 9, 1],
+                'top_mask.art': ['board', 'solder_mask', 'smt', 14, 1],
+                'top_past.art': ['board', 'solder_paste', 'spt', 15, 1],
+                'top_silk.art': ['board', 'silk_screen', 'sst', 18, 2],
+                'layer2.art': ['board', 'signal', 'l2', 5, 5],
+                'layer3.art': ['board', 'signal', 'l3', 6, 6],
+                'layer4.art': ['board', 'signal', 'l4', 7, 7],
+                'layer5.art': ['board', 'signal', 'l5', 8, 8],
+                'layer6.art': ['board', 'signal', 'l6', 9, 9],
+                'layer7.art': ['board', 'signal', 'l7', 10, 10],
+                'layer8.art': ['board', 'signal', 'l8', 11, 11],
+                'layer9.art': ['board', 'signal', 'l9', 12, 12]
+            }
+            for layer_name in all_layers_list_job_ep:
+                # 修改层别名称，定义层别属性
+                Matrix.change_matrix_row(job_ep, layer_name, new_attribute[layer_name][0], new_attribute[layer_name][1],
+                                         new_attribute[layer_name][2], True)
+                # 层排序
+                Matrix.move_layer(job_ep, new_attribute[layer_name][3], new_attribute[layer_name][4])
+            # GUI.show_matrix(job_ep)
+
             for layer_name in all_layers_list_job_ep:
                 if layer_name == 'bottom.art':
                     Matrix.change_matrix_row(job_ep, 'bottom.art', 'board', 'signal', 'bot', True)
@@ -385,14 +355,11 @@ class TestPretreatment:
             # BASE.show_layer(job_ep,step_orig,'outline')
 
             """----------复制orig到step----------"""
-            BASE.save_job(job_ep)
             step_net = 'net'
             step_name = Matrix.copy_step(job_ep, step_orig)
             Matrix.change_matrix_column(job_ep, step_name, step_net)
-            BASE.save_job(job_ep)
             outline = 'outline+1'
             Matrix.create_layer(job_ep, outline, -1)
-            BASE.save_job(job_ep)
             # GUI.show_matrix(job_ep)
 
             # 获取outline层外框线
