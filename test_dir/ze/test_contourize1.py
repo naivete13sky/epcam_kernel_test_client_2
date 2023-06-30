@@ -77,21 +77,23 @@ class TestGraphicEditContourize:
         #GUI.show_layer(job_ep, step, 'l4')
 
 
-        #6.新增负极性长方形pad，X、Y单边清除空洞整合(验证Maxsize栏和mode栏的正确性)
+        #6.新增负极性长方形pad，X、Y单边清除空洞整合(mode选XorY，验证Maxsize栏和mode栏的正确性)
         Layers.add_pad(job_ep, step, ['l5'], "rect20x10", 2540000, 1 * 2540000, False, 9, [], 0)
         Layers.add_pad(job_ep, step, ['l5'], "rect40x20", 2540000, 3 * 2540000, False, 9, [], 0)
         Layers.add_pad(job_ep, step, ['l5'], "rect50x30", 2540000, 5 * 2540000, False, 9, [], 0)#添加三个负极性长方形pad
-        Layers.contourize(job_ep, step, ['l5'], 6350, False, 20 * 25400, 0)#Max size设置为20mil ,mode设置为0：X or Y（清除X或Y轴任一尺寸小于等于Max Size的洞）
+        Layers.contourize(job_ep, step, ['l5'], 6350, False, 20 * 25400, 0)#Max size设置为20mil ,mode设置为0：X or Y
+                                                                           # （清除X或Y轴任一尺寸小于等于Max Size的洞，预期 "rect20x10","rect40x20"被清除）
         #GUI.show_layer(job_ep, step, 'l5')
 
-        #7.新增负极性长方形pad，X、Y单边清除空洞整合(验证Maxsize栏和mode栏的正确性)
+        #7.新增负极性长方形pad，X、Y单边清除空洞整合(mode选XandY，验证Maxsize栏和mode栏的正确性)
         Layers.add_pad(job_ep, step, ['l6'], "rect20x10", 2540000, 1 * 2540000, False, 9, [], 0)
         Layers.add_pad(job_ep, step, ['l6'], "rect40x20", 2540000, 3 * 2540000, False, 9, [], 0)
         Layers.add_pad(job_ep, step, ['l6'], "rect50x30", 2540000, 5 * 2540000, False, 9, [], 0)#添加三个负极性长方形pad
-        Layers.contourize(job_ep, step, ['l6'], 6350, False, 20 * 25400, 1)#Max size设置为20mil ,mode设置为1：X and Y（清除X及Y轴两尺寸皆小于等于Max Size的洞）
-        #GUI.show_layer(job_ep, step, 'l6')
+        Layers.contourize(job_ep, step, ['l6'], 6350, False, 20 * 25400, 1)#Max size设置为20mil ,mode设置为1：X and Y
+                                                                             # （清除X及Y轴两尺寸皆小于等于Max Size的洞，预期"rect20x10"被清除）
+        # #GUI.show_layer(job_ep, step, 'l6')
 
-        #8.通过面积清除空洞整合(验证Maxsize栏和mode栏的正确性)
+        #8.通过面积清除空洞整合(mode选area，验证Maxsize栏和mode栏的正确性)
         Layers.contourize(job_ep, step, ['l7'], 6350, False, 1000 * 25400, 2)#Max size设置为1000mil ,
                                                                              # mode设置为2：Area（清除X or Y ; X and Y选项检测不到的洞）
         # GUI.show_layer(job_ep, step, 'l7')
