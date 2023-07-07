@@ -15,7 +15,7 @@ class TestGraphicRoutConnection:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('rounding_line_corner'))
     def testConnection(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试line导圆角功能
+        本用例测试line导圆角功能--rounding_line_corner,ID:12150
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -25,7 +25,7 @@ class TestGraphicRoutConnection:
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
         # layers = ['l1', 'l2', 'l3','l4','l6']  # 定义需要比对的层
-        layers = ['l2']
+        layers = ['l1']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -47,10 +47,10 @@ class TestGraphicRoutConnection:
         # Selection.select_feature_by_id(job_case, step, 'l1', [0,1])
         # Layers.rounding_line_corner(job_case, step, 'l1', 2540000)
 
-        # # 2.选择两根线导圆角,角度为0.4inch,利用反选功能选中物件
+        # 2.选择两根线导圆角,角度为0.4inch,利用反选功能选中物件
         Selection.reverse_select(job_case, step, 'l2')
         Layers.rounding_line_corner(job_case, step, ['l2'], 10160000)
-        #
+
         # # 3.选择两根线导圆角,角度为0.25inch,接口有bug
         # Selection.reverse_select(job_case, step, 'l3')
         # Layers.rounding_line_corner(job_case, step, ['l3'], 6350000)

@@ -15,7 +15,7 @@ class TestGraphicEditPositivePolarity:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Polarity'))
     def testPolarity(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试极性反转功能
+        本用例测试极性反转功能--Polarity,ID:11940
         '''
 
         g = RunConfig.driver_g  # 拿到G软件

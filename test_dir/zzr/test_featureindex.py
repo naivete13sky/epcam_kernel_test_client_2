@@ -16,7 +16,7 @@ class TestGraphicEditFeatureIndex:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Feature_index'))
     def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试改变物件叠放顺序（编号）
+        本用例测试改变物件叠放顺序（编号）--Feature_index,ID:13244
         '''
 
         g = RunConfig.driver_g  # 拿到G软件

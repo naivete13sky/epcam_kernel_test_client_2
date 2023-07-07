@@ -16,7 +16,7 @@ class TestGraphicEditChangeAttributes:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Modify_attributes'))
     def testChangeAttributes(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试改变物件属性
+        本用例测试改变物件属性--Modify_attributes,ID:12226
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -26,7 +26,7 @@ class TestGraphicEditChangeAttributes:
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
         layers = ['drl1-10+1', 'l4+1', 'l5+1','l1+1','l6+1', 'l7+1', 'l7-neg', 'l2+1']  # 定义需要比对的层
-        # layers = ['l2+1']
+        # layers = ['drl1-10+1']
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
         temp_compressed_path = os.path.join(temp_path, 'compressed')
@@ -44,16 +44,19 @@ class TestGraphicEditChangeAttributes:
         Input.open_job(job_case, temp_compressed_path)  # 用悦谱CAM打开料号
 
         #1.整层物件替换属性,筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层）,1为替换，pass
-        Layers.modify_attributes(job_case, step, ['drl1-10'], 1, [{".smd":""}])
+        # Layers.modify_attributes(job_case, step, ['drl1-10'], 1, [{".smd":""}])
+        BASE.modify_attributes(job_case,step,['drl1-10'],1,[{".smd":""}])
         Selection.set_attribute_filter(0, [{".smd":""}])          #设置筛选器属性
         Selection.select_features_by_filter(job_case, step, ['drl1-10'])      #选中满足以上条件的物件
         Matrix.create_layer(job_case, 'drl1-10+1')
         Layers.copy2other_layer(job_case, step, 'drl1-10', 'drl1-10+1', False, 0, 0, 0, 0, 0, 0, 0)
+        # GUI.show_layer(job_case, step, 'drl1-10+1')
 
 
         #2.单选物件替换属性，筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层），1为替换，pass
         Selection.select_feature_by_id(job_case, step, 'l4', [623])
-        Layers.modify_attributes(job_case, step, ['l4'], 1, [{".fiducial_name": "trace"}])
+        # Layers.modify_attributes(job_case, step, ['l4'], 1, [{".fiducial_name": "trace"}])
+        BASE.modify_attributes(job_case, step, ['l4'], 1, [{".fiducial_name": "trace"}])
         Selection.set_attribute_filter(0, [{".fiducial_name": "trace"}])
         Selection.select_features_by_filter(job_case, step, ['l4'])
         Matrix.create_layer(job_case, 'l4+1')
@@ -63,7 +66,8 @@ class TestGraphicEditChangeAttributes:
 
         # 3.多选物件替换属性，筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层），1为替换，pass
         Selection.select_feature_by_id(job_case, step, 'l5', [1351,1805,65,611])
-        Layers.modify_attributes(job_case, step, ['l5'], 1, [{".AOI_ALIGN": ""}])
+        # Layers.modify_attributes(job_case, step, ['l5'], 1, [{".AOI_ALIGN": ""}])
+        BASE.modify_attributes(job_case, step, ['l5'], 1, [{".AOI_ALIGN": ""}])
         Selection.set_attribute_filter(0, [{".AOI_ALIGN": ""}])
         Selection.select_features_by_filter(job_case, step, ['l5'])
         Matrix.create_layer(job_case, 'l5+1')
