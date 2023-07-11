@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 import time
+import urllib
 from pathlib import Path
 
 import pandas as pd
@@ -19,7 +20,6 @@ class Pretreatment(object):
         pass
         self.job = job
 
-    # 修改层别名称，属性，排序
     def change_layer_attribute(self,attributes:dict):
         """
         修改层别名称，定义属性，重新排序
@@ -30,6 +30,7 @@ class Pretreatment(object):
         ]
         """
         pass
+        # 得到原稿层名
         all_layers_list_job_ep = Information.get_layers(self.job)
         try:
             for layer_name in all_layers_list_job_ep:
@@ -82,13 +83,13 @@ class Pretreatment(object):
         Selection.reset_select_filter()
 
     # 修改物件属性
-    def change_attribute(self, step, layer, attribute, select_types, locations, ids, points):
+    def change_attribute(self, step, layer, attributes, select_types, locations, ids, points):
         pass
         # Selection.select_feature_by_id(self.job, step, layer, ids)
         self.select_feature_type(step, layer, select_types, locations, ids, points)
         if Information.has_selected_features(self.job, step, layer):
             # GUI.show_layer(self.job, step, layer)
-            BASE.modify_attributes(self.job, step, [layer], 1, attribute)
+            BASE.modify_attributes(self.job, step, [layer], 1, attributes)
             # GUI.show_layer(self.job, step, layer)
         else:
             print("没有选中物件！")
@@ -114,9 +115,10 @@ class Pretreatment(object):
             print("没有选中物件！")
 
     # 根据选择类型调用select_feature接口
-    def select_feature_type(self, step, layer, select_types, locations, ids, points ):
+    def select_feature_type(self, step, layer, select_types:list, locations, ids, points ):
         pass
         for type in select_types:
+            print("=type=:",type)
             if type == 'locations': #根据坐标选择物件
                 for location_x, location_y in locations:
                     Selection.select_feature_by_point(self.job, step, layer, location_x, location_y)
