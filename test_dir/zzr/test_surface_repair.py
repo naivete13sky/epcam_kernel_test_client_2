@@ -16,8 +16,8 @@ class TestGraphicEditRemove_Copper_Wire:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Surface_repair'))
     def testRemove_Copper_Wire(self, job_id, g,prepare_test_job_clean_g):
         '''
-            id:15168,本用例测试改变物件叠放顺序（编号）
-            '''
+        Id:15168,Surface_repair--本用例测试改变物件叠放顺序（编号）
+        '''
 
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
