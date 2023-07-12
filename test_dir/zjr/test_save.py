@@ -2,6 +2,7 @@ import pytest,os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
 from config_ep.epcam_cc_method import MyInput
+from config_ep.epcam_jerry_method import Pretreatment
 from epkernel import Input,GUI,BASE
 from epkernel.Action import Information
 from epkernel.Edition import Matrix
@@ -27,14 +28,12 @@ class TestSaveJob:
         temp_compressed_path = os.path.join(temp_path, 'compressed')
         temp_ep_path = os.path.join(temp_path, 'ep')
 
-
         # ----------悦谱转图。先下载并解压原始gerber文件,拿到解压后的文件夹名称，此名称加上_ep就是我们要的名称。然后转图。-------------
         result = DMS().get_job_fields_from_dms_db_pandas(job_id)
         file_format = os.path.splitext(result['file'])[1]
         if file_format == '.rar':
             job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
-            MyInput(folder_path=os.path.join(temp_gerber_path, os.listdir(temp_gerber_path)[0].lower()),
-                    job=job_ep, step=r'orig', job_id=job_id, save_path=temp_ep_path)
+            Pretreatment(job=job_ep, job_id=job_id).input_folder(temp_gerber_path, temp_ep_path)
             dir_path = temp_ep_path
         elif file_format =='.tgz':
             job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
@@ -50,12 +49,9 @@ class TestSaveJob:
         add_layer_name = 'test_add_layer_save'
         Matrix.create_layer(job_ep, add_layer_name, -1)
         # GUI.show_matrix(job_ep)
-
-        # job若存在则删除
-        # shutil.rmtree(os.path.join(dir_path, job_ep)) if os.path.exists(os.path.join(dir_path, job_ep)) else True
-        # 保存料号
+        # 保存料号,必须调用BASE中的save_job
         BASE.save_job(job_ep)
-
+        #
         # 获取layers文件夹下的层别数量
         ep_dir_path = dir_path + '\\' + job_ep + '\\steps\\' + step_name + '\\layers'
 
@@ -64,11 +60,12 @@ class TestSaveJob:
             item_path = os.path.join(ep_dir_path, item)
             if os.path.isdir(item_path):
                 ep_folder_names.append(item)
-        print("ep文件夹所有layer名:", ep_folder_names)
 
-        # 重新获取ui上的层别
+        print("ep文件夹layers名:", ep_folder_names)
+
+        # # 重新获取ui上的层别
         all_layers_list_job_ep_new = Information.get_layers(job_ep)
-        print("ui所有layer名：",all_layers_list_job_ep_new)
+        print("ui最新layers名：",all_layers_list_job_ep_new)
         # GUI.show_matrix(job_ep)
 
         # ----------------------------------------断言--------------------------------------------------------

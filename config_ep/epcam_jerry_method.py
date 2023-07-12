@@ -15,10 +15,15 @@ from epkernel import Configuration, Input, GUI,BASE,Output
 from epkernel.Edition import Job,Matrix,Layers
 from epkernel.Action import Information,Selection
 
+Configuration.init(RunConfig.ep_cam_path)
+Configuration.set_sysattr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\sysattr'))
+Configuration.set_userattr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\userattr'))
+
 class Pretreatment(object):
-    def __init__(self,*,job):
+    def __init__(self,*,job, job_id):
         pass
         self.job = job
+        self.job_id = job_id
 
     def change_layer_attribute(self,attributes:dict):
         """
@@ -128,3 +133,113 @@ class Pretreatment(object):
                 Selection.select_feature_by_polygon(self.job, step, layer, points)
             else:
                 print("type不存在")
+
+    def get_job_layer_info_from_dms(self):
+        job_id = self.job_id
+        sql = '''SELECT a.* from eptest_layer a where a.job_id = {}'''.format(job_id)
+        engine = create_engine('postgresql+psycopg2://readonly:123456@10.97.80.119/epdms')
+        pd_job_layer_info = pd.read_sql(sql=sql, con=engine)
+        # self.pd_job_layer_info = pd_job_layer_info
+        return pd_job_layer_info
+
+    def input_folder(self, temp_gerber_path, save_path):
+        '''
+        函数：把指定路径下的所有Gerber274X或Excello2文件全部转换到指定名称的料号，并保存到指定路径。
+        命名关键字参数save_path，用来保存料号的路径，未传此参数时，默认路径为r'C:\job\test\odb'。
+        '''
+        # folder_path = self.folder_path
+        job = self.job
+        # step = self.step
+        # save_path = self.save_path
+        step = 'orig'
+        folder_path = temp_gerber_path
+        # folder_path = os.
+
+        #如果未指定保存路径,默认路径为r'C:\job\test\odb'。
+        save_path = r'C:\job\test\odb' if not save_path else save_path
+
+        # job若存在则删除
+        shutil.rmtree(os.path.join(save_path, job)) if os.path.exists(os.path.join(save_path, job)) else True
+
+        # 创建一个空料号
+        # Job.create_job(job)
+        BASE.create_job(save_path,job)
+        #创建一个空step
+        Matrix.create_step(job, step)
+
+        #开始识别文件夹中各个文件的类型，此方只识别单层文件夹中的内容
+        file_list = [x for x in os.listdir(folder_path + '\\' + job.split("_ep")[0]) if os.path.isfile(os.path.join(folder_path + '\\' + job.split("_ep")[0],x))]
+        # print("folder_path",folder_path + "\\" + job.split("_ep")[0])
+        # print("file_list",file_list)
+        # file_list = []
+        # for root, dirs, files in os.walk(folder_path):
+        #     for file in files:
+        #         file_list.append(file)
+        print("list",file_list)
+
+        offsetFlag = False
+        offset1 = 0
+        offset2 = 0
+        for each_file in file_list:
+            print(each_file)
+            # result_each_file_identify = Input.file_identify(os.path.join(folder_path,each_file))
+            result_each_file_identify = Input.file_identify(folder_path + '\\' + job.split("_ep")[0] + '\\' + each_file)
+            print("result_each_file_identify",result_each_file_identify)
+            min_1 = result_each_file_identify['parameters']['min_numbers']['first']
+            min_2 = result_each_file_identify['parameters']['min_numbers']['second']
+            print("orig min_1,min_2:",min_1,":",min_2)
+            #如果是孔的话，需要从DMS读取导入参数。是不是孔文件，以及相关参数信息都从DMS获取信息。孔参数信息是要人工确认过的，即层信息状态是published的。
+            try:
+                pd_job_layer_info = self.get_job_layer_info_from_dms()
+                pd_job_layer_info_cuurent_layer = pd_job_layer_info[(pd_job_layer_info["layer"] == each_file)]
+                print("layer_file_type_value:".center(192,'-'))
+                print(pd_job_layer_info_cuurent_layer['layer_file_type'].values[0])
+
+                if pd_job_layer_info_cuurent_layer['status'].values[0] ==  'published' and pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] ==  'excellon2' or \
+                        pd_job_layer_info_cuurent_layer['status'].values[0] ==  'published' and pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] ==  'excellon1':
+                    print('need to set the para for drill excellon2'.center(190,'-'))
+                    print('原来导入参数'.center(190,'-'))
+                    print(result_each_file_identify)
+                    result_each_file_identify['parameters']['units'] = pd_job_layer_info_cuurent_layer['units'].values[0]
+                    result_each_file_identify['parameters']['zeroes_omitted'] = pd_job_layer_info_cuurent_layer['zeroes_omitted'].values[0]
+                    result_each_file_identify['parameters']['Number_format_integer'] = int(pd_job_layer_info_cuurent_layer['number_format_A'].values[0])
+                    result_each_file_identify['parameters']['Number_format_decimal'] = int(pd_job_layer_info_cuurent_layer['number_format_B'].values[0])
+                    result_each_file_identify['parameters']['tool_units'] = pd_job_layer_info_cuurent_layer['tool_units_ep'].values[0]
+                    print('现在导入参数'.center(190, '-'))
+                    print(result_each_file_identify)
+
+                if pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'gerber274X' or pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'else' \
+                        or pd_job_layer_info_cuurent_layer['layer_file_type'].values[0] == 'dxf':
+                    if result_each_file_identify["format"] == "Gerber274x":
+                        # print("hihihi1:", each_file)
+                        print("我不是孔类型")
+                        print('orig para'.center(190, '-'))
+                        print(result_each_file_identify)
+                        print("offsetFlag:", offsetFlag)
+                        if (offsetFlag == False) and (abs(min_1 - sys.maxsize) > 1e-6 and abs(min_2 - sys.maxsize) > 1e-6):
+                            # print("hihihi2:",each_file)
+                            offset1 = min_1
+                            offset2 = min_2
+                            offsetFlag = True
+                        result_each_file_identify['parameters']['offset_numbers'] = {'first': offset1, 'second': offset2}
+                    elif result_each_file_identify["format"] == "DXF":
+                        # print("hihihi1:", each_file)
+                        print("我是dxf呀")
+                        print('dxf para'.center(190, '-'))
+                        print(result_each_file_identify)
+                        if pd_job_layer_info_cuurent_layer['status'].values[0] == 'published':
+                            result_each_file_identify['parameters']['units'] = \
+                            pd_job_layer_info_cuurent_layer['units'].values[0]
+                        result_each_file_identify['parameters']['scale'] = 1  # 改参数在kernel1.9版本中添加
+                    print('now para'.center(190, '-'))
+                    print(result_each_file_identify)
+
+            except Exception as e:
+                print(e)
+                print("有异常情况发生")
+            Input.file_translate(path=folder_path + '\\' + job.split("_ep")[0] + '\\' + each_file, job=job, step='orig', layer=each_file,
+                                 param=result_each_file_identify['parameters'])
+
+        #保存料号
+        BASE.save_job(job)
+

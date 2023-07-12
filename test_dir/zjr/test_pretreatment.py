@@ -53,7 +53,7 @@ class TestPretreatment:
         step_net = 'net'
         step_pre = 'pre'
 
-        pretreatment = Pretreatment(job = job_ep)
+        pretreatment = Pretreatment(job = job_ep, job_id = job_id)
         if (job_id == 11633):
             """-----------修改层别名称，定义层别属性，重新排序-----------"""
             #定义新的层别名称，属性，层别顺序
