@@ -5,6 +5,7 @@ import sys
 import time
 import urllib
 from pathlib import Path
+import tarfile as tf
 
 import pandas as pd
 import psycopg2
@@ -242,4 +243,3 @@ class Pretreatment(object):
 
         #保存料号
         BASE.save_job(job)
-
