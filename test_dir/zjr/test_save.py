@@ -42,7 +42,7 @@ class TestSaveJob:
         all_layers_list_job_ep = Information.get_layers(job_ep)
         step_name = Information.get_steps(job_ep)[0]
 
-        # GUI.show_matrix(job_ep)
+        # ----------第一次对料号进行编辑（删除、新增层别），验证save后layers文件夹中多出一个netlist层、以及ui上删除层别还存在-------------
         # 删除料号的第一个层别
         Matrix.delete_layer(job_ep, all_layers_list_job_ep[0])
         # 创建一个新的层别
@@ -51,25 +51,48 @@ class TestSaveJob:
         # GUI.show_matrix(job_ep)
         # 保存料号,必须调用BASE中的save_job
         BASE.save_job(job_ep)
-        #
+        # 重新获取ui上的层别
+        all_layers_list_job_ep_1 = Information.get_layers(job_ep)
+
+        # ----------第二次对料号进行编辑（删除层别），验证ui上删除层别后，然后rename_job，再save_job，ui上删除的层别，在layers文件夹中依然存在-------------
+        job_ep_new = job_ep + '_new'
+        BASE.save_job_as(job_ep,temp_path)
+        BASE.close_job(job_ep)
+        Input.open_job(job_ep,temp_path)
+        # GUI.show_matrix(job_ep)
+        # 删除料号的第一个层别
+        Matrix.delete_layer(job_ep, all_layers_list_job_ep[1])
+        BASE.job_rename(job_ep,job_ep_new)
+        BASE.save_job(job_ep_new)
+        all_layers_list_job_ep_2 = Information.get_layers(job_ep_new)
+
         # 获取layers文件夹下的层别数量
-        ep_dir_path = dir_path + '\\' + job_ep + '\\steps\\' + step_name + '\\layers'
-
-        ep_folder_names = [] #存放ep层别名称
-        for item in os.listdir(ep_dir_path):
-            item_path = os.path.join(ep_dir_path, item)
+        ep_dir_path_1 = dir_path + '\\' + job_ep + '\\steps\\' + step_name + '\\layers'
+        ep_folder_names_1 = [] #存放ep层别名称
+        for item in os.listdir(ep_dir_path_1):
+            item_path = os.path.join(ep_dir_path_1, item)
             if os.path.isdir(item_path):
-                ep_folder_names.append(item)
+                ep_folder_names_1.append(item)
 
-        print("ep文件夹layers名:", ep_folder_names)
+        ep_dir_path_2 = temp_path + '\\' + job_ep_new + '\\steps\\' + step_name + '\\layers'
+        ep_folder_names_2 = []  # 存放ep层别名称
+        for item in os.listdir(ep_dir_path_2):
+            item_path = os.path.join(ep_dir_path_2, item)
+            if os.path.isdir(item_path):
+                ep_folder_names_2.append(item)
 
-        # # 重新获取ui上的层别
-        all_layers_list_job_ep_new = Information.get_layers(job_ep)
-        print("ui最新layers名：",all_layers_list_job_ep_new)
+        print("原始layers:",all_layers_list_job_ep)
+        print("第一次ep文件夹layers名:", ep_folder_names_1)
+        print("第一次ui最新layers名：", all_layers_list_job_ep_1)
+        # 重新获取ui上的层别
+        print("第二次ep文件夹layers名:", ep_folder_names_2)
+        print("第二次ui最新layers名：", all_layers_list_job_ep_2)
         # GUI.show_matrix(job_ep)
 
         # ----------------------------------------断言--------------------------------------------------------
-        Print.print_with_delimiter("断言--开始")
-        for ep_layer_name in ep_folder_names:
-            assert ep_layer_name in all_layers_list_job_ep_new
+        for ep_layer_name_1 in ep_folder_names_1:
+            assert ep_layer_name_1 in all_layers_list_job_ep_1
+        for ep_layer_name_2 in ep_folder_names_2:
+            assert ep_layer_name_2 in all_layers_list_job_ep_2
+
 
