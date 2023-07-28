@@ -24,8 +24,8 @@ class TestGraphicRoutConnection:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
-        # layers = ['l1', 'l2', 'l3','l4','l6']  # 定义需要比对的层
-        layers = ['l1']
+        layers = ['l1', 'l2', 'l3','l4','l6','l7','l8','l9']  # 定义需要比对的层
+        # layers = ['l1']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -43,25 +43,49 @@ class TestGraphicRoutConnection:
         # 用悦谱CAM打开料号
         Input.open_job(job_case, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        # #1.选择两根线导圆角,角度为0.1inch，利用单选功能,接口有bug
-        # Selection.select_feature_by_id(job_case, step, 'l1', [0,1])
-        # Layers.rounding_line_corner(job_case, step, 'l1', 2540000)
+        # 1.选择两根未连接线导圆角,角度为0.1inch,pass
+        Selection.select_feature_by_id(job_case, step, 'l1', [0, 1])
+        BASE.connections(job_case, step, ['l1'], 1, 2540000, 0)
+        # GUI.show_layer(job_case, step, 'l1')
 
-        # 2.选择两根线导圆角,角度为0.4inch,利用反选功能选中物件
+        # 2.选择两根线导圆角,角度为0.4inch,pass
         Selection.reverse_select(job_case, step, 'l2')
-        Layers.rounding_line_corner(job_case, step, ['l2'], 10160000)
+        # Layers.rounding_line_corner(job_case, step, ['l2'], 10160000)
+        BASE.connections(job_case, step, ['l2'], 1, 10160000, 0)
+        # GUI.show_layer(job_case, step, 'l2')
 
-        # # 3.选择两根线导圆角,角度为0.25inch,接口有bug
-        # Selection.reverse_select(job_case, step, 'l3')
+        # 3.选择两根线导圆角,角度为0.25inch,pass
+        Selection.reverse_select(job_case, step, 'l3')
         # Layers.rounding_line_corner(job_case, step, ['l3'], 6350000)
-        #
-        # # 4.选择两根线导圆角,角度为0.6inch,接口有bug
-        # Selection.reverse_select(job_case, step, 'l4')
-        # Layers.rounding_line_corner(job_case, step, ['l4'], 15240000)
+        BASE.connections(job_case, step, ['l3'], 1, 6350000, 0)
+        # GUI.show_layer(job_case, step, 'l3')
 
-        # 5.选择两根线导圆角,角度为1inch,为钝角时，接口有bug
-        # Selection.reverse_select(job_case, step, 'l6')
+        # 4.选择两根线导圆角,角度为0.6inch,pass
+        Selection.reverse_select(job_case, step, 'l4')
+        # Layers.rounding_line_corner(job_case, step, ['l4'], 15240000)
+        BASE.connections(job_case, step, ['l4'], 1, 15240000, 0)
+        # GUI.show_layer(job_case, step, 'l4')
+
+        # 5.选择两根线导圆角,角度为1inch,pass
+        Selection.reverse_select(job_case, step, 'l6')
         # Layers.rounding_line_corner(job_case, step, ['l6'], 25400000)
+        BASE.connections(job_case, step, ['l6'], 1, 25400000, 0)
+        # GUI.show_layer(job_case, step, 'l6')
+
+        # 6.选择两根线导圆角,角度为0.2inch,pass
+        Selection.reverse_select(job_case, step, 'l7')
+        BASE.connections(job_case, step, ['l7'], 1, 5080000, 0)
+        # GUI.show_layer(job_case, step, 'l7')
+
+        # 7.选择两根线导圆角,角度为0.4inch,pass
+        Selection.reverse_select(job_case, step, 'l8')
+        BASE.connections(job_case, step, ['l8'], 1, 10160000, 0)
+        # GUI.show_layer(job_case, step, 'l8')
+
+        # 8.选择两根线导圆角,角度为1inch,pass
+        Selection.reverse_select(job_case, step, 'l9')
+        BASE.connections(job_case, step, ['l9'], 1, 2032000, 0)
+        # GUI.show_layer(job_case, step, 'l9')
 
         save_job(job_case, temp_ep_path)
         # GUI.show_layer(job_case, step, 'l6')
