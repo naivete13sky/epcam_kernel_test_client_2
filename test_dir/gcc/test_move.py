@@ -1,7 +1,7 @@
 import pytest, os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
-from epkernel import Input
+from epkernel import Input, GUI
 from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
@@ -11,7 +11,7 @@ class TestGraphicEditMove:
     def testMove(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试 Move功能
+        本用例测试 Move功能, 用例数：9
         ID: 11631
         '''
 
@@ -40,44 +40,48 @@ class TestGraphicEditMove:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 移动选中物件
+        # 1、移动选中物件
         Selection.select_feature_by_id(job_ep, step, 'top', [2525])
         Layers.move2same_layer(job_ep, step, ['top'], 2*2540000, 0)
 
-        # 移动整层物件
+        # 2、移动整层物件
         Layers.move2same_layer(job_ep, step, ['bot'], 2*2540000, 0)
 
-        # 选中负属性物件移动到其他层并反转极性
+        # 3、选中负属性物件移动到其他层并反转极性
         Selection.select_feature_by_id(job_ep, step, 'l2', [20])
         Matrix.create_layer(job_ep, 'l2+1')
         Layers.move2other_layer(job_ep, step, ['l2'], job_ep, step, 'l2+1', True, 0, 0, 0, 0, 0, 0, 0)
 
-        # 选中物件移动至其他层并横纵向偏移
+        # 4、选中物件移动至其他层并横纵向偏移
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
         Matrix.create_layer(job_ep, 'l3+1')
         Layers.move2other_layer(job_ep, step, ['l3'], job_ep, step, 'l3+1', False, 200*25400, -200*25400, 0, 0, 0, 0, 0)
 
-        # 选中物件移动至其他层并水平镜像
+        # 5、选中物件移动至其他层并水平镜像
         Selection.select_feature_by_id(job_ep, step, 'l4', [0])
         Matrix.create_layer(job_ep, 'l4+1')
         Layers.move2other_layer(job_ep, step, ['l4'], job_ep, step, 'l4+1', False, 0, 0, 1, 0, 0, 0, 0)
 
-        # 选中物件移动至其他层并竖直镜像
+        # 6、选中物件移动至其他层并竖直镜像
         Selection.select_feature_by_id(job_ep, step, 'l5', [0])
         Matrix.create_layer(job_ep, 'l5+1')
         Layers.move2other_layer(job_ep, step, ['l5'], job_ep, step, 'l5+1', False, 0, 0, 2, 0, 0, 0, 0)
 
-        # 选中物件移动至其他层并涨大4mil
+        # 7、选中物件移动至其他层并涨大4mil
         Selection.select_feature_by_id(job_ep, step, 'l6', [866])
         Matrix.create_layer(job_ep, 'l6+1')
         Layers.move2other_layer(job_ep, step, ['l6'], job_ep, step, 'l6+1', False, 0, 0, 0, 4*25400, 0, 0, 0)
 
-        # 选中物件移动至其他层并以锚点旋转45°
+        # 8、选中物件移动至其他层并以锚点旋转45°
         Selection.select_feature_by_id(job_ep, step, 'l7', [0])
         Matrix.create_layer(job_ep, 'l7+1')
         Layers.move2other_layer(job_ep, step, ['l7'], job_ep, step, 'l7+1', False, 0, 0, 0, 0, 45, 0, 0)
 
-        # GUI.show_layer(job_ep, step, 'l6')
+        # 9、多个层别移动到同一层
+        Matrix.create_layer(job_ep, 'l8+1')
+        Layers.move2other_layer(job_ep, step, ['l8', 'l9', 'drl1-10'], job_ep, step, 'l8+1', False, 0, 0, 0, 0, 0, 0, 0)
+
+        # GUI.show_layer(job_ep, step, 'l8+1')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
