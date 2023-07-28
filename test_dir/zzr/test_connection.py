@@ -24,7 +24,7 @@ class TestGraphicRoutConnection:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
-        layers = ['l1', 'l2', 'l3','l4','l6','l7','l8','l9']  # 定义需要比对的层
+        layers = ['l1', 'l2', 'l3','l4','l6','l7','l8','l9','l10','smb','ssb','spb','spt','sst','smt']  # 定义需要比对的层
         # layers = ['l1']
 
         # 取到临时目录
@@ -86,6 +86,35 @@ class TestGraphicRoutConnection:
         Selection.reverse_select(job_case, step, 'l9')
         BASE.connections(job_case, step, ['l9'], 1, 2032000, 0)
         # GUI.show_layer(job_case, step, 'l9')
+
+        # 9.单选两根线段进行连接，功能为：corner
+        Selection.select_feature_by_id(job_case, step, 'l10', [0, 1])
+        BASE.connections(job_case, step, ['l10'], 0, 0, 0)
+        # GUI.show_layer(job_case, step, 'l10')
+
+        # 10.单选两根线段进行连接，功能为：corner
+        Selection.select_feature_by_id(job_case, step, 'smb', [0, 1])
+        BASE.connections(job_case, step, ['smb'], 0, 0, 0)
+
+        # 11.单选两根线段进行连接，功能为：corner
+        Selection.select_feature_by_id(job_case, step, 'ssb', [0, 1])
+        BASE.connections(job_case, step, ['ssb'], 0, 0, 0)
+
+        # 12.单选两根线段进行连接，功能为：corner
+        Selection.select_feature_by_id(job_case, step, 'spb', [0, 1])
+        BASE.connections(job_case, step, ['spb'], 0, 0, 0)
+
+        # 13.单选两根线段进行连接，功能为：corner
+        Selection.select_feature_by_id(job_case, step, 'spt', [0, 1])
+        BASE.connections(job_case, step, ['spt'], 0, 0, 0)
+
+        # 14.单选两根线段进行连接，功能为：corner
+        Selection.select_feature_by_id(job_case, step, 'sst', [0, 1])
+        BASE.connections(job_case, step, ['sst'], 0, 0, 0)
+
+        # 15.单选两根线段进行连接，功能为：corner
+        Selection.select_feature_by_id(job_case, step, 'smt', [0, 1])
+        BASE.connections(job_case, step, ['smt'], 0, 0, 0)
 
         save_job(job_case, temp_ep_path)
         # GUI.show_layer(job_case, step, 'l6')
