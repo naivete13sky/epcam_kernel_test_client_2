@@ -1,7 +1,7 @@
 import pytest, os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
-from epkernel import Input
+from epkernel import Input, GUI
 from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
@@ -12,7 +12,7 @@ class TestGraphicEditContour2pad:
     def testContour2pad (self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Contour2pad铜皮转pad功能
+        本用例测试Contour2pad铜皮转pad功能，用例数：3
         ID: 17155
         '''
 
@@ -41,7 +41,7 @@ class TestGraphicEditContour2pad:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 选取多个铜皮转换成pad然后删除所有pad
+        # 1、选取多个铜皮转换成pad然后删除所有pad
         points_location = []
         points_location.append([1 * 1000000, -1 * 1000000])
         points_location.append([1 * 1000000, -5 * 1000000])
@@ -53,20 +53,18 @@ class TestGraphicEditContour2pad:
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['top'])
         Layers.delete_feature(job_ep, step, ['top'])
-        Selection.reset_selection()     # 重置筛选
-        Selection.reset_select_filter()
+        Selection.reset_select_filter()  # 重置筛选
 
-        # 添加圆surface，全部转为pad之后删除pad
+        # 2、添加圆surface，全部转为pad之后删除pad
         Layers.add_round_surface(job_ep, step, ['bot'], True,
                                  [{'.out_flag': '233'}, {'.pattern_fill': ''}], 0, 0, 35 * 25400)
         Layers.contour2pad(job_ep, step, ['bot'], 1 * 25400, 5 * 25400, 99999 * 25400, '+++')
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['bot'])
         Layers.delete_feature(job_ep, step, ['bot'])
-        Selection.reset_selection()     # 重置筛选
-        Selection.reset_select_filter()
+        Selection.reset_select_filter()  # 重置筛选
 
-        # 铜皮转pad导致物件变形的BUG
+        # 3、铜皮转pad导致物件变形-----BUG号：4379
         Selection.select_feature_by_id(job_ep, step, 'gtl', [70])
         Layers.contour2pad(job_ep, step, ['gtl'], 1*25400, 5*25400, 99999*25400, '+++')
 

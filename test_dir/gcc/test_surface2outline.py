@@ -12,7 +12,7 @@ class TestGraphicEditSurface2outline:
     def testSurface2outline (self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Surface2outline功能
+        本用例测试Surface2outline功能，用例数：3
         ID: 17806
         '''
 
@@ -41,18 +41,17 @@ class TestGraphicEditSurface2outline:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 单层铜皮转外框线，线宽为0
+        # 1、单层铜皮转外框线，线宽为0
         Selection.select_feature_by_id(job_ep, step, 'top', [27])
         Layers.surface2outline(job_ep, step, ['top'], 0)
 
-        # 多层铜皮转外框线，线宽为2
+        # 2、多层铜皮转外框线，线宽为2
         Selection.set_featuretype_filter(True, False, False, True, False, False, False)
         Selection.select_features_by_filter(job_ep, step, ['l2', 'l3'])
         Layers.surface2outline(job_ep, step, ['l2', 'l3'], 2*25400)
-        Selection.reset_selection()     # 重置筛选
-        Selection.reset_select_filter()
+        Selection.reset_select_filter()   # 重置筛选
 
-        # 负极性铜皮转外框线，线宽为20
+        # 3、负极性铜皮转外框线，线宽为20
         Selection.select_feature_by_id(job_ep, step, 'l4', [237])
         Layers.surface2outline(job_ep, step, ['l4'], 10*25400)
 

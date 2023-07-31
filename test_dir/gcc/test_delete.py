@@ -12,7 +12,7 @@ class TestGraphicEditDelete:
     def testDelete (self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Delete删除物件功能
+        本用例测试Delete删除物件功能，用例数：3
         ID: 11630
         '''
 
@@ -41,14 +41,14 @@ class TestGraphicEditDelete:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 删除选中物件
+        # 1、删除选中物件
         Selection.select_feature_by_id(job_ep, step, 'top', [2525])
         Layers.delete_feature(job_ep, step, ['top'])
 
-        # 删除整层物件
+        # 2、删除整层物件
         Layers.delete_feature(job_ep, step, ['l2'])
 
-        # 删除多层选中物件
+        # 3、删除多层选中物件
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
         Selection.select_feature_by_id(job_ep, step, 'l4', [0])
         Layers.delete_feature(job_ep, step, ['l3', 'l4'])

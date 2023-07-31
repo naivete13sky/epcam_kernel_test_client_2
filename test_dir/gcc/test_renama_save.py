@@ -1,21 +1,15 @@
-import shutil
-import tarfile
-
 import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from collections import namedtuple
-from epkernel import Input, GUI, BASE, Output, Application
+from cc.cc_method import GetTestData, DMS
+from epkernel import Input, GUI, BASE
 from epkernel.Action import Information
-from epkernel.Edition import Layers, Matrix, Job
+from epkernel.Edition import Matrix, Job
 
 
 @pytest.mark.cc
-class Test_Export_tgz():
+class TestSavejob():
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Rename_save'))
-    def test_output_gerber274x(self, job_id):
+    def test_Savejob(self, job_id):
         '''
         本用例测试 Rename、Save功能。料号ID：21648
         导入tgz删除step、删除layer，更改step、job名之后save
@@ -60,20 +54,20 @@ class Test_Export_tgz():
         layers_list = os.listdir(os.path.join(temp_compressed_path, '2625262a-orig\\steps\\orig\\layers'))
 
         # 获取EP—CAM层别信息
-        steps = Information.get_layers('2625262a-orig')
-        layers = Information.get_steps('2625262a-orig')
+        steps = Information.get_steps('2625262a-orig')
+        layers = Information.get_layers('2625262a-orig')
 
         # if sorted(steps_list) == sorted(steps):
-        #     print('测试通过')
+        #     print('steps测试通过')
         # else:
-        #     print('测试失败')
+        #     print('steps测试失败')
         #     print(steps_list)
         #     print(steps)
         #
         # if sorted(layers_list) == sorted(layers):
-        #     print('测试通过')
+        #     print('layers测试通过')
         # else:
-        #     print('测试失败')
+        #     print('layers测试失败')
         #     print(sorted(layers_list))
         #     print(sorted(layers))
 

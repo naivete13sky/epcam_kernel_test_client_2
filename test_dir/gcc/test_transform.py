@@ -1,22 +1,21 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input, GUI
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicEditTransform:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Transform'))
     def testTransform (self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Transform功能
+        本用例测试Transform功能，用例数：6
         ID: 12015
         '''
+
         g = RunConfig.driver_g  # 拿到G软件
 
         data = {}  # 存放比对结果信息
@@ -24,7 +23,7 @@ class TestGraphicEditTransform:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l4', 'l5']
+        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'spb']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -42,26 +41,36 @@ class TestGraphicEditTransform:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 选中物件以锚点旋转90°
+        # 1、选中物件以锚点旋转90°
         Selection.select_feature_by_id(job_ep, step, 'top', [2525])
         Layers.transform_features(job_ep, step, 'top', 0, True, False, False, False, False, {'ix': 0, 'iy': 0},
                                   90, 0, 0, 0, 0)
-        # 选中物件以轴旋转缩放
+
+        # 2、选中物件以轴旋转缩放
         Selection.select_feature_by_id(job_ep, step, 'l2', [0])
         Layers.transform_features(job_ep, step, 'l2', 1, True, True, False, False, False, {'ix': 0, 'iy': 0},
                                   45, 0.5, 0.5, 0, 0)
-        # 整层物件以锚点旋转X轴镜像
+
+        # 3、整层物件以锚点旋转X轴镜像
         Layers.transform_features(job_ep, step, 'l3', 0, True, False, True, False, False, {'ix': 0, 'iy': 0},
                                   90, 0, 0, 0, 0)
-        # 整层物件以Y轴镜像偏移
+
+        # 4、整层物件以Y轴镜像偏移
         Layers.transform_features(job_ep, step, 'l4', 0, False, False, False, True, False, {'ix': 0, 'iy': 0},
                                   0, 0, 0, 0, -10*1000000)
-        # 整层物件以Y轴偏移缩放复制
+
+        # 5、整层物件以Y轴偏移缩放复制
         Layers.transform_features(job_ep, step, 'l5', 0, False, True, False, True, True, {'ix': 0, 'iy': 0},
                                   0, 2, 2, 0, -20*1000000)
 
-        # GUI.show_layer(job_ep, step, 'l5')
+        # 6、涨大带有弧线的外框线-----BUG号：1785
+        Selection.set_featuretype_filter(True, False, False, False, True, True, False)
+        Selection.select_features_by_filter(job_ep, step, ['spb'])
+        Layers.transform_features(job_ep, step, 'spb', 0, False, True, False, False, False, {'ix': 0, 'iy': 0},
+                                  0, 1.2, 1.2, 0, 0)
+        Selection.reset_select_filter()
 
+        # GUI.show_layer(job_ep, step, 'spb')
         save_job(job_ep, temp_ep_path)
 
         Job.close_job(job_ep)

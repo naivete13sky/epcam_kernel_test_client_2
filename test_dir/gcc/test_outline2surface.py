@@ -12,7 +12,7 @@ class TestGraphicEditOutline2surface:
     def testOutline2surface(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Outline2surface功能
+        本用例测试Outline2surface功能，用例数：3
         ID: 18584
         '''
 
@@ -41,14 +41,14 @@ class TestGraphicEditOutline2surface:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 选中闭合的线段集转换为实心铜面
+        # 1、选中闭合的线段集转换为实心铜面
         Selection.select_feature_by_id(job_ep, step, 'top', [2526, 2527, 2528, 2529, 2530])
         Layers.outline2surface(job_ep, step, ['top'], False)
 
-        # 不选中闭合的线段集转换为实心铜面
+        # 2、不选中闭合的线段集转换为实心铜面
         Layers.outline2surface(job_ep, step, ['l2'], False)
 
-        # 不选中闭合的线段集转换为实心铜面，并转为pad
+        # 3、不选中闭合的线段集转换为实心铜面，并转为pad
         Layers.outline2surface(job_ep, step, ['l3'], True)
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['l3'])

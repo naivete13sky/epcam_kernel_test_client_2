@@ -11,7 +11,7 @@ class TestGraphicEditMove:
     def testMove(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试 Move功能, 用例数：9
+        本用例测试 Move功能，用例数：9
         ID: 11631
         '''
 

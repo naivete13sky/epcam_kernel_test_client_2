@@ -12,7 +12,7 @@ class TestGraphicEditContourize:
     def testContourize(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Contourize整合铜皮功能
+        本用例测试Contourize整合铜皮功能，用例数：7
         ID: 17805
         '''
 
@@ -41,7 +41,7 @@ class TestGraphicEditContourize:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 正负极性整合
+        # 1、正负极性整合
         Selection.select_feature_by_id(job_ep, step, 'top', [27, 40])
         Layers.contourize(job_ep, step, ['top'], 6350, True, 3*25400, 1)
         Selection.set_featuretype_filter(False, True, False, True, False, False, False)
@@ -50,7 +50,7 @@ class TestGraphicEditContourize:
         Selection.reset_selection()     # 重置筛选
         Selection.reset_select_filter()
 
-        # pad、line、surface整合
+        # 2、pad、line、surface整合
         Selection.select_feature_by_id(job_ep, step, 'top', [4, 5, 126, 1980, 1982])
         Layers.contourize(job_ep, step, ['top'], 6350, True, 3*25400, 1)
         Selection.select_feature_by_id(job_ep, step, 'top', [4])
@@ -58,29 +58,29 @@ class TestGraphicEditContourize:
         Selection.reset_selection()     # 重置筛选
         Selection.reset_select_filter()
 
-        # 分离孤岛整合
+        # 3、分离孤岛整合
         Layers.contourize(job_ep, step, ['l2'], 6350, True, 3*25400, 1)
         Selection.select_feature_by_id(job_ep, step, 'l2', [445])
         Layers.delete_feature(job_ep, step, ['l2'])
 
-        # 不分离孤岛整合
+        # 4、不分离孤岛整合
         Layers.contourize(job_ep, step, ['l3'], 6350, False, 3*25400, 1)
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
         Layers.delete_feature(job_ep, step, ['l3'])
 
-        # 新增负极性长方形pad，X、Y单边清除空洞整合
+        # 5、新增负极性长方形pad，X、Y单边清除空洞整合
         Layers.add_pad(job_ep, step, ['l4'], "rect20x10", 2540000, 1 * 2540000, False, 9, [], 0)
         Layers.add_pad(job_ep, step, ['l4'], "rect40x20", 2540000, 3 * 2540000, False, 9, [], 0)
         Layers.add_pad(job_ep, step, ['l4'], "rect50x30", 2540000, 5 * 2540000, False, 9, [], 0)
         Layers.contourize(job_ep, step, ['l4'], 6350, False, 20 * 25400, 0)
 
-        # 新增负极性长方形pad，X、Y双边清除空洞整合
+        # 6、新增负极性长方形pad，X、Y双边清除空洞整合
         Layers.add_pad(job_ep, step, ['l5'], "rect20x10", 2540000, 1 * 2540000, False, 9, [], 0)
         Layers.add_pad(job_ep, step, ['l5'], "rect40x20", 2540000, 3 * 2540000, False, 9, [], 0)
         Layers.add_pad(job_ep, step, ['l5'], "rect50x30", 2540000, 5 * 2540000, False, 9, [], 0)
         Layers.contourize(job_ep, step, ['l5'], 6350, False, 20 * 25400, 1)
 
-        # 通过面积清除空洞整合
+        # 7、通过面积清除空洞整合
         Layers.contourize(job_ep, step, ['l6'], 6350, False, 800 * 25400, 2)
 
         # GUI.show_layer(job_ep, step, 'l6')

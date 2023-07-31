@@ -12,7 +12,7 @@ class TestGraphicEditUse_line_fill_contours:
     def testUse_line_fill_contours (self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Use_line_fill_contours填充功能
+        本用例测试Use_line_fill_contours填充功能，用例数：6
         ID: 17867
         '''
 
@@ -41,11 +41,11 @@ class TestGraphicEditUse_line_fill_contours:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 选中铜皮填充（线宽5，间距10）❤❤❤
+        # 1、选中铜皮填充（线宽5，间距10）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'top', [27])
         Layers.use_line_fill_contours(job_ep, step, 'top', 10*25400, 10*25400, 5*25400, 0*25400, 0*25400, 0)
 
-        # 整合正负极性铜皮填充（线宽5，间距10，X、Y偏置，角度偏转45°）
+        # 2、整合正负极性铜皮填充（线宽5，间距10，X、Y偏置，角度偏转45°）
         Selection.set_featuretype_filter(True, True, False, True, False, False, False)
         Selection.select_features_by_filter(job_ep, step, ['l2'])
         Layers.contourize(job_ep, step, ['l2'], 6350, True, 3*25400, 1)
@@ -54,19 +54,19 @@ class TestGraphicEditUse_line_fill_contours:
         Selection.reset_selection()     # 重置筛选
         Selection.reset_select_filter()
 
-        # 选中物件填充（线宽5，角度偏转45°）
+        # 3、选中物件填充（线宽5，角度偏转45°）
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
         Layers.use_line_fill_contours(job_ep, step, 'l3', 10*25400, 10*25400, 5*25400, 0*25400, 0*25400, 45)
 
-        # 选中负极性铜皮填充（线宽5，X、Y偏置，角度偏转45°）
+        # 4、选中负极性铜皮填充（线宽5，X、Y偏置，角度偏转45°）
         Selection.select_feature_by_id(job_ep, step, 'l4', [237])
         Layers.use_line_fill_contours(job_ep, step, 'l4', 10*25400, 10*25400, 5*25400, 0*25400, 0*25400, 45)
 
-        # 选中铜皮填充（线宽10）
+        # 5、选中铜皮填充（线宽10）
         Selection.select_feature_by_id(job_ep, step, 'l5', [1])
         Layers.use_line_fill_contours(job_ep, step, 'l5', 10*25400, 10*25400, 10*25400, 0*25400, 0*25400, 45)
 
-        # 选中铜皮填充（线宽10，间距1）
+        # 6、选中铜皮填充（线宽10，间距1）
         Selection.select_feature_by_id(job_ep, step, 'l6', [0, 1, 2])
         Layers.use_line_fill_contours(job_ep, step, 'l6', 1*25400, 1*25400, 10*25400, 0*25400, 0*25400, 45)
 

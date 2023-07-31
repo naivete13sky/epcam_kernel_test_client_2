@@ -12,7 +12,7 @@ class TestGraphicEditResize:
     def testResize(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Resize功能
+        本用例测试Resize功能，用例数：7
         ID: 11941
         '''
 
@@ -23,7 +23,7 @@ class TestGraphicEditResize:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'  # 定义需要执行比对的step名
-        layers = ['top', 'l2', 'l3', 'l4', 'comp', 'symbol_type']
+        layers = ['top', 'l2', 'l3', 'l4', 'comp', 'symbol_type', 'drlmap']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -38,36 +38,41 @@ class TestGraphicEditResize:
 
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 选中pad、line、surface物件涨大
+        # 1、选中pad、line、surface物件涨大
         Selection.select_feature_by_id(job_ep, step, 'top', [9, 36, 58, 1457, 2525])
-        Layers.resize_global(job_ep, step, ['top'], 0, 10 * 25400)
+        Layers.resize_global(job_ep, step, ['top'], 0, 10*25400)
 
-        # 整层物件缩小
+        # 2、整层物件缩小
         Layers.resize_global(job_ep, step, ['l2'], 1, -5 * 25400)
 
-        # 涨弧
+        # 3、涨弧
         Selection.select_feature_by_id(job_ep, step, 'l3', [2360, 2376])
         Layers.resize_polyline(job_ep, step, ['l3'], 14*25400, True)
 
-        # 涨外框线
+        # 4、涨外框线
         Selection.select_feature_by_id(job_ep, step, 'l4', [910, 911, 912, 913, 914, 915, 916, 917, 918, 919, 920, 921,
                                                             922, 923, 924, 925, 926, 927, 928, 929])
         Layers.resize_polyline(job_ep, step, ['l4'], 30*25400, True)
 
-        # 缩小特殊pad(user symbol)导致物件消失的BUG
+        # 5、缩小特殊pad(user symbol)导致物件消失-----BUG号:4393
         Selection.set_include_symbol_filter(['i274x.macro138.d138_inc_1.5'])    # 第一个属性物件
         Selection.select_features_by_filter(job_ep, step, ['comp'])
         Layers.resize_global(job_ep, step, ['comp'], 0, -38100)
         Selection.set_include_symbol_filter(['construct_inc_1.5'])    # 第二个属性物件
         Selection.select_features_by_filter(job_ep, step, ['comp'])
         Layers.resize_global(job_ep, step, ['comp'], 0, -38100)
-        Selection.reset_selection()     # 重置筛选
-        Selection.reset_select_filter()
+        Selection.reset_select_filter()  # 重置筛选
 
-        # 涨大多种symbol
+        # 6、涨大多种symbol-----BUG号：3809
         Layers.resize_global(job_ep, step, ['symbol_type'], 1, 20 * 25400)
 
-        # GUI.show_layer(job_ep, step, 'symbol_type')
+        # 7、涨大缩小任意相同值-----BUG号：3515
+        Layers.resize_global(job_ep, step, ['drlmap'], 0, 10 * 25400)
+        Layers.resize_global(job_ep, step, ['drlmap'], 0, -10 * 25400)
+
+        # BUG号：387 暂未解决，解决了再更新场景、测试料号
+
+        # GUI.show_layer(job_ep, step, 'drlmap')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
