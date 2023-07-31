@@ -8,7 +8,7 @@ from epkernel.Output import save_job
 
 
 class TestGraphicEditLine2pad:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Line2pad'))
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Line2pad1'))
     def testLine2pad (self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Line2pad线转pad功能(ID：17869)

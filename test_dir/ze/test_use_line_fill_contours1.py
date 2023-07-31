@@ -8,7 +8,7 @@ from epkernel.Output import save_job
 
 
 class TestGraphicEditUse_line_fill_contours:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Line_fill_contours'))
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Line_fill_contours1'))
     def testUse_line_fill_contours (self, job_id, g, prepare_test_job_clean_g):
 
         '''
