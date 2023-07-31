@@ -8,7 +8,7 @@ from epkernel.Output import save_job
 
 
 class TestGraphicEditContour2pad:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Contour2pad'))
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Contour2pad1'))
     def testContour2pad (self, job_id, g, prepare_test_job_clean_g):
 
         '''

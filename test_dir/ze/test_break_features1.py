@@ -10,7 +10,7 @@ from epkernel.Output import save_job
 from config_g.g_cc_method import G
 
 class TestGraphicEditBreak_features:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break'))
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break1'))
     def testBreak_features (self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Break_features删除物件功能（ID：17486）
