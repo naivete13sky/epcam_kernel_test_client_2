@@ -11,7 +11,7 @@ class TestGraphicEditUse_pattern_fill_contours:
     def testUse_pattern_fill_contours (self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Use_pattern_fill_contours填充功能
+        本用例测试Use_pattern_fill_contours填充功能，用例数：6
         ID: 17873
         '''
 
@@ -40,37 +40,36 @@ class TestGraphicEditUse_pattern_fill_contours:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 指定符号填充铜皮（拆分删除框外元素，且奇数行偏移）❤❤❤
+        # 1、指定符号填充铜皮（拆分删除框外元素，且奇数行偏移）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'top', [27])
         Layers.use_pattern_fill_contours(job_ep, step, 'top', 'bfr8', 10*25400, 10*25400,
                                          True, False, False, False, 1*25400, False, 5*25400, 0*25400)
 
-        # 指定符号填充铜皮（切除位于边框上的基本元素，创建轮廓化的铜面，且偶数行偏移）❤❤❤
+        # 2、指定符号填充铜皮（切除位于边框上的基本元素，创建轮廓化的铜面，且偶数行偏移）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'l2', [0])
         Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'bfr8', 10*25400, 10*25400,
                                          False, True, False, False, 1*25400, False, 0*25400, 5*25400)
 
-        # 指定符号填充铜皮（将原点设置为基准点）❤❤❤
+        # 3、指定符号填充铜皮（将原点设置为基准点）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
         Layers.use_pattern_fill_contours(job_ep, step, 'l3', 'bfr8', 10*25400, 10*25400,
                                          False, False, True, False, 1*25400, False, 0*25400, 0*25400)
 
-        # 指定符号填充铜皮（铜皮轮廓化）❤❤❤
+        # 4、指定符号填充铜皮（铜皮轮廓化）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'l4', [0])
         Layers.use_pattern_fill_contours(job_ep, step, 'l4', 'di10x10', 10*25400, 10*25400,
                                          False, False, False, True, 2*25400, False, 0*25400, 0*25400)
 
-        # 指定符号填充铜皮（铜皮轮廓化并转换轮廓线极性）❤❤❤
+        # 5、指定符号填充铜皮（铜皮轮廓化并转换轮廓线极性）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'l5', [0])
         Layers.use_pattern_fill_contours(job_ep, step, 'l5', 'di10x10', 10*25400, 10*25400,
                                          False, False, False, True, 2*25400, True, 0*25400, 0*25400)
         Selection.set_featuretype_filter(False, True, False, False, False, True, False)
         Selection.select_features_by_filter(job_ep, step, ['l5'])   # 负极性外框线不可见，再次转换极性
         Layers.change_polarity(job_ep, step, ['l5'], 2, 0)
-        Selection.reset_selection()     # 重置筛选
-        Selection.reset_select_filter()
+        Selection.reset_select_filter()  # 重置筛选
 
-        # 指定符号填充负极性铜皮（切除位于边框上的基本元素，创建轮廓化的铜面）❤❤❤
+        # 6、指定符号填充负极性铜皮（切除位于边框上的基本元素，创建轮廓化的铜面）❤❤❤
         Selection.select_feature_by_id(job_ep, step, 'bot', [34, 38])
         Layers.use_pattern_fill_contours(job_ep, step, 'bot', 'di10x10', 10*25400, 10*25400,
                                          False, True, False, True, 2*25400, False, 0*25400, 0*25400)

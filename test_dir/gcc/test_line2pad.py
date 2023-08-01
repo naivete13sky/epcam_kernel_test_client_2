@@ -12,7 +12,7 @@ class TestGraphicEditLine2pad:
     def testLine2pad (self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Line2pad线转pad功能
+        本用例测试Line2pad线转pad功能，用例数：3
         ID: 17803
         '''
 
@@ -41,32 +41,29 @@ class TestGraphicEditLine2pad:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 选取多条线段转pad
+        # 1、选取多条线段转pad
         Selection.select_feature_by_id(job_ep, step, 'top', [1946, 1947, 1949, 1950, 1958])
         Layers.line2pad(job_ep, step, ['top'])
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['top'])
         Layers.delete_feature(job_ep, step, ['top'])
-        Selection.reset_selection()  # 重置筛选
-        Selection.reset_select_filter()
+        Selection.reset_select_filter()  # 重置筛选
 
-        # 添加线段（起点与终点重合）后转pad
+        # 2、添加线段（起点与终点重合）后转pad
         Layers.add_line(job_ep, step, ['l2'], 'r200', 2 * 2540000, -2 * 2540000, 2 * 2540000, -2 * 2540000, True, [])
         Selection.select_feature_by_id(job_ep, step, 'l2', [907])
         Layers.line2pad(job_ep, step, ['l2'])
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['l2'])
         Layers.delete_feature(job_ep, step, ['l2'])
-        Selection.reset_selection()  # 重置筛选
-        Selection.reset_select_filter()
+        Selection.reset_select_filter()  # 重置筛选
 
-        # 整层转pad
+        # 3、整层转pad
         Layers.line2pad(job_ep, step, ['l3'])
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
         Selection.select_features_by_filter(job_ep, step, ['l3'])
         Layers.delete_feature(job_ep, step, ['l3'])
-        Selection.reset_selection()  # 重置筛选
-        Selection.reset_select_filter()
+        Selection.reset_select_filter()  # 重置筛选
 
         # GUI.show_layer(job_ep, step, 'l2')
         save_job(job_ep, temp_ep_path)

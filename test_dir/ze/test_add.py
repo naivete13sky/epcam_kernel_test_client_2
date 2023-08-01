@@ -39,10 +39,15 @@ class TestGraphicAdd:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 1.增加文字
+        # 1.增加正极性文字
         attributes = [{'.text': '2'}]  # 定义文字属性
         Layers.add_text(job_ep, step, ['l2'], 'standard', '66666', 20*25400, 20*25400, 2 * 25400,
-                        3*10000000, 4*10000000, True, 0, attributes, 45)
+                        5*1000000, 24*1000000, True, 0, attributes, 45)
+        #2.增加负极性文字
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'fjr35', 20*25400, 20*25400, 2 * 25400,
+                        3*1000000, 12*1000000, False, 0, attributes, 45)
+        #GUI.show_layer(job_ep, step, 'l2')
         # 2.增加线条
         Layers.add_line(job_ep, step, ['l2'], 'r5', 10000000, 30000000, 30000000, 30000000,
                         True, [{'.fiducial_name': '0'}, {'.area': ''}])

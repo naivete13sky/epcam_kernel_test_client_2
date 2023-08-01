@@ -12,7 +12,7 @@ class TestGraphicEditDelete:
     def testDelete (self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Delete删除物件功能
+        本用例测试Delete删除物件功能，用例数：7
         ID: 11630
         '''
 
@@ -41,17 +41,35 @@ class TestGraphicEditDelete:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 删除选中物件
+        # 1、删除单个物件
         Selection.select_feature_by_id(job_ep, step, 'top', [2525])
         Layers.delete_feature(job_ep, step, ['top'])
 
-        # 删除整层物件
+        # 2、删除多个物件
+        Selection.select_feature_by_id(job_ep, step, 'l2', [20, 838, 839, 887, 905])
         Layers.delete_feature(job_ep, step, ['l2'])
 
-        # 删除多层选中物件
-        Selection.select_feature_by_id(job_ep, step, 'l3', [0])
-        Selection.select_feature_by_id(job_ep, step, 'l4', [0])
+        # 3、删除多层多个物件
+        Selection.select_feature_by_id(job_ep, step, 'l3', [0, 2525])
+        Selection.select_feature_by_id(job_ep, step, 'l4', [0, 2525])
         Layers.delete_feature(job_ep, step, ['l3', 'l4'])
+
+        # 4、筛选器删除多层多物件
+        Selection.set_featuretype_filter(True, True, False, False, False, True, True)
+        Selection.select_features_by_filter(job_ep, step, ['l5', 'l6'])
+        Layers.delete_feature(job_ep, step, ['l5', 'l6'])
+        Selection.reset_select_filter()
+
+        # 5、不选中删除单层
+        Layers.delete_feature(job_ep, step, ['l7'])
+
+        # 6、删除整层选中物件
+        Selection.set_featuretype_filter(True, True, True, True, True, True, True)
+        Selection.select_features_by_filter(job_ep, step, ['l8'])
+        Layers.delete_feature(job_ep, step, ['l8'])
+
+        # 7、不选中删除多层
+        Layers.delete_feature(job_ep, step, ['l9', 'bot'])
 
         # GUI.show_layer(job_ep, step, 'l3')
         save_job(job_ep, temp_ep_path)

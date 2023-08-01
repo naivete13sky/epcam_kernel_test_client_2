@@ -1,20 +1,18 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input, GUI
+from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicEditCopy:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Copy'))
     def testCopy(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Copy功能
+        本用例测试Copy功能，用例数：5
         ID: 11839
         '''
 
@@ -42,31 +40,29 @@ class TestGraphicEditCopy:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 同层别原地复制极性反转
+        # 1、同层别原地复制极性反转
         Selection.select_feature_by_id(job_ep, step, 'top', [2525])
         Layers.copy2other_layer(job_ep, step, 'top', 'top', True, 0, 0, 0, 0, 0, 0, 0)
 
-        # 同层复制坐标偏移
+        # 2、同层复制坐标偏移
         Selection.select_feature_by_id(job_ep, step, 'l2', [840])
         Layers.copy2other_layer(job_ep, step, 'l2', 'l2', False, 6000000, 2000000, 0, 0, 0, 0, 0)
 
-        # 同层水平镜像复制
+        # 3、同层水平镜像复制
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
         Layers.copy2other_layer(job_ep, step, 'l3', 'l3', False, 0, 0, 1, 0, 0, 0, 0)
 
-        # 同层垂直镜像
+        # 4、同层垂直镜像
         Selection.select_feature_by_id(job_ep, step, 'l4', [0])
         Layers.copy2other_layer(job_ep, step, 'l4', 'l4', False, 0, 0, 2, 0, 0, 0, 0)
 
-        # 旋转90度复制到新建层别
+        # 5、旋转90度复制到新建层别
         Matrix.create_layer(job_ep, 'l5_1')
         Selection.select_feature_by_id(job_ep, step, 'l5', [0])
         Layers.copy2other_layer(job_ep, step, 'l5', 'l5_1', False, 0, 0, 0, 0, 90, 0, 0)
 
         # GUI.show_layer(job_ep, step, 'l5_1')
-
         save_job(job_ep,temp_ep_path)
-
         Job.close_job(job_ep)
 
         # ----------------------------------------开始比图：G与EP---------------------------------------------------------

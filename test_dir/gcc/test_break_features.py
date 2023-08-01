@@ -12,7 +12,7 @@ class TestGraphicEditBreak_features:
     def testBreak_features (self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Break_features删除物件功能
+        本用例测试Break_features删除物件功能，用例数：3
         ID: 17802
         '''
 
@@ -41,7 +41,7 @@ class TestGraphicEditBreak_features:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 先添加文字然后再打散
+        # 1、先添加文字然后再打散
         attributes = [{'.text_88': ''}]
         Layers.add_text(job_ep, step, ['top'], 'standard', '666', 200*25400, 200*25400, 20 * 25400,
                         1 * 25400000, 2 * 25400000, True, 0, attributes, 45)
@@ -52,7 +52,7 @@ class TestGraphicEditBreak_features:
         Selection.select_feature_by_id(job_ep, step, 'top', [2526])
         Layers.delete_feature(job_ep, step, ['top'])   # 删除打散之后的某个物件（用以证明物件被打散）
 
-        # 添加文字然后整层打散
+        # 2、添加文字然后整层打散
         attributes = [{'.text_88': ''}]
         Layers.add_text(job_ep, step, ['l2'], 'standard', 'abc', 200*25400, 200*25400, 20 * 25400,
                         1 * 25400000, 2 * 25400000, True, 0, attributes, 45)
@@ -62,7 +62,7 @@ class TestGraphicEditBreak_features:
         Selection.select_feature_by_id(job_ep, step, 'l2', [907, 928])
         Layers.delete_feature(job_ep, step, ['l2'])   # 删除打散之后的某个物件（用以证明物件被打散）
 
-        # 添加usersymbol打散拆分
+        # 3、添加usersymbol打散拆分
         Layers.add_pad(job_ep, step, ['l3'], 'i274x.macro11', 2 * 2540000, -2 * 2540000, True, 0, [], 0)
         Layers.add_pad(job_ep, step, ['l3'], 'i274x.macro14', 3 * 2540000, -2 * 2540000, True, 0, [], 0)
         Layers.break_features(job_ep, step, ['l3'], 1)
