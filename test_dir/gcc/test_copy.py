@@ -12,7 +12,7 @@ class TestGraphicEditCopy:
     def testCopy(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Copy功能，用例数：5
+        本用例测试Copy功能，用例数：9
         ID: 11839
         '''
 
@@ -23,7 +23,7 @@ class TestGraphicEditCopy:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l4', 'l5_1']
+        layers = ['top', 'l2', 'l3', 'l4_1', 'l5_1', 'l6_1', 'l7_1', 'l8_1', 'l9_1']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -40,28 +40,48 @@ class TestGraphicEditCopy:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 1、同层别原地复制极性反转
+        # 1、单物件同层复制
         Selection.select_feature_by_id(job_ep, step, 'top', [2525])
-        Layers.copy2other_layer(job_ep, step, 'top', 'top', True, 0, 0, 0, 0, 0, 0, 0)
+        Layers.copy2other_layer(job_ep, step, 'top', 'top', False, 200*25400, 0*25400, 0, 0, 0, 0, 0)
 
-        # 2、同层复制坐标偏移
-        Selection.select_feature_by_id(job_ep, step, 'l2', [840])
-        Layers.copy2other_layer(job_ep, step, 'l2', 'l2', False, 6000000, 2000000, 0, 0, 0, 0, 0)
+        # 2、多物件同层复制
+        Selection.select_feature_by_id(job_ep, step, 'l2', [0, 20, 37, 38, 840])
+        Layers.copy2other_layer(job_ep, step, 'l2', 'l2', False, 0*25400, 1000*25400, 0, 0, 0, 0, 0)
 
-        # 3、同层水平镜像复制
-        Selection.select_feature_by_id(job_ep, step, 'l3', [0])
-        Layers.copy2other_layer(job_ep, step, 'l3', 'l3', False, 0, 0, 1, 0, 0, 0, 0)
+        # 3、不选中物件同层复制
+        Layers.copy2other_layer(job_ep, step, 'l3', 'l3', False, 0*25400, -1000*25400, 0, 0, 0, 0, 0)
 
-        # 4、同层垂直镜像
-        Selection.select_feature_by_id(job_ep, step, 'l4', [0])
-        Layers.copy2other_layer(job_ep, step, 'l4', 'l4', False, 0, 0, 2, 0, 0, 0, 0)
+        # 4、选中负极性物件复制到其他层并极性转换
+        Matrix.create_layer(job_ep, 'l4_1')
+        Selection.select_feature_by_id(job_ep, step, 'l4', [39])
+        Layers.copy2other_layer(job_ep, step, 'l4', 'l4_1', True, 0, 0, 0, 0, 0, 0, 0)
 
-        # 5、旋转90度复制到新建层别
+        # 5、整层复制到其他层上移并水平镜像
         Matrix.create_layer(job_ep, 'l5_1')
-        Selection.select_feature_by_id(job_ep, step, 'l5', [0])
-        Layers.copy2other_layer(job_ep, step, 'l5', 'l5_1', False, 0, 0, 0, 0, 90, 0, 0)
+        Layers.copy2other_layer(job_ep, step, 'l5', 'l5_1', False, 0, 1000*25400, 1, 0, 0, 0, 0)
 
-        # GUI.show_layer(job_ep, step, 'l5_1')
+        # 6、整层物件复制到其他层垂直镜像并旋转
+        Matrix.create_layer(job_ep, 'l6_1')
+        Selection.set_featuretype_filter(True, True, True, True, True, True, True)
+        Selection.select_features_by_filter(job_ep, step, ['l6'])
+        Layers.copy2other_layer(job_ep, step, 'l6', 'l6_1', False, 0, 0, 2, 0, 90, 0, 0)
+
+        # 7、单个物件复制到其他层缩小并旋转
+        Matrix.create_layer(job_ep, 'l7_1')
+        Selection.select_feature_by_id(job_ep, step, 'l7', [5])
+        Layers.copy2other_layer(job_ep, step, 'l7', 'l7_1', False, 0, 0, 0, -10*25400, 45, 0, 0)
+
+        # 8、单个物件复制到其他层并旋转放大
+        Matrix.create_layer(job_ep, 'l8_1')
+        Selection.select_feature_by_id(job_ep, step, 'l8', [0])
+        Layers.copy2other_layer(job_ep, step, 'l8', 'l8_1', False, 0, 0, 0, 20*25400, 361, 0, 0)
+
+        # 9、单个物件复制到其他层以基准点旋转并放大
+        Matrix.create_layer(job_ep, 'l9_1')
+        Selection.select_feature_by_id(job_ep, step, 'l9', [0])
+        Layers.copy2other_layer(job_ep, step, 'l9', 'l9_1', False, 0, 0, 0, 200*25400, 90, 1000*25400, 0*25400)
+
+        # GUI.show_layer(job_ep, step, 'l9')
         save_job(job_ep,temp_ep_path)
         Job.close_job(job_ep)
 
