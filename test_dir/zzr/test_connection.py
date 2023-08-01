@@ -24,7 +24,7 @@ class TestGraphicRoutConnection:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
-        layers = ['l1', 'l2', 'l3', 'l4', 'l6', 'l7', 'l8', 'l9', 'l10', 'smb', 'ssb', 'spt', 'sst', 'smt']  # 定义需要比对的层
+        layers = ['l1', 'l2', 'l3', 'l4', 'l6', 'l7', 'l8', 'l9', 'l10', 'smb', 'ssb', 'spt', 'sst', 'smt', 'spb', 'nc']  # 定义需要比对的层
         # layers = ['l6','l9']
 
         # 取到临时目录
@@ -66,7 +66,7 @@ class TestGraphicRoutConnection:
         BASE.connections(job_case, step, ['l4'], 1, 15240000, 0)
         # GUI.show_layer(job_case, step, 'l4')
 
-        # 5.选择两根部分相交线导圆角,角度为1inch,pass
+        # 5.选择两根部分相交线导圆角,角度为1inch
         Selection.reverse_select(job_case, step, 'l6')
         # Layers.rounding_line_corner(job_case, step, ['l6'], 25400000)
         BASE.connections(job_case, step, ['l6'], 1, 25400000, 0)
@@ -82,35 +82,53 @@ class TestGraphicRoutConnection:
         BASE.connections(job_case, step, ['l8'], 1, 10160000, 0)
         # GUI.show_layer(job_case, step, 'l8')
 
-        # 8.选择两根相交线导圆角,角度为0.08inch,pass
+        # 8.选择两根相交线导圆角,角度为0.08inch
         Selection.reverse_select(job_case, step, 'l9')
         BASE.connections(job_case, step, ['l9'], 1, 2032000, 0)
         # GUI.show_layer(job_case, step, 'l9')
 
-        # 9.选择两根未连接线段进行连接，形成钝角
+        # 9.选择两根未相交的线和弧导圆角,角度为0.03inch
+        Selection.reverse_select(job_case, step, 'c')
+        BASE.connections(job_case, step, ['c'], 1, 762000, 0)
+        # GUI.show_layer(job_case, step, 'c')
+
+        # 10.选择两根相交的线和弧导圆角,角度为0.3inch
+        Selection.reverse_select(job_case, step, 'nc')
+        BASE.connections(job_case, step, ['nc'], 1, 7620000, 0)
+        # GUI.show_layer(job_case, step, 'nc')
+
+        # 11.选择两根未连接线段进行连接，形成钝角
         Selection.select_feature_by_id(job_case, step, 'l10', [0, 1])
         BASE.connections(job_case, step, ['l10'], 0, 0, 0)
         # GUI.show_layer(job_case, step, 'l10')
 
-        # 10.选择两根触碰线段进行连接，形成锐角
+        # 12.选择两根触碰线段进行连接，形成锐角
         Selection.select_feature_by_id(job_case, step, 'smb', [0, 1])
         BASE.connections(job_case, step, ['smb'], 0, 0, 0)
 
-        # 11.选择两根未连接线段进行连接，形成锐角
+        # 13.选择两根未连接线段进行连接，形成锐角
         Selection.select_feature_by_id(job_case, step, 'ssb', [0, 1])
         BASE.connections(job_case, step, ['ssb'], 0, 0, 0)
 
-        # 12.选择两根未连接线段进行连接，形成直角
+        # 14.选择两根未连接线段进行连接，形成直角
         Selection.select_feature_by_id(job_case, step, 'spt', [0, 1])
         BASE.connections(job_case, step, ['spt'], 0, 0, 0)
 
-        # 13.选择两根未连接的”T“字形线段，形成夹角
+        # 15.选择两根未连接的”T“字形线段，形成夹角
         Selection.select_feature_by_id(job_case, step, 'sst', [0, 1])
         BASE.connections(job_case, step, ['sst'], 0, 0, 0)
 
-        # 14.选择两根相交的线段进行连接
+        # 16.选择两根相交的线段进行连接
         Selection.select_feature_by_id(job_case, step, 'smt', [0, 1])
         BASE.connections(job_case, step, ['smt'], 0, 0, 0)
+
+        # 17.选择线和弧未相交进行连接
+        Selection.select_feature_by_id(job_case, step, 'spb', [0, 1])
+        BASE.connections(job_case, step, ['spb'], 0, 0, 0)
+
+        # 18.选择线和弧相交进行连接
+        Selection.select_feature_by_id(job_case, step, 'spb+1', [0, 2])
+        BASE.connections(job_case, step, ['spb+1'], 0, 0, 0)
 
         save_job(job_case, temp_ep_path)
         # GUI.show_layer(job_case, step, 'l6')
