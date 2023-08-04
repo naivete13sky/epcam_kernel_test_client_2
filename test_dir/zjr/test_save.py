@@ -14,7 +14,7 @@ class TestSaveJob:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Save'))
     def test_save(self, job_id):
         '''
-        本用例测试cam对料号执行增、删层别保存后，验证ui上的层别和layers文件夹下的层别是否一致
+        本用例测试cam对料号执行增、删层别保存后，验证ui上的层别和layers文件夹下的层别是否一致，bugid:4665
         '''
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
@@ -45,10 +45,10 @@ class TestSaveJob:
         # ----------第一次对料号进行编辑（删除、新增层别），验证save后layers文件夹中多出一个netlist层、以及ui上删除层别还存在-------------
         # 删除料号的第一个层别
         Matrix.delete_layer(job_ep, all_layers_list_job_ep[0])
+        # GUI.show_matrix(job_ep)
         # 创建一个新的层别
         add_layer_name = 'test_add_layer_save'
         Matrix.create_layer(job_ep, add_layer_name, -1)
-        # GUI.show_matrix(job_ep)
         # 保存料号,必须调用BASE中的save_job
         BASE.save_job(job_ep)
         # 重新获取ui上的层别

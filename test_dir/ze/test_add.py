@@ -39,15 +39,70 @@ class TestGraphicAdd:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 1.增加正极性文字
+        # 1.增加正极性文字，字体为standard
         attributes = [{'.text': '2'}]  # 定义文字属性
-        Layers.add_text(job_ep, step, ['l2'], 'standard', '66666', 20*25400, 20*25400, 2 * 25400,
-                        5*1000000, 24*1000000, True, 0, attributes, 45)
-        #2.增加负极性文字
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20*25400, 20*25400, 2 * 25400,
+                        5*1000000, 24*1000000, True, 0, attributes, 0)
+        # 2.增加正极性文字，字体为canned_57
         attributes = [{'.text': '2'}]  # 定义文字属性
-        Layers.add_text(job_ep, step, ['l2'], 'standard', 'fjr35', 20*25400, 20*25400, 2 * 25400,
-                        3*1000000, 12*1000000, False, 0, attributes, 45)
-        #GUI.show_layer(job_ep, step, 'l2')
+        Layers.add_text(job_ep, step, ['l2'], 'canned_57', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 2 * 25400,
+                        5 * 1000000, 25 * 1000000, True, 0, attributes, 0)
+        # 3.增加正极性文字，字体为canned_67
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'canned_67', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400,
+                        2 * 25400,
+                        5 * 1000000, 26 * 1000000, True, 0, attributes, 0)
+        # 4.增加正极性文字，字体为seven_seg
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'seven_seg', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400,
+                        2 * 25400,
+                        5 * 1000000, 27 * 1000000, True, 0, attributes, 0)
+        # 5.增加正极性文字，字体为simple
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'simple', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400,
+                        2 * 25400,
+                        5 * 1000000, 28 * 1000000, True, 0, attributes, 0)
+        # 6.增加正极性文字，字体为suntak_date(动态文字，为了不让其变化频率过高，该用例使用动态年份)
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'suntak_date', '$$YYYY', 20 * 25400, 20 * 25400,
+                        2 * 25400,
+                        5 * 1000000, 29 * 1000000, True, 0, attributes, 0)#添加动态年份（'$$YYYY'）
+        #7.增加负极性文字
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20*25400, 20*25400, 2 * 25400,
+                        26*1000000, 35*100000, False, 0, attributes, 0)
+        #8.增加正极性文字，验证X size栏的正确性
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 40*25400, 20*25400, 2 * 25400,
+                        5*1000000, 30*1000000, True, 0, attributes, 0)
+        #9.增加正极性文字，验证Y size栏的正确性
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 40 * 25400, 2 * 25400,
+                        5 * 1000000, 32 * 1000000, True, 0, attributes, 0)
+        #10.增加正极性文字，验证Line Width栏的正确性
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
+                        5 * 1000000, 34 * 1000000, True, 0, attributes, 0)
+        #11.增加正极性文字，验证旋转角度功能正确性（不镜像）
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
+                        5 * 1000000, 35 * 1000000, True, 2, attributes, 0)#文字旋转180度，不镜像
+        #12.增加正极性文字，验证镜像功能的正确性（文字旋转180度，同时镜像）
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
+                        5 * 1000000, 35 * 1000000, True, 6, attributes, 0)  # 文字旋转180度，同时镜像
+        #13.增加正极性文字，验证不镜像情况下自定义旋转角度（文字自定义旋转30度，不镜像）
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
+                        60 * 1000000, 26 * 1000000, True, 8, attributes, 30)  # 文字自定义旋转30度，不镜像
+        # 13.增加正极性文字，验证镜像情况下自定义旋转角度（文字自定义旋转66度，镜像）
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
+                        60 * 1000000, 36 * 1000000, True, 9, attributes, 66)  # 文文字自定义旋转66度，镜像
+
+
+
+        GUI.show_layer(job_ep, step, 'l2')
         # 2.增加线条
         Layers.add_line(job_ep, step, ['l2'], 'r5', 10000000, 30000000, 30000000, 30000000,
                         True, [{'.fiducial_name': '0'}, {'.area': ''}])
