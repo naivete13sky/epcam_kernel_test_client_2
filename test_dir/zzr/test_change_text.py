@@ -24,8 +24,8 @@ class TestGraphicEditChangeText:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
-        # layers = ['sst','spt','smt','l1','spt-1','sst-1','l2','smt-1','l3','l4','l5','l6','l1-1' ,'l2-1','l3-1']  # 定义需要比对的层
-        layers = ['drl']
+        layers = ['spt','sst','smt','l1','l2','l3','l4','l5','l6','l7','l8','l9','l10','smb','drl']  # 定义需要比对的层
+        # layers = ['drl']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
