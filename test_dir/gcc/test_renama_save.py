@@ -35,17 +35,18 @@ class TestSavejob():
 
         # 删除以及保留的layer、step
         delete_layers = [x for x in all_layers_list_job if len(str(x)) > 3]
-        delete_step = all_step_list_job[1:]
+        delete_steps = all_step_list_job[1:]
 
         # 删除step、layer
         for layer in delete_layers:
-            Matrix.delete_layer('2625262a', layer)
-        for step in delete_step:
-            Matrix.delete_step('2625262a', step)
+            Matrix.delete_layer(job, layer)
+        for step in delete_steps:
+            Matrix.delete_step(job, step)
 
         # 更名、保存
-        Job.rename_job('2625262a', '2625262a-orig')
-        BASE.save_job('2625262a-orig')
+        job_rename = '2625262a-orig'
+        Job.rename_job(job, job_rename)
+        BASE.save_job(job_rename)
         # GUI.show_matrix('2625262a-orig')
         # GUI.show_layer('8037049a', 'net', 'l1')
 
@@ -54,22 +55,22 @@ class TestSavejob():
         layers_list = os.listdir(os.path.join(temp_compressed_path, '2625262a-orig\\steps\\orig\\layers'))
 
         # 获取EP—CAM层别信息
-        steps = Information.get_steps('2625262a-orig')
-        layers = Information.get_layers('2625262a-orig')
+        steps = Information.get_steps(job_rename)
+        layers = Information.get_layers(job_rename)
 
-        # if sorted(steps_list) == sorted(steps):
-        #     print('steps测试通过')
-        # else:
-        #     print('steps测试失败')
-        #     print(steps_list)
-        #     print(steps)
-        #
-        # if sorted(layers_list) == sorted(layers):
-        #     print('layers测试通过')
-        # else:
-        #     print('layers测试失败')
-        #     print(sorted(layers_list))
-        #     print(sorted(layers))
+        if sorted(steps_list) == sorted(steps):
+            print('steps测试通过')
+        else:
+            print('steps测试失败')
+            print(steps_list)
+            print(steps)
+
+        if sorted(layers_list) == sorted(layers):
+            print('layers测试通过')
+        else:
+            print('layers测试失败')
+            print(sorted(layers_list))
+            print(sorted(layers))
 
         assert sorted(steps_list) == sorted(steps)
         assert sorted(layers_list) == sorted(layers)
