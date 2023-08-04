@@ -24,8 +24,8 @@ class TestGraphicEditChangeText:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
-        layers = ['sst','spt','smt','l1','spt-1','sst-1','l2','smt-1','l3','l4','l5','l6','l1-1' ,'l2-1','l3-1']  # 定义需要比对的层
-        # layers = ['l2-1','l3-1']
+        # layers = ['sst','spt','smt','l1','spt-1','sst-1','l2','smt-1','l3','l4','l5','l6','l1-1' ,'l2-1','l3-1']  # 定义需要比对的层
+        layers = ['drl']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -43,70 +43,107 @@ class TestGraphicEditChangeText:
         # 用悦谱CAM打开料号
         Input.open_job(job_case, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        #1.整层修改文字信息且为正极性,字体类型为standard,不镜像不旋转
-        Layers.change_text(job_case, step, ['sst'], '8', 'standard', 5080000,
-                           5080000, 609600, True, 0, 0)
+        # 1.整层修改文字内容，线款和XY大小，选择Negative反转，其他与原字体参数一致,禅道ID2554
+        Layers.change_text(job_case, step, ['spt'], '89', 'suntak_date', 2540000,
+                           2540000, 304800, False, 0, 0)
+        Layers.change_polarity(job_case,step,['spt'],2,1)
+        # GUI.show_layer(job_case, step, 'spt')
 
-        #2.整层修改文字信息且为正极性,字体类型为simple，不镜像不旋转
-        Layers.change_text(job_case, step, ['spt'], 'g', 'simple', 2540000,
-                           2540000, 762000, True, 0, 0)
+        # 2.单选某个文字，修改为动态文本，其余参数不变,禅道ID2553
+        Selection.select_feature_by_id(job_case, step, 'sst', [24])
+        Layers.change_text(job_case,step,['sst'],'$$DD','suntak_date',5080000,
+                           5080000,762000,True,0,0)
+        # GUI.show_layer(job_case, step, 'sst')
 
-        # 3.整层修改文字信息且为正极性,字体类型为seven_seg，旋转角度45
-        Layers.change_text(job_case, step, ['smt'], 'W', 'seven_seg', 5080000,
-                           5080000, 609600, True, 0, 45)
+        # 3.选中某个文字，角度旋转15°修改成功，其余参数不变，禅道ID2548
+        Selection.select_feature_by_id(job_case,step,'smt',[3])
+        Layers.change_text(job_case,step,['smt'],'$$STEP','standard',5080000,
+                           5080000,304800,True,0,15)
+        # GUI.show_layer(job_case,step,'smt')
 
-        # 4.整层修改文字信息且为正极性,字体类型为canned_67，角度选择90度并镜像
-        Layers.change_text(job_case, step, ['l1'], 'M', 'canned_67', 7620000,
-                           7620000, 609600, True, 1, 90)
+        # 4.选中某个文字，镜像修改成功，其余参数不变，禅道ID2545
+        Selection.select_feature_by_id(job_case, step, 'l1', [24])
+        Layers.change_text(job_case,step,['l1'],'$$YY/WK','suntak_date',5080000,
+                           5080000,762000,True,1,0)
+        # GUI.show_layer(job_case,step,'l1')
 
-        # 5.整层修改文字信息且为正极性,字体类型为suntak_date,镜像
-        Layers.change_text(job_case, step, ['spt-1'], '$$DD', 'suntak_date', 3810000,
-                           2540000, 508000, True, 1, 0)
+        # 5.选中多个文字，修改文字字体线宽，其余参数不变，禅道ID2544
+        Selection.select_feature_by_id(job_case,step,'l2',[14,1,55,22])
+        Layers.change_text(job_case,step,['l2'],'','',5080000,5080000,254000,True,0,0)
+        # GUI.show_layer(job_case, step, 'l2')
 
-        # 6.整层默认原始文字信息且为正极性,字体类型为canned_57,角度旋转360
-        Layers.change_text(job_case, step, ['sst-1'], '', 'canned_57', 3810000,
-                           2540000, 508000, True, 0, 360)
-        # GUI.show_layer(job_case, step, 'sst-1')
+        # 6.选中某个文字，修改文字的宽度与高度，其余参数不变，禅道ID2543
+        Selection.select_feature_by_id(job_case,step,'l3',[28])
+        Layers.change_text(job_case,step,['l3'],'$$YYYY','standard',2540000,
+                           2540000,762000,True,0,45)
+        # GUI.show_layer(job_case, step, 'l3')
 
-        # 7.整层修改文字信息且为负极性,字体类型为canned_57,角度旋转45度并镜像，然后整层资料极性反向转换
-        Layers.change_text(job_case, step, ['l2'], '$$MM', 'canned_57', 2540000,
-                           2540000, 304800, False, 1, 45)
-        Layers.change_polarity(job_case, step, ['l2'], 2, 1)
+        # 7.选中多个负极性的文字，修改其极性，其余参数不变，禅道ID2542
+        Selection.select_feature_by_id(job_case,step,'l4',[37,43,38,40])
+        Layers.change_text(job_case,step,['l4'],'','',5080000,
+                           5080000,609600,True,0,0)
+        # GUI.show_layer(job_case, step, 'l4')
 
-        # 8.整层默认原始文字信息且为负极性,字体类型为simple,极性为正
-        Layers.change_text(job_case, step, ['smt-1'], '', 'simple', 5080000,
-                           5080000, 762000, True, 0, 0)
-        # GUI.show_layer(job_case, step, 'smt-1')
+        # 8.选中某个正极性的文字，修改文字内容，其余参数不变，禅道2538
+        Selection.select_feature_by_id(job_case,step,'l5',[22])
+        Layers.change_text(job_case,step,['l5'],'Turday','canned_67',5080000,
+                           5080000,762000,True,0,0)
+        # GUI.show_layer(job_case, step, 'l5')
 
-        # 9.整层修改文字信息且为负极性,字体类型为suntak_date并镜像
-        Layers.change_text(job_case, step, ['l3'], '$$DD', 'suntak_date', 5080000,
-                           5080000, 609600, True, 1, 0)
+        # 9.整层修改文字信息,字体类型为seven_seg，旋转角度60,禅道ID2555
+        Layers.change_text(job_case, step, ['l6'], '$$YY', 'seven_seg', 5080000,
+                           5080000, 762000, True, 0, 60)
+        # GUI.show_layer(job_case, step, 'l6')
 
-        # 10.单选文字修改信息且为正极性,字体类型为standard，镜像并角度旋转45度
-        Selection.select_feature_by_id(job_case, step, 'l4', [52])
-        Layers.change_text(job_case, step, ['l4'], '$$DATE-MMDDYYYY', 'standard', 5080000,
-                           5080000, 609600, True, 1, 45)
+        # 10.整层修改文字为负极性,字体类型为simple，角度选择90度并镜像，禅道ID3540
+        Layers.change_text(job_case, step, ['l7'], '', 'simple', 5080000,
+                           5080000, 762000, False, 1, 90)
+        Layers.change_polarity(job_case,step,['l7'],2,1)
+        # GUI.show_layer(job_case, step, 'l7')
 
-        # 11.单选文字修改信息转为负极性,字体类型为canned_67,镜像并旋转角度
-        Selection.select_feature_by_id(job_case, step, 'l6', [52, 23, 40, 25])
-        Layers.change_text(job_case, step, ['l6'], '$$LAYER', 'canned_67', 5080000,
+
+        # 11.单选文字修改信息,字体类型为standard，镜像并角度旋转45度，禅道ID2539
+        Selection.select_feature_by_id(job_case, step, 'l8', [53])
+        Layers.change_text(job_case, step, ['l8'], '$$WEEK-DAY', 'standard', 2540000,
+                           2540000, 406400, True, 1, 45)
+        # GUI.show_layer(job_case, step, 'l8')
+
+        # 12.选中多个文字修改信息转为负极性,字体类型为canned_67,镜像并旋转角度,禅道ID2541
+        Selection.select_feature_by_id(job_case, step, 'l9', [52, 23, 40, 25])
+        Layers.change_text(job_case, step, ['l9'], '$$LAYER', 'canned_67', 5080000,
                            5080000, 762000, False, 1, 45)
+        # GUI.show_layer(job_case, step, 'l9')
 
-        # 12.单选文字修改信息转为负极性,字体类型为seven_seg，镜像并旋转角度，然后转极性为正。
-        Selection.select_feature_by_id(job_case, step, 'l5', [26])
-        Layers.change_text(job_case, step, ['l5'], '$$YY', 'seven_seg', 5080000,
-                           5080000, 762000, False, 1, 45)
-        Selection.select_feature_by_id(job_case, step, 'l5', [26])
-        Layers.change_polarity(job_case, step, ['l5'], 2, 0)
+        # 13.多选负极性文字转换为正，字体类型为 “standard”，禅道ID2540
+        Selection.select_feature_by_id(job_case, step, 'l10', [0,49,51,55,52])
+        Layers.change_text(job_case, step, ['l10'], 'test', 'standard', 2540000,
+                           2540000, 304800, True, 0, 0)
+        # GUI.show_layer(job_case, step, 'l10')
 
-        # 13.验证多选负极性文字转换为正，字体类型为 “standard”
-        Selection.select_feature_by_id(job_case, step, 'l1-1', [0, 1, 2, 40,48])
-        Layers.change_text(job_case, step, ['l1-1'], 'test', 'standard', 5080000,
-                           5080000, 762000, True, 0, 0)
+        # 14.验证多层整层改变字体，极性为正，镜像并角度旋转15°,禅道ID3546
+        Layers.change_text(job_case, step, ['smb','smb+1'], 'ceshi', 'canned_57', 5080000,
+                           5080000, 635000, True, 1, 15)
+        # GUI.show_layer(job_case, step, 'smb')
 
-        # 14.验证多层改变字体，极性为正，镜像并角度旋转15°
-        Layers.change_text(job_case, step, ['l2-1','l3-1'], '$$MM', 'seven_seg', 5080000,
-                           3810000, 635000, True, 1, 15)
+        # # 15.验证多层选中负极性文字改变字体，极性为正，镜像并角度旋转15°
+        # Selection.select_feature_by_id(job_case, step, ['ssb','ssb+1'], [49])
+        # Layers.change_text(job_case, step, ['ssb', 'ssb+1'], '$$WEEK-DAY', 'suntak_date', 5080000,
+        #                    5080000, 635000, True, 1, 15)
+        # GUI.show_layer(job_case, step, 'ssb')
+        #
+        # # 16.验证多层选中负极性文字改变字体，极性为正，镜像并角度旋转20°
+        # Selection.select_feature_by_id(job_case, step, ['spb','spb+1'], [13,16,23,29])
+        # Layers.change_text(job_case, step, ['spb', 'spb+1'], '', '', 5080000,
+        #                    5080000, 381000, False, 1, 20)
+        # GUI.show_layer(job_case, step, 'spb')
+
+        # 17.验证整层文字极性为负，镜像并角度旋转20°，禅道ID3547
+        Layers.change_text(job_case, step, ['drl', 'drl+1'], '', '', 2540000,
+                           2540000, 304800, False, 1, 20)
+        Layers.change_polarity(job_case,step,['drl', 'drl+1'],2,1)
+        # GUI.show_layer(job_case, step, 'drl')
+
+
 
         # GUI.show_layer(job_case, step, 'l4')
         save_job(job_case, temp_ep_path)

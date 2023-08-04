@@ -53,7 +53,7 @@ class TestGraphicEditChangeAttributes:
         # GUI.show_layer(job_case, step, 'drl1-10+1')
 
 
-        #2.单选物件替换属性，筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层），1为替换，pass
+        #2.单选有属性物件替换属性，筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层），1为替换，pass
         Selection.select_feature_by_id(job_case, step, 'l4', [623])
         # Layers.modify_attributes(job_case, step, ['l4'], 1, [{".fiducial_name": "trace"}])
         BASE.modify_attributes(job_case, step, ['l4'], 1, [{".fiducial_name": "trace"}])
@@ -64,7 +64,7 @@ class TestGraphicEditChangeAttributes:
         # GUI.show_layer(job_case, step, 'l4+1')
 
 
-        # 3.多选物件替换属性，筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层），1为替换，pass
+        # 3.多选物件替换属性，筛选器选中该属性的物件，copy复制到目标层（matrix创建一个空层），1为替换，pass   ---待补充用例
         Selection.select_feature_by_id(job_case, step, 'l5', [1351,1805,65,611])
         # Layers.modify_attributes(job_case, step, ['l5'], 1, [{".AOI_ALIGN": ""}])
         BASE.modify_attributes(job_case, step, ['l5'], 1, [{".AOI_ALIGN": ""}])
@@ -85,7 +85,7 @@ class TestGraphicEditChangeAttributes:
         # GUI.show_layer(job_case, step, 'l1+1')
 
 
-        # 5.多选物件添加属性，筛选器选中该属性的物件，copy复制到目标层,0为添加,pass
+        # 5.多选物件添加属性，筛选器选中该属性的物件，copy复制到目标层,0为添加,pass    ---待补充用例
         Selection.select_feature_by_id(job_case, step, 'l6', [624,622,288,333,366])
         Layers.modify_attributes(job_case, step, ['l6'], 0, [{".copper_weight": "1"}])
         Selection.set_attribute_filter(0, [{".copper_weight": "1"}])

@@ -47,7 +47,7 @@ class TestGraphicEditRemove_Copper_Wire:
         # 1.整层surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为False，pass
         Layers.surface_repair(job_case, step, ['l1'], 1, 127000, 0, False)
 
-        # 2.整层surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为True,pass
+        # 2.整层surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为True,pass   ---待补充用例
         Layers.surface_repair(job_case, step, ['l1-c'], 1, 50800, 0, True)
 
         # 3.整层surface去尖角，模式：1-remove tip,圆角化为False，pass
@@ -59,20 +59,20 @@ class TestGraphicEditRemove_Copper_Wire:
         # 5.整层surface去尖角，模式：2-bridge,圆角化为False,pass
         Layers.surface_repair(job_case, step, ['l4'], 1, 127000, 2, False)
 
-        # 6.整层surface去尖角，模式：2-bridge,圆角化为True,pass
+        # 6.整层surface去尖角，模式：2-bridge,圆角化为True,pass    ---待补充用例
         Layers.surface_repair(job_case, step, ['l4-c'], 1, 127000, 2, True)
 
         # 7.整层surface去尖角，模式：3-fix sliver,圆角化为False,pass
         Layers.surface_repair(job_case, step, ['l10'], 1, 152400, 3, False)
 
-        # 8.整层surface去尖角，模式：3-fix sliver,圆角化为False,pass
+        # 8.整层surface去尖角，模式：3-fix sliver,圆角化为False,pass    ---待补充用例
         Layers.surface_repair(job_case, step, ['l10-c'], 1, 152400, 3, True)
 
         # 9.单选surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为False,pass
         Selection.select_feature_by_id(job_case, step, 'l3', [2293])
         Layers.surface_repair(job_case, step, ['l3'], 0, 101600, 0, False)
 
-        # 10.单选surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为True,pass
+        # 10.单选surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为True,pass，---待补充用例
         Selection.select_feature_by_id(job_case, step, 'l3-c', [2279, 2288, 2262, 2278])
         Layers.surface_repair(job_case, step, ['l3-c'], 0, 152400, 0, True)
 
@@ -80,7 +80,7 @@ class TestGraphicEditRemove_Copper_Wire:
         Selection.select_feature_by_id(job_case, step, 'l5', [1810, 1809, 1796, 1808])
         Layers.surface_repair(job_case, step, ['l5'], 0, 152400, 1, False)
 
-        # 12.单选surface去尖角，模式：1-remove tip,圆角化为True,pass
+        # 12.单选surface去尖角，模式：1-remove tip,圆角化为True,pass   ---待补充用例
         Selection.select_feature_by_id(job_case, step, 'l5-c', [1810, 1809, 1796, 1807])
         Layers.surface_repair(job_case, step, ['l5-c'], 0, 152400, 1, True)
 
@@ -88,7 +88,7 @@ class TestGraphicEditRemove_Copper_Wire:
         Selection.select_feature_by_id(job_case, step, 'l6', [16])
         Layers.surface_repair(job_case, step, ['l6'], 0, 127000, 2, False)
 
-        # 14.单选surface去尖角，模式：2-bridge,圆角化为True,pass
+        # 14.单选surface去尖角，模式：2-bridge,圆角化为True,pass   ---待补充用例
         Selection.select_feature_by_id(job_case, step, 'l6-c', [15, 14])
         Layers.surface_repair(job_case, step, ['l6-c'], 0, 127000, 2, True)
 
@@ -96,7 +96,7 @@ class TestGraphicEditRemove_Copper_Wire:
         Selection.select_feature_by_id(job_case, step, 'l7', [2139, 2137])
         Layers.surface_repair(job_case, step, ['l7'], 0, 101600, 3, False)
 
-        # 16.单选surface去尖角，模式：3-fix sliver,圆角化为True,pass
+        # 16.单选surface去尖角，模式：3-fix sliver,圆角化为True,pass  ---待补充用例
         Selection.select_feature_by_id(job_case, step, 'l7-c', [2140, 2116, 2137])
         Layers.surface_repair(job_case, step, ['l7-c'], 0, 101600, 3, True)
 
