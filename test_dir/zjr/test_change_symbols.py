@@ -36,8 +36,6 @@ class TestGraphicEditChangesymbols:
         # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
         job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
 
-
-
         # --------------------------------下载yg转图tgz，并解压好，获取到文件夹名称，作为g料号名称-------------------------------
         job_g = DMS().get_file_from_dms_db(temp_path, job_id, field='file_odb_g', decompress='tgz')
         Input.open_job(job_g,temp_g_path)
@@ -50,9 +48,8 @@ class TestGraphicEditChangesymbols:
         # BASE.show_layer(job_id,step,'top')
         step = 'orig'
 
-
         '''
-        用例名称：对line, pad, surface, arc, text不同物件类型分别执行change_symbol操作
+        用例名称：对正极性的line, pad, surface, arc, text不同物件类型分别执行change_symbol操作
         预期：line,pad,arc图形发生变更；surface和text图形未发生变更，和执行前一样
         执行场景数：5个
         '''
@@ -65,6 +62,20 @@ class TestGraphicEditChangesymbols:
             Layers.change_feature_symbols(job_ep, step, [layer],'r220',False)
             Selection.unselect_features(job_ep, step, layer)
         # GUI.show_layer(job_ep, step, layer)
+
+        '''
+        用例名称：对负极性的line, pad, surface, arc, text不同物件类型分别执行change_symbol操作
+        预期：line,pad,arc图形发生变更；surface和text图形未发生变更，和执行前一样
+        执行场景数：5个
+        '''
+        layer = 'top'
+        features_id = [1954, 2525, 34, 1956, 2526]  # id依序分别为line, pad, surface, arc, text
+        for id in features_id:
+            print("=id=:", id)
+            Selection.select_feature_by_id(job_ep, step, layer, [id])
+            # GUI.show_layer(job_ep, step, layer)
+            Layers.change_feature_symbols(job_ep, step, [layer], 'r220', False)
+            Selection.unselect_features(job_ep, step, layer)
 
         '''
         用例名称：执行层未选中物件进行change_symbol操作
@@ -140,7 +151,20 @@ class TestGraphicEditChangesymbols:
                 index += 1
                 # GUI.show_layer(job_ep, step, layer)
         else:
-            print("请检查物件数量是否是一致！")
+            print("请检查物件数量是否一致！")
+
+        '''
+        验证Round/Round Thermal类型Num Spokes值为0时,bug：4572，影响版本号：1.1.7.0
+        预期：软件不会卡死
+        执行测试场景：1个
+        '''
+        layer = 'symbol_type'
+        feature_index = 27
+        symbol = 'thr200x150x90x0x10' #Round/Round Thermal类型
+        Selection.select_feature_by_id(job_ep, step, layer, [feature_index])
+        # GUI.show_layer(job_ep, step, layer)
+        Layers.change_feature_symbols(job_ep, step, [layer], symbol, False)
+        # GUI.show_layer(job_ep, step, layer)
 
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)

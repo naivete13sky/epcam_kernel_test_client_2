@@ -34,12 +34,8 @@ class TestPretreatment:
         # ----------悦谱转图。先下载并解压原始gerber文件,拿到解压后的文件夹名称，此名称加上_ep就是我们要的名称。然后转图。-------------
         job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
         # print('job_ep:',job_ep)
-        input_star_time = datetime.now()
-        print("导入开始时间",input_star_time)
         MyInput(folder_path=os.path.join(temp_gerber_path, os.listdir(temp_gerber_path)[0].lower()),
                 job=job_ep, step=r'orig', job_id=job_id, save_path=temp_ep_path)
-        input_end_time = datetime.now()
-        print("导入结束时间", input_end_time)
         all_layers_list_job_ep = Information.get_layers(job_ep)
         print("all_layers_list_job_ep1:",all_layers_list_job_ep)
 
@@ -253,7 +249,7 @@ class TestPretreatment:
             for layer in board_layers:
                 if layer not in signal_layers or layer not in solder_mask_layers:
                     BASE.split_layer_with_attribute(job_ep, step_pre, layer)
-            # GUI.show_layer(job_ep, step_pre, 'top')
+            GUI.show_layer(job_ep, step_pre, 'top')
 
 
 
@@ -276,7 +272,7 @@ class TestPretreatment:
             #
             # GUI.show_layer(job_ep,'orig','top')
             # Input.file_identify()
-            save_job(job_ep, r'C:\Users\Administrator\Desktop\新建文件夹')
+            save_job(job_ep, temp_ep_path)
 
         elif (job_id == 15892):# 未写好
             """-----------修改层别名称，定义层别属性，重新排序-----------"""
@@ -456,6 +452,7 @@ class TestPretreatment:
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_yg)
         job_ep_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format(
             'temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
+        print("job_ep_remote_path",job_ep_remote_path)
         # 导入要比图的资料
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
