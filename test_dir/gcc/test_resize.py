@@ -3,7 +3,7 @@ from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
 from epkernel import Input, GUI
 from epkernel.Action import Selection
-from epkernel.Edition import Layers, Job
+from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
 
 
@@ -12,7 +12,7 @@ class TestGraphicEditResize:
     def testResize(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Resize功能，用例数：7
+        本用例测试Resize功能，用例数：11
         ID: 11941
         '''
 
@@ -23,7 +23,7 @@ class TestGraphicEditResize:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'  # 定义需要执行比对的step名
-        layers = ['top', 'l2', 'l3', 'l4', 'comp', 'symbol_type', 'drlmap']
+        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'outline', 'comp', 'symbol_type', 'drlmap']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -45,16 +45,33 @@ class TestGraphicEditResize:
         # 2、整层物件缩小
         Layers.resize_global(job_ep, step, ['l2'], 1, -5 * 25400)
 
-        # 3、涨弧
-        Selection.select_feature_by_id(job_ep, step, 'l3', [2360, 2376])
-        Layers.resize_polyline(job_ep, step, ['l3'], 14*25400, True)
+        # 3、多层物件涨大
+        Layers.resize_global(job_ep, step, ['l3', 'l4'], 1, 5*25400)
 
-        # 4、涨外框线
-        Selection.select_feature_by_id(job_ep, step, 'l4', [910, 911, 912, 913, 914, 915, 916, 917, 918, 919, 920, 921,
-                                                            922, 923, 924, 925, 926, 927, 928, 929])
-        Layers.resize_polyline(job_ep, step, ['l4'], 30*25400, True)
+        # 4、涨大0mil
+        Layers.resize_global(job_ep, step, ['l5'], 1, 0)
 
-        # 5、缩小特殊pad(user symbol)导致物件消失-----BUG号:4393
+        # 5、涨大缩小极限值8000
+        Layers.resize_global(job_ep, step, ['l6'], 1, 8000*25400)
+        Layers.resize_global(job_ep, step, ['l7'], 1, -8000*25400)
+
+        # 6、涨弧
+        Selection.select_feature_by_id(job_ep, step, 'l8', [899, 903, 911, 915])
+        Layers.resize_polyline(job_ep, step, ['l8'], 14*25400, True)
+
+        # 7、涨外框线
+        Selection.select_feature_by_id(job_ep, step, 'l9', [1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015,
+                                                            1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025])
+        Layers.resize_polyline(job_ep, step, ['l9'], 30*25400, True)
+
+        # 8、不选中缩小外框线
+        Selection.select_feature_by_id(job_ep, step, 'l5', [680, 681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691,
+                                                            692, 693, 694, 695, 696, 697, 698, 699])
+        Matrix.create_layer(job_ep, 'outline')
+        Layers.copy2other_layer(job_ep, step, 'l5', 'outline', False, 0, 0, 0, 0, 0, 0, 0)
+        Layers.resize_polyline(job_ep, step, ['outline'], -5 * 25400, False)
+
+        # 9、缩小特殊pad(user symbol)导致物件消失-----BUG号:4393
         Selection.set_include_symbol_filter(['i274x.macro138.d138_inc_1.5'])    # 第一个属性物件
         Selection.select_features_by_filter(job_ep, step, ['comp'])
         Layers.resize_global(job_ep, step, ['comp'], 0, -38100)
@@ -63,16 +80,16 @@ class TestGraphicEditResize:
         Layers.resize_global(job_ep, step, ['comp'], 0, -38100)
         Selection.reset_select_filter()  # 重置筛选
 
-        # 6、涨大多种symbol-----BUG号：3809
+        # 10、涨大多种symbol-----BUG号：3809
         Layers.resize_global(job_ep, step, ['symbol_type'], 1, 20 * 25400)
 
-        # 7、涨大缩小任意相同值-----BUG号：3515
+        # 11、涨大缩小任意相同值-----BUG号：3515
         Layers.resize_global(job_ep, step, ['drlmap'], 0, 10 * 25400)
         Layers.resize_global(job_ep, step, ['drlmap'], 0, -10 * 25400)
 
         # BUG号：387 暂未解决，解决了再更新场景、测试料号
 
-        # GUI.show_layer(job_ep, step, 'drlmap')
+        GUI.show_layer(job_ep, step, 'l8')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
