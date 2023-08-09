@@ -24,7 +24,8 @@ class TestGraphicRoutConnection:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
-        layers = ['l1', 'l2', 'l3', 'l4', 'l6', 'l7', 'l8', 'l9', 'l10', 'smb', 'ssb', 'spt', 'sst', 'smt', 'spb', 'nc']  # 定义需要比对的层
+        layers = ['l1', 'l2', 'l3', 'l4', 'l6', 'l7', 'l8', 'l9', 'c', 'nc', 'l10', 'smb', 'ssb', 'spt', 'sst',
+                  'smt', 'spb', 'spb+1']  # 定义需要比对的层
         # layers = ['l6','l9']
 
         # 取到临时目录
