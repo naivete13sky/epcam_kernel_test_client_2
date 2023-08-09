@@ -12,7 +12,7 @@ import re
 
 class TestGraphicEditChangesymbols:
     '''
-    id:17804，共执行1个测试用例，实现5个方法，覆盖41个测试场景
+    id:17804，共执行1个测试用例，实现5个方法，覆盖47个测试场景
     '''
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Change_Symbol'))
     def testChange_symbols (self, job_id, g, prepare_test_job_clean_g):
@@ -20,7 +20,7 @@ class TestGraphicEditChangesymbols:
         本用例测试Change_symbols功能
         '''
         g = RunConfig.driver_g  # 拿到G软件
-
+        test_cases = 0
         data = {}  # 存放比对结果信息
         vs_time_g = str(int(time.time()))  # 比对时间
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
@@ -45,7 +45,7 @@ class TestGraphicEditChangesymbols:
         Input.open_job(job_ep, temp_compressed_path)
         all_layers_list_job_ep = Information.get_layers(job_ep)
 
-        # BASE.show_layer(job_id,step,'top')
+        # BASE.show_layer(job_id, 'orig', 'top')
         step = 'orig'
 
         '''
@@ -61,6 +61,7 @@ class TestGraphicEditChangesymbols:
             # GUI.show_layer(job_ep, step, layer)
             Layers.change_feature_symbols(job_ep, step, [layer],'r220',False)
             Selection.unselect_features(job_ep, step, layer)
+        test_cases = test_cases + len(features_id)
         # GUI.show_layer(job_ep, step, layer)
 
         '''
@@ -76,7 +77,7 @@ class TestGraphicEditChangesymbols:
             # GUI.show_layer(job_ep, step, layer)
             Layers.change_feature_symbols(job_ep, step, [layer], 'r220', False)
             Selection.unselect_features(job_ep, step, layer)
-
+        test_cases = test_cases + len(features_id)
         '''
         用例名称：执行层未选中物件进行change_symbol操作
         场景1：执行层中存在line（或pad、或arc）和surface（或text）
@@ -92,7 +93,7 @@ class TestGraphicEditChangesymbols:
             print("=layer=:",layer)
             Layers.change_feature_symbols(job_ep, step, [layer],'r220',False)
         # GUI.show_layer(job_ep, step, layer)
-
+        test_cases = test_cases + len(layers)
         '''
         测试用例：使用无效值对pad执行change_symbol
         场景1：值为文字
@@ -113,7 +114,7 @@ class TestGraphicEditChangesymbols:
             Layers.change_feature_symbols(job_ep, step, [layer], symbol, False)
             Selection.unselect_features(job_ep, step, layer)
             # GUI.show_layer(job_ep, step, layer)
-
+        test_cases = test_cases + len(symbols)
         '''
         测试用例名称：Reset pad angle参数设置为yes对有旋转角度的pad进行复位
         预期：已旋转的角度复位
@@ -125,7 +126,7 @@ class TestGraphicEditChangesymbols:
         # GUI.show_layer(job_ep, step, layer)
         Layers.change_feature_symbols(job_ep, step, [layer], 'rect50x100', True)
         # GUI.show_layer(job_ep, step, layer)
-
+        test_cases = test_cases + 1
         '''
         测试用例名称：对圆pad执行symbol中29种类型操作:Round、
         预期：图形发生变更
@@ -152,22 +153,91 @@ class TestGraphicEditChangesymbols:
                 # GUI.show_layer(job_ep, step, layer)
         else:
             print("请检查物件数量是否一致！")
+        test_cases = test_cases + len(symbols)
 
         '''
-        验证Round/Round Thermal类型Num Spokes值为0时,bug：4572，影响版本号：1.1.7.0
+        验证Round/Round Thermal类型Num Spokes值为0时，软件不会卡死
         预期：软件不会卡死
+        bug：4572
+        功能测试用例：3553
+        影响版本号：1.1.7.0
         执行测试场景：1个
         '''
         layer = 'symbol_type'
         feature_index = 27
         symbol = 'thr200x150x90x0x10' #Round/Round Thermal类型
         Selection.select_feature_by_id(job_ep, step, layer, [feature_index])
+        try:
+            Layers.change_feature_symbols(job_ep, step, [layer], symbol, False)
+        except Exception as e:
+            print(e)
+        test_cases = test_cases + 1
+
+        '''
+        验证change_symbol功能的吸取器可以正常获取物件属性
+        预期：可以获取物件属性，软件不闪退
+        bug：3276
+        功能测试用例：3569
+        影响版本号：1.1.0.0
+        执行测试场景：1个
+        '''
+        layer = 'top'
+        points = []
+        points.append({'ix': 28 * 1000000, 'iy': 24 * 1000000})
+        points.append({'ix': 28 * 1000000, 'iy': 26 * 1000000})
+        points.append({'ix': 31 * 1000000, 'iy': 26 * 1000000})
+        points.append({'ix': 31 * 1000000, 'iy': 24 * 1000000})
+        points.append({'ix': 28 * 1000000, 'iy': 24 * 1000000})
+        ret = BASE.get_symbol_name(job_ep, step, layer, points)
+        symbol = json.loads(ret)['paras']['symbol_name']
+        print('symbols1:', symbol)
         # GUI.show_layer(job_ep, step, layer)
+        test_cases = test_cases + 1
+
+        '''
+        验证使用吸附器读取特殊pad的形状和大小，可以对其他pad执行改变，
+        预期：可以获取物件属性，软件不闪退
+        bug：3991
+        功能测试用例：3578
+        影响版本号：1.1.3.18
+        执行测试场景：1个
+        '''
+        layer = 'gts'
+        points = []
+        points.append({'ix': 104 * 1000000, 'iy': 19 * 1000000})
+        points.append({'ix': 104 * 1000000, 'iy': 24 * 1000000})
+        points.append({'ix': 106 * 1000000, 'iy': 24 * 1000000})
+        points.append({'ix': 106 * 1000000, 'iy': 19 * 1000000})
+        points.append({'ix': 104 * 1000000, 'iy': 19 * 1000000})
+        ret = BASE.get_symbol_name(job_ep, step, layer, points)
+        symbol = json.loads(ret)['paras']['symbol_name']
+        Selection.select_feature_by_id(job_ep, step, layer, [372])
+        print('symbols2:', symbol)
+        Layers.change_feature_symbols(job_ep, step, [layer], symbol[0], False)
+        # GUI.show_layer(job_ep, step, layer)
+        test_cases = test_cases + 1
+
+        '''
+        验证对带有.rain_chain属性的物件执行change_symbol
+        预期：无法改变，软件不闪退
+        bug：4828
+        功能测试用例：3579
+        影响版本号：1.1.8.2
+        执行测试场景：1个
+        '''
+        layer = 'gts'
+        symbol = 'r200'
+        Selection.set_attribute_filter(0,[{'.rout_chain':'1'}])
+        # Selection.select_feature_by_id(job_ep, step, layer, [447])
+        Selection.select_features_by_filter(job_ep, step, [layer])
+        Selection.reset_select_filter()
         Layers.change_feature_symbols(job_ep, step, [layer], symbol, False)
         # GUI.show_layer(job_ep, step, layer)
+        test_cases = test_cases + 1
 
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
+        print("test_cases：", test_cases)
 
         # ----------------------------------------开始比图：G与EP---------------------------------------------------------
         job_g_remote_path = r'\\vmware-host\Shared Folders\share/{}/g/{}'.format(
@@ -203,5 +273,4 @@ class TestGraphicEditChangesymbols:
         assert data['g1_vs_total_result_flag'] == True
         for key in data['all_result_g1']:
             assert data['all_result_g1'][key] == "正常"
-
         Print.print_with_delimiter("断言--结束")
