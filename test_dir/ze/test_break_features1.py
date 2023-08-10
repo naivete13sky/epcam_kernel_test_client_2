@@ -104,6 +104,22 @@ class TestGraphicEditBreak_features:
         Layers.delete_feature(job_ep, step, ['l5'])  # 全部被删除证明没有被打散
         #GUI.show_layer(job_ep, step, 'l5')
 
+        '''
+        验证S开头方形pad打散后还是原来的属性
+        bug编号：3991
+        功能用例ID：3578
+        影响版本号：
+        '''
+        Layers.add_pad(job_ep, step, ['l5'], "s100", 25400000, 25400000, True,
+                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)  # 添加普通焊盘
+        Layers.break_features(job_ep, step, ['l5'], 1)  # 打散整层物件
+        Selection.select_feature_by_id(job_ep, step, 'l5', [1897, 1898, 1899, 1900])  # 选中添加的线、面、pad、弧
+        Layers.delete_feature(job_ep, step, ['l5'])  # 全部被删除证明没有被打散
+
+
+
+
+
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
