@@ -22,7 +22,7 @@ class TestGraphicEditBreak_features:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['smt', 'l1','l2','l3','l4','l5']
+        layers = ['smt', 'l1','l2','l3','l4','l5','l6','l7']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -94,8 +94,8 @@ class TestGraphicEditBreak_features:
         points_location.append([50 * 1000000, 25 * 1000000])
         Layers.add_surface(job_ep, step, ['l5'], True,
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)#添加面
-        Layers.add_pad(job_ep, step, ['l5'], "s100", 25400000, 25400000, True,
-                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)#添加普通焊盘
+        Layers.add_pad(job_ep, step, ['l5'], "s150", 25400000, 25400000, True,
+                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)#添加S开头的焊盘
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l5'], 'r7.874', 40 * 1000000, 25 * 1000000,
                40 * 1000000, 31 * 1000000, 40 * 1000000, 28 * 1000000, True, True, attributes)#添加弧
@@ -105,16 +105,33 @@ class TestGraphicEditBreak_features:
         #GUI.show_layer(job_ep, step, 'l5')
 
         '''
-        验证S开头方形pad打散后还是原来的属性
-        bug编号：3991
+        验证S开头方形Pad打散后还是Pad的属性
+        bug编号：4474
         功能用例ID：3578
-        影响版本号：
+        影响版本号：1.1.6.8
         '''
-        Layers.add_pad(job_ep, step, ['l5'], "s100", 25400000, 25400000, True,
-                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)  # 添加普通焊盘
-        Layers.break_features(job_ep, step, ['l5'], 1)  # 打散整层物件
-        Selection.select_feature_by_id(job_ep, step, 'l5', [1897, 1898, 1899, 1900])  # 选中添加的线、面、pad、弧
-        Layers.delete_feature(job_ep, step, ['l5'])  # 全部被删除证明没有被打散
+        Layers.add_pad(job_ep, step, ['l6'], "s150", 25400000, 25400000, True,
+                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)  # 添加S开头的焊盘
+        Selection.select_feature_by_id(job_ep, step, 'l6', [933],)#选中它
+        Layers.break_features(job_ep, step, ['l6'], 0)  # 打散选中物件
+        Selection.set_featuretype_filter(True, False, False, False, False, False, True)  # 用筛选器筛选中正极性Pad
+        Selection.select_features_by_filter(job_ep, step, ['l6'])
+        Layers.delete_feature(job_ep, step, ['l6'])  # 删除所选pad，如被删除证明pad属性没有改变
+        #GUI.show_layer(job_ep, step, 'l6')
+
+        '''
+        验证所选物件不属于可被打散物件时，执行Break操作后取消被选中状态
+        bug编号：4428
+        功能用例ID：3578
+        影响版本号：1.1.6.8
+        '''
+        Selection.select_feature_by_id(job_ep, step, 'l7', [721,244,251],)#选中几个正极性普通pad
+        Layers.break_features(job_ep, step, ['l7'], 0)  # 打散选中物件
+        Layers.delete_feature(job_ep, step, ['l7'])#如果整层物件被删除，证明不属于可被打散物件时，执行Break操作后取消被选中状态了，则符合预期
+        #GUI.show_layer(job_ep, step, 'l7')
+
+
+
 
 
 
