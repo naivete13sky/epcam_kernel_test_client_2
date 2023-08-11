@@ -121,14 +121,28 @@ class TestGraphicEditBreak_features:
 
         '''
         验证所选物件不属于可被打散物件时，执行Break操作后取消被选中状态
-        bug编号：4428
-        功能用例ID：3578
-        影响版本号：1.1.6.8
+        bug编号：4281
+        功能用例ID：3589
+        影响版本号：1.1.5.1
         '''
         Selection.select_feature_by_id(job_ep, step, 'l7', [721,244,251],)#选中几个正极性普通pad
         Layers.break_features(job_ep, step, ['l7'], 0)  # 打散选中物件
         Layers.delete_feature(job_ep, step, ['l7'])#如果整层物件被删除，证明不属于可被打散物件时，执行Break操作后取消被选中状态了，则符合预期
         #GUI.show_layer(job_ep, step, 'l7')
+
+
+        '''
+        验证使用Break功能可将指定pad打散为surface
+        bug编号：4428
+        功能用例ID：3578
+        影响版本号：1.1.6.3
+        '''
+        Selection.select_feature_by_id(job_ep, step, 'dc-s', [933], )  # 选中它
+        Layers.break_features(job_ep, step, ['dc-s'], 0)  # 打散选中物件为Surface属性
+        Selection.set_featuretype_filter(True, False, False, True, False, False, False)  # 用筛选器筛选中正极性Surface
+        Selection.select_features_by_filter(job_ep, step, ['dc-s'])
+        Layers.delete_feature(job_ep, step, ['dc-s']）#如果物件被删除则证明符合预期
+
 
 
 
