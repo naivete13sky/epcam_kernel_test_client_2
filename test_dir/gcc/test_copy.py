@@ -1,7 +1,7 @@
 import pytest, os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
-from epkernel import Input, GUI
+from epkernel import Input, GUI, Guide
 from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
@@ -23,7 +23,7 @@ class TestGraphicEditCopy:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l4_1', 'l5_1', 'l6_1', 'l7_1', 'l8_1', 'l9_1']
+        layers = ['top', 'l2', 'l3', 'l4_1', 'l5_1', 'l6_1', 'l7_1', 'l8_1', 'l9_1', 'bot_1']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -81,7 +81,14 @@ class TestGraphicEditCopy:
         Selection.select_feature_by_id(job_ep, step, 'l9', [0])
         Layers.copy2other_layer(job_ep, step, 'l9', 'l9_1', False, 0, 0, 0, 200*25400, 90, 1000*25400, 0*25400)
 
-        # GUI.show_layer(job_ep, step, 'l9')
+        # 10、验证resize by的范围值-----4104
+        Matrix.create_layer(job_ep, 'bot_1')
+        Selection.select_feature_by_id(job_ep, step, 'bot', [18])
+        Layers.copy2other_layer(job_ep, step, 'bot', 'bot_1', False, 0, 0, 0, -500*25400, 0, 0, 0)
+        Selection.select_feature_by_id(job_ep, step, 'bot', [1315])
+        Layers.copy2other_layer(job_ep, step, 'bot', 'bot_1', False, 0, 0, 0, 500*25400, 0, 0, 0)
+
+        # GUI.show_layer(job_ep, step, '2')
         save_job(job_ep,temp_ep_path)
         Job.close_job(job_ep)
 

@@ -12,7 +12,7 @@ class TestGraphicEditResize:
     def testResize(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Resize功能，用例数：11
+        本用例测试Resize功能，用例数：17
         ID: 11941
         '''
 
@@ -23,7 +23,8 @@ class TestGraphicEditResize:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'  # 定义需要执行比对的step名
-        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'outline', 'comp', 'symbol_type', 'drlmap']
+        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'outline', 'comp', 'symbol_type', 'drlmap',
+                  '4735']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -60,13 +61,13 @@ class TestGraphicEditResize:
         Layers.resize_polyline(job_ep, step, ['l8'], 14*25400, True)
 
         # 7、涨外框线
-        Selection.select_feature_by_id(job_ep, step, 'l9', [1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015,
-                                                            1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025])
+        feature_id = [y for y in range(1006, 1026)]
+        Selection.select_feature_by_id(job_ep, step, 'l9', feature_id)
         Layers.resize_polyline(job_ep, step, ['l9'], 30*25400, True)
 
         # 8、不选中缩小外框线
-        Selection.select_feature_by_id(job_ep, step, 'l5', [680, 681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691,
-                                                            692, 693, 694, 695, 696, 697, 698, 699])
+        feature_id = [y for y in range(680, 700)]
+        Selection.select_feature_by_id(job_ep, step, 'l5', feature_id)
         Matrix.create_layer(job_ep, 'outline')
         Layers.copy2other_layer(job_ep, step, 'l5', 'outline', False, 0, 0, 0, 0, 0, 0, 0)
         Layers.resize_polyline(job_ep, step, ['outline'], -5 * 25400, False)
@@ -80,16 +81,43 @@ class TestGraphicEditResize:
         Layers.resize_global(job_ep, step, ['comp'], 0, -38100)
         Selection.reset_select_filter()  # 重置筛选
 
-        # 10、涨大多种symbol-----BUG号：3809
-        Layers.resize_global(job_ep, step, ['symbol_type'], 1, 20 * 25400)
+        # 10、涨大多种symbol
+        feature_id = [y for y in range(1, 24)]
+        Selection.select_feature_by_id(job_ep, step, 'symbol_type', [feature_id])
+        Layers.resize_global(job_ep, step, ['symbol_type'], 0, 10 * 25400)
 
-        # 11、涨大缩小任意相同值-----BUG号：3515
+        # 11、涨大symbol不能变形-----BUG号：4466
+        Selection.select_feature_by_id(job_ep, step, 'symbol_type', [24])
+        Layers.resize_global(job_ep, step, ['symbol_type'], 0, 4 * 25400)
+
+        # 12、涨大sumbol圆弧角度跟着涨大-----BUG号：3809
+        Selection.select_feature_by_id(job_ep, step, 'symbol_type', [25])
+        Layers.resize_global(job_ep, step, ['symbol_type'], 0, 2 * 25400)
+
+        # 13、涨大超过symbol允许的极限值物件消失-----BUG号：4464、4465
+        Selection.select_feature_by_id(job_ep, step, 'symbol_type', [26])
+        Layers.resize_global(job_ep, step, ['symbol_type'], 0, 1 * 25400)
+        Selection.select_feature_by_id(job_ep, step, 'symbol_type', [27])
+        Layers.resize_global(job_ep, step, ['symbol_type'], 0, 4 * 25400)
+
+        # 14、多边形PAD涨大变形-----BUG号4175
+        Selection.select_feature_by_id(job_ep, step, 'symbol_type', [28, 29, 30, 31])
+        Layers.resize_global(job_ep, step, ['symbol_type'], 0, 4 * 25400)
+
+        # 15、多边形PAD涨大有偏差-----BUG号：4110
+        Selection.select_feature_by_id(job_ep, step, 'symbol_type', [32])
+        Layers.resize_global(job_ep, step, ['symbol_type'], 0, 4 * 25400)
+
+        # 16、涨大缩小任意相同值-----BUG号：3515
         Layers.resize_global(job_ep, step, ['drlmap'], 0, 10 * 25400)
         Layers.resize_global(job_ep, step, ['drlmap'], 0, -10 * 25400)
 
+        # 17、铜皮涨大形状优化-----BUG号：4753
+        Layers.resize_global(job_ep, step, ['4753'], 0, 1 * 25400)
+
         # BUG号：387 暂未解决，解决了再更新场景、测试料号
 
-        GUI.show_layer(job_ep, step, 'l8')
+        GUI.show_layer(job_ep, step, 'l5')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
