@@ -141,7 +141,8 @@ class TestGraphicEditBreak_features:
         Layers.break_features(job_ep, step, ['dc-s'], 0)  # 打散选中物件为Surface属性
         Selection.set_featuretype_filter(True, False, False, True, False, False, False)  # 用筛选器筛选中正极性Surface
         Selection.select_features_by_filter(job_ep, step, ['dc-s'])
-        Layers.delete_feature(job_ep, step, ['dc-s']）#如果物件被删除则证明符合预期
+        Layers.delete_feature(job_ep, step, ['dc-s'])#如果物件被删除则证明符合预期
+        #GUI.show_layer(job_ep, step, 'l7'
 
 
 
