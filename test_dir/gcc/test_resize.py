@@ -14,6 +14,7 @@ class TestGraphicEditResize:
         '''
         本用例测试Resize功能，用例数：19
         ID: 11941
+        BUG：1262、2135、3934、4097、4701、3515、3809、4110、4175、4393、4464、4465、4466、4753
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -92,7 +93,7 @@ class TestGraphicEditResize:
         Selection.select_feature_by_id(job_ep, step, 'symbol_type', [24])
         Layers.resize_global(job_ep, step, ['symbol_type'], 0, 4 * 25400)
 
-        # 12、涨大sumbol圆弧角度跟着涨大-----BUG号：3809
+        # 12、涨大symbol圆弧角度跟着涨大-----BUG号：3809
         Selection.select_feature_by_id(job_ep, step, 'symbol_type', [25])
         Layers.resize_global(job_ep, step, ['symbol_type'], 0, 2 * 25400)
 
@@ -117,7 +118,7 @@ class TestGraphicEditResize:
         # 17、铜皮涨大形状优化-----BUG号：4753
         Layers.resize_global(job_ep, step, ['4753'], 1, 1 * 25400)
 
-        # 18、验证外框线有断线能正常外扩以及涨缩精度-----BUG号：4097、3934
+        # 18、验证外框线有断线能正常外扩以及涨缩精度-----BUG号：4097、3934、1262
         Layers.resize_polyline(job_ep, step, ['4097'], 20 * 25400, False)
 
         # 19、验证方形、圆形同时涨缩-----BUG号：2135
