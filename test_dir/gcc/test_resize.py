@@ -2,7 +2,7 @@ import pytest, os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
 from epkernel import Input, GUI
-from epkernel.Action import Selection
+from epkernel.Action import Selection, Information
 from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
 
@@ -168,3 +168,43 @@ class TestGraphicEditResize:
             assert data['all_result_g1'][key] == "正常"
 
         Print.print_with_delimiter("断言--结束")
+
+
+# @pytest.mark.ResizeBUG
+class TestGraphicEditResize1:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Resize1'))
+    def testResize1(self, job_id):
+
+        '''
+        本用例测试Resize功能，用例数：1
+        ID: 11941
+        BUG：3287
+        '''
+
+        vs_time_g = str(int(time.time()))  # 比对时间
+        step = 'orig'
+        layer = '3287'
+
+        # 取到临时目录
+        temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
+        temp_compressed_path = os.path.join(temp_path, 'compressed')
+
+        # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
+        job = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
+
+        # 打开料号
+        Input.open_job(job, temp_compressed_path)
+
+        # 涨大指定物件
+        Selection.select_feature_by_id(job, step, layer, [12902])
+        Layers.resize_global(job, step, [layer], 0, 6*25400)
+
+        # 获取指定物件信息，拿到symbolname
+        Selection.select_feature_by_id(job, step, layer, [12902])
+        feature_info = Information.get_selected_features_infos(job, step, layer)
+        symbolname = feature_info[0].get('symbolname')
+        print('-'*10, symbolname, '-'*10)
+        symbol_name = 'i274x.a56m1_inc_6'
+
+        # 断言
+        assert symbolname == symbol_name
