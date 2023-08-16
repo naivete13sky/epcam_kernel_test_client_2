@@ -2,18 +2,19 @@ import pytest, os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
 from epkernel import Input, GUI
-from epkernel.Action import Selection
+from epkernel.Action import Selection, Information
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 
 
 class TestGraphicEditTransform:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Transform'))
-    def testTransform (self, job_id, g, prepare_test_job_clean_g):
+    def testTransform(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Transform功能，用例数：9
+        本用例测试Transform功能，用例数：11
         ID: 12015
+        BUG:1785、4211、4286
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -23,7 +24,7 @@ class TestGraphicEditTransform:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'spb']
+        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'spb', 'logo']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -84,7 +85,12 @@ class TestGraphicEditTransform:
                                   1.2, 0, 0)
         Selection.reset_select_filter()
 
-        # GUI.show_layer(job_ep, step, 'spb')
+        # 10、验证特殊物件logo是否可以旋转-----BUG号：4286
+        Selection.select_feature_by_id(job_ep, step, 'logo', [0])
+        Layers.transform_features(job_ep, step, 'logo', 0, True, False, False, False, False, {'ix': 0, 'iy': 0},
+                                  90, 0, 0, 0, 0)
+
+        # GUI.show_layer(job_ep, step, 'logo')
         save_job(job_ep, temp_ep_path)
 
         Job.close_job(job_ep)
@@ -127,3 +133,32 @@ class TestGraphicEditTransform:
             assert data['all_result_g1'][key] == "正常"
 
         Print.print_with_delimiter("断言--结束")
+
+
+class TestGraphicEditTransform1:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Transform1'))
+    def testTransform1(self, job_id):
+
+        vs_time_g = str(int(time.time()))  # 比对时间
+
+        # 取到临时目录
+        temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
+        temp_compressed_path = os.path.join(temp_path, 'compressed')
+
+        # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
+        job = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
+        step = 'orig'
+        layer = 'logo'
+
+        # 用悦谱CAM打开料号
+        Input.open_job(job, temp_compressed_path)
+
+        # 翻转复制指定物件
+        Selection.select_feature_by_id(job, step, layer, [0])
+        Layers.transform_features(job, step, layer, 0, False, False, True, False, True, {'ix': 0, 'iy': 0}, 0, 0, 0, 0, 0)
+
+        # 验证指定层是否有物件被选中，返回bool
+        select_info = Information.has_selected_features(job, step, layer)
+
+        # 断言
+        assert select_info == False

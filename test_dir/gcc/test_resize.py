@@ -170,7 +170,6 @@ class TestGraphicEditResize:
         Print.print_with_delimiter("断言--结束")
 
 
-# @pytest.mark.ResizeBUG
 class TestGraphicEditResize1:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Resize1'))
     def testResize1(self, job_id):
@@ -192,7 +191,7 @@ class TestGraphicEditResize1:
         # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
         job = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
 
-        # 打开料号
+        # 用悦谱CAM打开料号
         Input.open_job(job, temp_compressed_path)
 
         # 涨大指定物件
