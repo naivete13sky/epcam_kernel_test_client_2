@@ -206,7 +206,7 @@ class TestGraphicEditChangeText:
 class TestTranChange_Text:
     # @pytest.mark.Connection
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('TranChange_text'))
-    def testChange_Text(self, job_id, prepare_test_job_clean_g):
+    def testChange_Text(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试line导圆角功能
         '''
