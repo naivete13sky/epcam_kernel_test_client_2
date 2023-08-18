@@ -22,7 +22,8 @@ class TestGraphicEditContourize1:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'xt']
+        layers = ['l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'xt','e22_bak_l2',
+                  '4809_edit_l3', '19te_net_l1', '10a68_net_l2','8a68782_edit_gts','9397_orig_l1','555_orig_l2',]
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -102,6 +103,72 @@ class TestGraphicEditContourize1:
         #9.验证accuracy栏的正确性（精度大于等于0.25mil时，那么contour无需靠近原物件的轮廓线，将更快速的处理复杂的输入数据）
         Layers.contourize(job_ep, step, ['l8'], 2*25400, True, 3*25400, 1)#accuracy栏输入2mil时整合铜皮,此时铜皮轮廓会有变化（因为大于0.25mil了）
         #GUI.show_layer(job_ep, step, 'l8')
+
+        '''
+        验证按照设置参数正确转铜皮，不丢失空洞
+        bug编号：4714
+        功能用例ID：3620
+        影响版本号：1.1.7.2
+        '''
+        Selection.set_featuretype_filter(True, False, False, True, False, False, False)  # 筛选正极性铜皮
+        Selection.select_features_by_filter(job_ep, step, ['e22_bak_l2'])
+        Layers.contourize(job_ep, step, ['e22_bak_l2'], 0*25400, True, 0*25400, 0)
+        Selection.reset_selection()  # 重置筛选器，不影响后续使用
+        Selection.reset_select_filter()
+        #GUI.show_layer(job_ep, step, 'e22_bak_l2')
+
+        '''
+        验证按照设置参数正确转铜皮，不丢失空洞
+        bug编号：4683、4388、2223（该用例验证三个不同料号的同一执行场景，已将问题层别拷贝到测试料号）
+        功能用例ID：3620
+        '''
+        Selection.set_featuretype_filter(False, True, True, True, True, True, True)# 筛选所有负极性物件
+        Selection.select_features_by_filter(job_ep, step, ['4809_edit_l3', '19te_net_l1', '10a68_net_l2'])
+        Selection.set_featuretype_filter(True, False, False, True, False, False, False) #筛选正极性铜皮
+        Selection.select_features_by_filter(job_ep, step, ['4809_edit_l3', '19te_net_l1', '10a68_net_l2'])
+        Layers.contourize(job_ep, step, ['4809_edit_l3','19te_net_l1','10a68_net_l2'], 1 * 254, True, 3 * 25400, 0)
+        Selection.reset_selection()  # 重置筛选器，不影响后续使用
+        Selection.reset_select_filter()
+        #GUI.show_layer(job_ep, step, '4809_edit_l3')
+
+        '''
+        验证选中选一个bga Pad和组成它的负极性铜皮，按照所填参数铜皮整合后图形不变形
+        bug编号：2824
+        功能用例ID：3622
+        '''
+        Selection.select_feature_by_id(job_ep, step, '8a68782_edit_gts', [13492, 2348])#物件坐标（x=2.994,y=3.139）
+        Layers.contourize(job_ep, step, ['8a68782_edit_gts'], 0, True, 3 * 25400, 0)
+        Selection.reset_selection()  # 重置筛选器，不影响后续使用
+        Selection.reset_select_filter()
+        #GUI.show_layer(job_ep, step, '8a68782_edit_gts')
+
+        '''
+        验证整合附件线铜后，按照所填参数正确整合，PAD不丢失
+        bug编号：1668
+        功能用例ID：3624
+        '''
+        Selection.set_featuretype_filter(False, True, True, True, True, True, True)  # 筛选所有负极性物件
+        Selection.select_features_by_filter(job_ep, step, ['9397_orig_l1'])
+        Selection.set_featuretype_filter(True, False, False, True, False, False, False)  # 筛选正极性铜皮
+        Selection.select_features_by_filter(job_ep, step, ['9397_orig_l1'])
+        Layers.contourize(job_ep, step, ['9397_orig_l1'], 25 * 254, True, 3 * 25400, 0)#按照所填参数正确整合，PAD不丢失(其坐标：x=0.920,y=0.333)
+        Selection.reset_selection()  # 重置筛选器，不影响后续使用
+        Selection.reset_select_filter()
+        Selection.reset_select_filter()
+        #GUI.show_layer(job_ep, step, '9397_orig_l1')
+
+        '''
+        验证线铜物料使用Contourize功能可正确整合铜皮
+        bug编号：1053
+        功能用例ID：3623
+        '''
+        Selection.set_featuretype_filter(True, True, False, False, False, True, False)  # 筛选正负极性线
+        Selection.select_features_by_filter(job_ep, step, ['555_orig_l2'])
+        Selection.set_include_symbol_filter(['r9.843'])
+        Layers.contourize(job_ep, step, ['555_orig_l2'], 25 * 254, True, 3 * 25400, 0)
+        #GUI.show_layer(job_ep, step, '555_orig_l2')
+
+
 
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
