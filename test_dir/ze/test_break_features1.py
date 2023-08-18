@@ -22,7 +22,7 @@ class TestGraphicEditBreak_features:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['smt', 'l1','l2','l3','l4','l5','l6','l7']
+        layers = ['smt', 'l1','l2','l3','l4','l5','l6','l7','dc-s']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
