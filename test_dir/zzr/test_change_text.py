@@ -199,3 +199,83 @@ class TestGraphicEditChangeText:
         #     assert all_result_ep_vs_g_g2[key] == "正常"
 
         Print.print_with_delimiter("断言--结束")
+
+
+
+# @pytest.mark.Change_Text
+class TestTranChange_Text:
+    # @pytest.mark.Connection
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('TranChange_text'))
+    def testChange_Text(self, job_id, prepare_test_job_clean_g):
+        '''
+        本用例测试line导圆角功能
+        '''
+
+        g = RunConfig.driver_g  # 拿到G软件
+        data = {}  # 存放比对结果信息
+        vs_time_g = str(int(time.time()))  # 比对时间
+        data["vs_time_g"] = vs_time_g  # 比对时间存入字典
+        data["job_id"] = job_id
+        step = 'prepare'  # 定义需要执行比对的step名
+        layers = ['f']# 定义需要比对的层
+
+        # 取到临时目录
+        temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
+        temp_compressed_path = os.path.join(temp_path, 'compressed')
+        temp_ep_path = os.path.join(temp_path, 'ep')
+        temp_g_path = os.path.join(temp_path, 'g')
+
+        # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
+        # 测试用例料号
+        job_case = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
+        # --------------------------------下载yg转图tgz，并解压好，获取到文件夹名称，作为g料号名称-------------------------------
+        # 原稿料号
+        job_yg = DMS().get_file_from_dms_db(temp_path, job_id, field='file_odb_g', decompress='tgz')
+
+        # 用悦谱CAM打开料号
+        Input.open_job(job_case, temp_compressed_path)  # 用悦谱CAM打开料号
+
+        '''
+                验证文字transform旋转后change_text功能的吸取器可以正常获取文字的Line Width大小
+                预期：获取文字的Line Width大小
+                bug:1247
+                功能测试用例：
+                影响版本号：
+                执行测试场景：
+                '''
+        Info = Information.get_all_features_info(job_case, step, 'f')
+        # Infor = Information.get_selected_features_infos(job_case, step, 'f')
+
+        #获取原始线宽大小存入字典
+        before_changetest_info = {}
+        for I in Info:
+            for key, value in I.items():
+                if 'linewidth' in I:
+                    if key == 'linewidth':
+                        print(key, ':', value)
+                        before_changetest_info[key] = value
+                        print(before_changetest_info)
+
+        # 旋转文字90°
+        Selection.select_feature_by_id(job_case, step, 'f', [5])
+        Layers.transform_features(job_case, step, 'f', 0,
+                                  True, False, False, False, False, {'ix': 56036112, 'iy': 185131029}, 90, 0, 0, 0, 0)
+
+        Infor_new = Information.get_all_features_info(job_case, step, 'f')
+        # print('Information:', Infor_new)
+
+        # 获取旋转后的线宽大小存入字典
+        new_changetext_info = {}
+        for new_I in Infor_new:
+            for key, value in new_I.items():
+                if 'linewidth' in new_I:
+                    if key == 'linewidth':
+                        print(key, 'new:', value)
+                        new_changetext_info[key] = value
+                        print(new_changetext_info)
+
+        save_job(job_case, temp_ep_path)
+        # GUI.show_layer(job_case, step, 'l1')
+
+        #断言（比对某个字典信息）
+        assert before_changetest_info == new_changetext_info
