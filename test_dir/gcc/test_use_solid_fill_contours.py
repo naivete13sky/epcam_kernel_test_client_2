@@ -7,13 +7,13 @@ from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 
 
-class TestGraphicEditUse_pattern_fill_contours:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_pattern'))
-    def testUse_pattern_fill_contours (self, job_id, g, prepare_test_job_clean_g):
-
+class TestGraphicEditUse_solid_fill_contours:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_solid'))
+    def testUse_solid_fill_contours(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Use_pattern_fill_contours填充功能，用例数：6
-        ID: 17873
+        本用例测试Use_solid_fill_contours填充功能，用例数：7
+        ID:27661
+        BUG:1764、4113、4749
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -23,7 +23,7 @@ class TestGraphicEditUse_pattern_fill_contours:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'bot', '1511']
+        layers = ['top', 'l2', 'l3', 'l4', '1764', '4113', '4749']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -41,45 +41,45 @@ class TestGraphicEditUse_pattern_fill_contours:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 1、指定符号填充铜皮（拆分删除框外元素，且奇数行偏移）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'top', [27])
-        Layers.use_pattern_fill_contours(job_ep, step, 'top', 'bfr8', 10*25400, 10*25400,
-                                         True, False, False, False, 1*25400, False, 5*25400, 0*25400)
+        # 1、不选中铜皮填充（不用弧，线宽10mil）
+        Layers.use_solid_fill_contours(job_ep, step, ['top'], 10*25400, False)
+        Selection.set_include_symbol_filter(['r10'])
+        Selection.set_attribute_filter(0, [{'.pattern_fill': ''}])  # 填充之后的线宽、属性筛选
+        Selection.select_features_by_filter(job_ep, step, ['top'])
+        Layers.delete_feature(job_ep, step, ['top'])    # 删除填充的线以证明填充成功
+        Selection.reset_select_filter()
 
-        # 2、指定符号填充铜皮（切除位于边框上的基本元素，创建轮廓化的铜面，且偶数行偏移）❤❤❤
+        # 2、选中铜皮填充（不用弧，线宽1mil）
         Selection.select_feature_by_id(job_ep, step, 'l2', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'bfr8', 10*25400, 10*25400,
-                                         False, True, False, False, 1*25400, False, 0*25400, 5*25400)
+        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 1*25400, False)
+        Selection.set_include_symbol_filter(['r1'])
+        Selection.set_attribute_filter(0, [{'.pattern_fill': ''}])    # 填充之后的线宽、属性筛选
+        Selection.select_features_by_filter(job_ep, step, ['l2'])
+        Layers.delete_feature(job_ep, step, ['l2'])    # 删除填充的线以证明填充成功
+        Selection.reset_select_filter()
 
-        # 3、指定符号填充铜皮（将原点设置为基准点）❤❤❤
+        # 3、选中铜皮填充（用弧，线宽5mil）
         Selection.select_feature_by_id(job_ep, step, 'l3', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l3', 'bfr8', 10*25400, 10*25400,
-                                         False, False, True, False, 1*25400, False, 0*25400, 0*25400)
+        Layers.use_solid_fill_contours(job_ep, step, ['l3'], 5*25400, False)
+        Selection.set_featuretype_filter(True, True, False, False, False, True, False)
+        Selection.set_attribute_filter(0, [{'.pattern_fill': ''}])    # 填充之后的线宽、属性筛选
+        Selection.select_features_by_filter(job_ep, step, ['l3'])
+        Layers.delete_feature(job_ep, step, ['l3'])    # 删除填充的线以证明填充成功
+        Selection.reset_select_filter()
 
-        # 4、指定符号填充铜皮（铜皮轮廓化）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'l4', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l4', 'di10x10', 10*25400, 10*25400,
-                                         False, False, False, True, 2*25400, False, 0*25400, 0*25400)
+        # 4、不选中铜皮填充（不删除验证）
+        Layers.use_solid_fill_contours(job_ep, step, ['l4'], 1*25400, True)
 
-        # 5、指定符号填充铜皮（铜皮轮廓化并转换轮廓线极性）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'l5', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l5', 'di10x10', 10*25400, 10*25400,
-                                         False, False, False, True, 2*25400, True, 0*25400, 0*25400)
-        Selection.set_featuretype_filter(False, True, False, False, False, True, False)
-        Selection.select_features_by_filter(job_ep, step, ['l5'])   # 负极性外框线不可见，再次转换极性
-        Layers.change_polarity(job_ep, step, ['l5'], 2, 0)
-        Selection.reset_select_filter()  # 重置筛选
+        # 5、验证填充之后显示有细丝-----BUG号：1764
+        Layers.use_solid_fill_contours(job_ep, step, ['1764'], 5*25400, False)
 
-        # 6、指定符号填充负极性铜皮（切除位于边框上的基本元素，创建轮廓化的铜面）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'bot', [34, 38])
-        Layers.use_pattern_fill_contours(job_ep, step, 'bot', 'di10x10', 10*25400, 10*25400,
-                                         False, True, False, True, 2*25400, False, 0*25400, 0*25400)
+        # 6、验证小于参数无法Fill的铜皮直接删除-----BUG号：4113
+        Layers.use_solid_fill_contours(job_ep, step, ['4113'], 15*25400, False)
 
-        # 7、验证Fill过程中自动删除不满足dummy pad的小铜块-----BUG号：1511
-        Layers.use_pattern_fill_contours(job_ep, step, '1511', 'r40', 50 * 25400, 50 * 25400,
-                                         True, False, False, False, 0 * 25400, False, 0 * 25400, 0 * 25400)
+        # 7、验证Fill之后有间隙-----BUG号：4749
+        Layers.use_solid_fill_contours(job_ep, step, ['4749'], 6*25400, False)
 
-        # GUI.show_layer(job_ep, step, 'bot')
+        # GUI.show_layer(job_ep, step, '4113')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 

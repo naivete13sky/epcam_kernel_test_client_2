@@ -12,7 +12,7 @@ class TestGraphicEditCopy:
     def testCopy(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试Copy功能，用例数：9
+        本用例测试Copy功能，用例数：10
         ID: 11839
         '''
 
