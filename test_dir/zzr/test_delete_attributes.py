@@ -40,17 +40,7 @@ class TestDeleteAttributes():
         # 用悦谱CAM打开料号
         Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
         # all_layers_list_job = Information.get_layers(job)
-        #
-        # # 获取标准资料物件属性存入字典
-        # standard_infos = Information.get_all_features_info(job_g, 'prepare', 'drl110')
-        #
-        # standard_attributes_info = {}
-        # for s in standard_infos:
-        #     for key, value in s.items():
-        #         if key == 'attributes':
-        #             print(key, ':', value)
-        #             standard_attributes_info[key] = value
-        #             print('standard:', standard_attributes_info)
+
 
         # 获取原始物件属性存入字典
         layer_infos = Information.get_all_features_info(job, 'prepare', 'drl110')
@@ -60,7 +50,7 @@ class TestDeleteAttributes():
             for key, value in i.items():
                 if 'attributes' in i:
                     if key == 'attributes':
-                        # print(key, ':', value)
+                        print(key, ':', value)
                         before_attributes_info[key] = value
                         print(before_attributes_info)
 
@@ -76,7 +66,7 @@ class TestDeleteAttributes():
             for key, value in i.items():
                 if 'attributes' in i:
                     if key == 'attributes':
-                        # print(key, ':', value)
+                        print(key, ':', value)
                         now_attributes_info[key] = value
                         print(now_attributes_info)
 
