@@ -3,17 +3,17 @@ from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
 from epkernel import Input, GUI
 from epkernel.Action import Selection
-from epkernel.Edition import Layers, Job
+from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
 
 
-class TestGraphicEditUse_pattern_fill_contours:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_pattern'))
-    def testUse_pattern_fill_contours (self, job_id, g, prepare_test_job_clean_g):
-
+class TestGraphicStepFill_profile:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_profile'))
+    def testFill_profile(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Use_pattern_fill_contours填充功能，用例数：6
-        ID: 17873
+        本用例测试Use_solid_fill_contours填充功能，用例数：1
+        ID:29278
+        BUG:4597
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -22,8 +22,8 @@ class TestGraphicEditUse_pattern_fill_contours:
         vs_time_g = str(int(time.time()))  # 比对时间
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
-        step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'bot', '1511']
+        step = 'panel'
+        layers = ['4597']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -41,45 +41,13 @@ class TestGraphicEditUse_pattern_fill_contours:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 1、指定符号填充铜皮（拆分删除框外元素，且奇数行偏移）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'top', [27])
-        Layers.use_pattern_fill_contours(job_ep, step, 'top', 'bfr8', 10*25400, 10*25400,
-                                         True, False, False, False, 1*25400, False, 5*25400, 0*25400)
+        # 1、验证指定符号填充profile线效果以及删除超过线的部分-----BUG号：4597
+        Matrix.create_layer(job_ep, '4597')
+        Layers.set_fill_pattern_param('inn_pad1', False, False, 2000000,
+                                      2000000, True, False, False, 0, 0, 0)
+        Layers.fill_profile(job_ep, step, ['4597'], 3, False, [], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
 
-        # 2、指定符号填充铜皮（切除位于边框上的基本元素，创建轮廓化的铜面，且偶数行偏移）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'l2', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'bfr8', 10*25400, 10*25400,
-                                         False, True, False, False, 1*25400, False, 0*25400, 5*25400)
-
-        # 3、指定符号填充铜皮（将原点设置为基准点）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'l3', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l3', 'bfr8', 10*25400, 10*25400,
-                                         False, False, True, False, 1*25400, False, 0*25400, 0*25400)
-
-        # 4、指定符号填充铜皮（铜皮轮廓化）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'l4', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l4', 'di10x10', 10*25400, 10*25400,
-                                         False, False, False, True, 2*25400, False, 0*25400, 0*25400)
-
-        # 5、指定符号填充铜皮（铜皮轮廓化并转换轮廓线极性）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'l5', [0])
-        Layers.use_pattern_fill_contours(job_ep, step, 'l5', 'di10x10', 10*25400, 10*25400,
-                                         False, False, False, True, 2*25400, True, 0*25400, 0*25400)
-        Selection.set_featuretype_filter(False, True, False, False, False, True, False)
-        Selection.select_features_by_filter(job_ep, step, ['l5'])   # 负极性外框线不可见，再次转换极性
-        Layers.change_polarity(job_ep, step, ['l5'], 2, 0)
-        Selection.reset_select_filter()  # 重置筛选
-
-        # 6、指定符号填充负极性铜皮（切除位于边框上的基本元素，创建轮廓化的铜面）❤❤❤
-        Selection.select_feature_by_id(job_ep, step, 'bot', [34, 38])
-        Layers.use_pattern_fill_contours(job_ep, step, 'bot', 'di10x10', 10*25400, 10*25400,
-                                         False, True, False, True, 2*25400, False, 0*25400, 0*25400)
-
-        # 7、验证Fill过程中自动删除不满足dummy pad的小铜块-----BUG号：1511
-        Layers.use_pattern_fill_contours(job_ep, step, '1511', 'r40', 50 * 25400, 50 * 25400,
-                                         True, False, False, False, 0 * 25400, False, 0 * 25400, 0 * 25400)
-
-        # GUI.show_layer(job_ep, step, 'bot')
+        # GUI.show_layer(job_ep, step, '4597')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
