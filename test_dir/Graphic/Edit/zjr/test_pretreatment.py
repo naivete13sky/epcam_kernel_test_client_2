@@ -249,7 +249,7 @@ class TestPretreatment:
             for layer in board_layers:
                 if layer not in signal_layers or layer not in solder_mask_layers:
                     BASE.split_layer_with_attribute(job_ep, step_pre, layer)
-            GUI.show_layer(job_ep, step_pre, 'top')
+            # GUI.show_layer(job_ep, step_pre, 'top')
 
 
 

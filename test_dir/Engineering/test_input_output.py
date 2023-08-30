@@ -34,12 +34,8 @@ class TestInputOutputBasicGerber274X:
         # ----------悦谱转图。先下载并解压原始gerber文件,拿到解压后的文件夹名称，此名称加上_ep就是我们要的名称。然后转图。-------------
         job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
         # print('job_ep:',job_ep)
-        input_star_time = datetime.now()
-        print("导入开始时间", input_star_time)
         MyInput(folder_path = os.path.join(temp_gerber_path, os.listdir(temp_gerber_path)[0].lower()),
                 job = job_ep, step = r'orig', job_id = job_id, save_path = temp_ep_path)
-        input_end_time = datetime.now()
-        print("导入结束时间", input_end_time)
         all_layers_list_job_ep = Information.get_layers(job_ep)
         # print('all_layers_list_job_ep:',all_layers_list_job_ep)
 
@@ -60,13 +56,18 @@ class TestInputOutputBasicGerber274X:
         # 导入要比图的资料
         g.import_odb_folder(job_g_remote_path)
         g.import_odb_folder(job_ep_remote_path)
-        vs_star_time = datetime.now()
-        print("导入比对开始时间", vs_star_time)
+
+        # 校正孔用
+        temp_path_local_info1 = os.path.join(temp_path, 'info1')
+        if not os.path.exists(temp_path_local_info1):
+            os.mkdir(temp_path_local_info1)
+        temp_path_local_info2 = os.path.join(temp_path, 'info2')
+        if not os.path.exists(temp_path_local_info2):
+            os.mkdir(temp_path_local_info2)
+
         r = g.layer_compare_dms(job_id = job_id, vs_time_g = vs_time_g, temp_path = temp_path,
                             job1 = job_g, step1 = 'orig', all_layers_list_job1 = all_layers_list_job_g, job2 = job_ep,
-                                step2 = 'orig', all_layers_list_job2 = all_layers_list_job_ep)
-        vs_end_time = datetime.now()
-        print("导入比对结束时间", vs_end_time)
+                                step2 = 'orig', all_layers_list_job2 = all_layers_list_job_ep,adjust_position=True)
         data["all_result_g"] = r['all_result_g']
         data["all_result"] = r['all_result']
         data['g_vs_total_result_flag'] = r['g_vs_total_result_flag']
@@ -76,11 +77,7 @@ class TestInputOutputBasicGerber274X:
         # ----------------------------------------开始测试输出gerber功能---------------------------------------------------
         customer_para = {}
         customer_para['numberFormatR'] = 6
-        output_star_time = datetime.now()
-        print("导出开始时间", output_star_time)
         MyOutput(temp_path = temp_path, job = job_ep, job_id = job_id,layer_info_from_obj='dms',customer_para = customer_para)
-        output_end_time = datetime.now()
-        print("导出结束时间", output_end_time)
 
         # ----------------------------------------开始用G软件input--------------------------------------------------------
         ep_out_put_gerber_folder = os.path.join(temp_path, r'output_gerber', job_ep, r'orig')
@@ -124,13 +121,9 @@ class TestInputOutputBasicGerber274X:
 
         # 以G1转图为主来比对
         # G打开要比图的2个料号g1和g2。g1就是原始的G转图，g2是悦谱输出的gerber又input得到的
-        vs_star_time = datetime.now()
-        print("导出比对开始时间", vs_star_time)
         r = g.layer_compare_dms(job_id=job_id, vs_time_g=vs_time_g, temp_path=temp_path,
                                 job1=job_g1, all_layers_list_job1=all_layers_list_job_g, job2=job_g2,
                                 all_layers_list_job2=all_layers_list_job_ep,adjust_position=True)
-        vs_end_time = datetime.now()
-        print("导出比对结束时间", vs_end_time)
         data["all_result_g1"] = r['all_result_g']
         data["all_result"] = r['all_result']
         data['g1_vs_total_result_flag'] = r['g_vs_total_result_flag']
