@@ -12,7 +12,7 @@ import re
 
 class TestGraphicEditChangesymbols:
     '''
-    id:17804，共执行1个测试用例，实现5个方法，覆盖47个测试场景
+    id:17804，共执行1个测试用例，实现10个方法，覆盖50个测试场景
     '''
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Change_Symbol'))
     def testChange_symbols (self, job_id, g, prepare_test_job_clean_g):
@@ -20,7 +20,7 @@ class TestGraphicEditChangesymbols:
         本用例测试Change_symbols功能
         '''
         g = RunConfig.driver_g  # 拿到G软件
-        test_cases = 0
+        test_cases = 0 # 用户统计执行了多少条测试用例
         data = {}  # 存放比对结果信息
         vs_time_g = str(int(time.time()))  # 比对时间
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
@@ -88,7 +88,8 @@ class TestGraphicEditChangesymbols:
         预期：图形未发生变更，和执行前一样
         执行场景数：3个
         '''
-        layers = ['top_all','top_line_pad_arc','top_surface_text']#top_all层中五种物件都存在，top_line_pad_arc层中存在line、pad、arc三种物件，top_surface_text层中存在surface、text两种物件
+        layers = ['top_all','top_line_pad_arc','top_surface_text']#top_all层中五种物件都存在，top_line_pad_arc层中存在
+        # line、pad、arc三种物件，top_surface_text层中存在surface、text两种物件
         for layer in layers:
             print("=layer=:",layer)
             Layers.change_feature_symbols(job_ep, step, [layer],'r220',False)
@@ -133,10 +134,12 @@ class TestGraphicEditChangesymbols:
         执行测试场景：29个
         '''
         layer = 'symbol_type'
-        symbols = ['r300', 's200', 'rect200x300', 'rect200x300xr50', 'rect200x300xc50', 'oval200x300', 'di200x300', 'oct200x300x30', 'donut_r200x100', 'donut_s200x100',
-                   'hex_l200x300x20', 'hex_s200x300x30', 'bfr200', 'bfs200', 'tri200x300', 'oval_h200x100', 'thr200x100x20x5x5', 'ths200x100x20x5x5', 's_ths200x100x10x5x5',
-                   's_tho200x100x45x4x5', 'sr_ths200x100x10x5x5', 'rc_ths200x100x90x3x20x20', 'rc_tho200x100x90x4x20x20', 'el200x300', 'moire20x10x5x10x20x20', 'hole250xvx10x20',
-                   'hole260xnx10x20', 'hole270xpx10x20', 'null1000']
+        symbols = ['r300', 's200', 'rect200x300', 'rect200x300xr50', 'rect200x300xc50', 'oval200x300', 'di200x300',
+                   'oct200x300x30', 'donut_r200x100', 'donut_s200x100', 'hex_l200x300x20', 'hex_s200x300x30', 'bfr200',
+                   'bfs200', 'tri200x300', 'oval_h200x100', 'thr200x100x20x5x5', 'ths200x100x20x5x5',
+                   's_ths200x100x10x5x5', 's_tho200x100x45x4x5', 'sr_ths200x100x10x5x5', 'rc_ths200x100x90x3x20x20',
+                   'rc_tho200x100x90x4x20x20', 'el200x300', 'moire20x10x5x10x20x20', 'hole250xvx10x20', 'hole260xnx10x20',
+                   'hole270xpx10x20', 'null1000']
         Selection.reverse_select(job_ep, step, layer)
         result = Information.get_selected_features_infos(job_ep, step, layer)
         index = 0
@@ -218,7 +221,7 @@ class TestGraphicEditChangesymbols:
         test_cases = test_cases + 1
 
         '''
-        验证对带有.rain_chain属性的物件执行change_symbol
+        验证对带有.rout_chain属性的物件执行change_symbol
         预期：无法改变，软件不闪退
         bug：4828
         功能测试用例：3579
@@ -230,8 +233,10 @@ class TestGraphicEditChangesymbols:
         Selection.set_attribute_filter(0,[{'.rout_chain':'1'}])
         # Selection.select_feature_by_id(job_ep, step, layer, [447])
         Selection.select_features_by_filter(job_ep, step, [layer])
-        Selection.reset_select_filter()
+        GUI.show_layer(job_ep,step,layer)
         Layers.change_feature_symbols(job_ep, step, [layer], symbol, False)
+        GUI.show_layer(job_ep, step, layer)
+        Selection.reset_select_filter()
         # GUI.show_layer(job_ep, step, layer)
         test_cases = test_cases + 1
 
