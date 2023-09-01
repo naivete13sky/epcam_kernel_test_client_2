@@ -22,7 +22,7 @@ class TestGraphicEditBreak_features:
         data["vs_time_g"] = vs_time_g  # 比对时间存入字典
         data["job_id"] = job_id
         step = 'orig'
-        layers = ['smt', 'l1','l2','l3','l4','l5','l6','l7']
+        layers = ['smt', 'l1','l2','l3','l4','l5','l6','l7','4281_panel_dc-s']
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
@@ -107,48 +107,45 @@ class TestGraphicEditBreak_features:
         '''
         验证S开头方形Pad打散后还是Pad的属性
         bug编号：4474
-        功能用例ID：3578
+        功能用例ID：3586
         影响版本号：1.1.6.8
         '''
         Layers.add_pad(job_ep, step, ['l6'], "s150", 25400000, 25400000, True,
                        9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)  # 添加S开头的焊盘
+        #GUI.show_layer(job_ep, step, 'l6')
         Selection.select_feature_by_id(job_ep, step, 'l6', [933],)#选中它
         Layers.break_features(job_ep, step, ['l6'], 0)  # 打散选中物件
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)  # 用筛选器筛选中正极性Pad
         Selection.select_features_by_filter(job_ep, step, ['l6'])
-        Layers.delete_feature(job_ep, step, ['l6'])  # 删除所选pad，如被删除证明pad属性没有改变
+        Layers.delete_feature(job_ep, step, ['l6'])  # 删除所选pad，如被删除证明改pad属性没有改变
+        Selection.reset_selection()  # 重置筛选器，不影响后续使用
+        Selection.reset_select_filter()
         #GUI.show_layer(job_ep, step, 'l6')
 
         '''
         验证所选物件不属于可被打散物件时，执行Break操作后取消被选中状态
+        bug编号：4428
+        功能用例ID：3588
+        影响版本号：1.1.6.8
+        '''
+        Selection.select_feature_by_id(job_ep, step, 'l7', [721,244,251],)#选中几个正极性普通pad
+        Layers.break_features(job_ep, step, ['l7'], 0)  # 打散选中物件
+        Layers.delete_feature(job_ep, step, ['l7'])#如果整层物件被删除，则说明执行Break操作后取消被选中状态了
+        #GUI.show_layer(job_ep, step, 'l7')
+
+        '''
+        验证 使用Break功能可正确打散附件指定物件（可将指定pad打散为surface）
         bug编号：4281
         功能用例ID：3589
         影响版本号：1.1.5.1
         '''
-        Selection.select_feature_by_id(job_ep, step, 'l7', [721,244,251],)#选中几个正极性普通pad
-        Layers.break_features(job_ep, step, ['l7'], 0)  # 打散选中物件
-        Layers.delete_feature(job_ep, step, ['l7'])#如果整层物件被删除，证明不属于可被打散物件时，执行Break操作后取消被选中状态了，则符合预期
-        #GUI.show_layer(job_ep, step, 'l7')
-
-
-        '''
-        验证使用Break功能可将指定pad打散为surface
-        bug编号：4428
-        功能用例ID：3578
-        影响版本号：1.1.6.3
-        '''
-        Selection.select_feature_by_id(job_ep, step, 'dc-s', [933], )  # 选中它
-        Layers.break_features(job_ep, step, ['dc-s'], 0)  # 打散选中物件为Surface属性
-        Selection.set_featuretype_filter(True, False, False, True, False, False, False)  # 用筛选器筛选中正极性Surface
-        Selection.select_features_by_filter(job_ep, step, ['dc-s'])
-        Layers.delete_feature(job_ep, step, ['dc-s'])#如果物件被删除则证明符合预期
-        #GUI.show_layer(job_ep, step, 'l7'
-
-
-
-
-
-
+        Selection.select_feature_by_id(job_ep, step, '4281_panel_dc-s', [22], )  # 选中一个箭头
+        #GUI.show_layer(job_ep, step, '4281_panel_dc-s')
+        Layers.break_features(job_ep, step, ['4281_panel_dc-s'], 0)  # 打散选中物件为Surface属性
+        Selection.set_featuretype_filter(True, False, False, True, False, False, False)  # 用筛选器筛选正极性Surface
+        Selection.select_features_by_filter(job_ep, step, ['4281_panel_dc-s'])
+        Layers.delete_feature(job_ep, step, ['4281_panel_dc-s'])#如果最初选中的箭头件被删除则证明符合预期
+        #GUI.show_layer(job_ep, step, '4281_panel_dc-s')
 
 
 
