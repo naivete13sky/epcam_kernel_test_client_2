@@ -1,10 +1,11 @@
 import pytest, os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
-from epkernel import Input, GUI
+from epkernel import Input, GUI, BASE
 from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
+
 
 
 class TestGraphicEditContour2pad:
@@ -131,33 +132,26 @@ class TestGraphicEditContour2pad:
         '''
         Selection.select_feature_by_id(job_ep, step, 'xqy_top', [9164, 9165, 9166, 9167])  # 选中目标物件,（X=2.852,y=5.089Inch）处的surface
         Layers.contour2pad(job_ep, step, ['xqy_top'], 1*25400, 0.01*25400, 99999*25400, '+++')#转换pad后的图形与原图形保持一致
-        #GUI.show_layer(job_ep, step, 'xqy_top')
+        # BASE.undo(job_ep,step)
+        # GUI.show_layer(job_ep, step, 'xqy_top')
 
         '''
         验证按照要求在smb层执行Contour to Pad操作，软件正确执行不卡死
-        bug编号：4814
-        功能用例ID：3590
+        bug编号：4809
+        功能用例ID：3600
         影响版本号：1.1.8.2
         '''
         Layers.contour2pad(job_ep, step, ['p1_pre_smb'], 1*25400, 0.01*25400, 99999*25400, '+++')#执行Contour to Pad操作，软件正确执行不卡死
         #GUI.show_layer(job_ep, step, 'p1_pre_smb')
 
-        '''
-        验证按照要求在smb层执行Contour to Pad操作，软件正确执行不卡死
-        bug编号：4814
-        功能用例ID：3590
-        影响版本号：1.1.8.2
-        '''
-        Layers.contour2pad(job_ep, step, ['p1_pre_smb'], 1*25400, 0.01*25400, 99999*25400, '+++')#执行Contour to Pad操作，软件正确执行不卡死
-        #GUI.show_layer(job_ep, step, 'p1_pre_smb')
+
 
         '''
-        验证gts+++层正确执行surface转pad操作，且图形不变形变形
+        验证gts+++层正确执行surface转pad操作，且图形不变形
         bug编号：3660
-        功能用例ID：3612
-        影响版本号：1.1.2.9
+        对应功能用例ID：3612、3616、3617、3618共四条用例
         '''
-        Layers.contour2pad(job_ep, step, ['h3_pre_gtsyg'], 1*25400, 0.01*25400, 99999*25400, '+++')#执行Contour to Pad操作，软件正确执行不卡死
+        Layers.contour2pad(job_ep, step, ['3660_h3_orig_gts','3616_pre_l6',], 1*25400, 0.01*25400, 99999*25400, '+++')#执行Contour to Pad操作，软件正确执行不变形
         #GUI.show_layer(job_ep, step, 'p1_pre_smb')
 
 
