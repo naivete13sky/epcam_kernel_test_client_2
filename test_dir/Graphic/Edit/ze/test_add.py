@@ -99,10 +99,34 @@ class TestGraphicAdd:
         attributes = [{'.text': '2'}]  # 定义文字属性
         Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
                         60 * 1000000, 36 * 1000000, True, 9, attributes, 66)  # 文文字自定义旋转66度，镜像
+        #GUI.show_layer(job_ep, step, 'l2')
 
+        '''
+        测试用例名称: 添加不同字体的正、负极性文字
+        预期结果: 正确添加
+        执行测试用例数: 12个
+        '''
+        points_location = []
+        points_location.append([24 * 1000000, 23 * 1000000])
+        points_location.append([24 * 1000000, 30 * 1000000])
+        points_location.append([40 * 1000000, 30 * 1000000])
+        points_location.append([40 * 1000000, 23 * 1000000])
+        points_location.append([24 * 1000000, 23 * 1000000])
+        Layers.add_surface(job_ep, step, ['l3'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)#先添加一块正极性大同皮，后面在铜皮上添加负极性文字
+        fonts = ['standard', 'canned_57', 'canned_67', 'seven_seg', 'simple', 'suntak_date']#文字类型
+        polaritys = [True,False]  # 物件极性属性
+        num_y = 24  # Y轴坐标
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        for font in fonts:
+            num_X = 5  # X轴坐标
+            for polarity in polaritys:
+                Layers.add_text(job_ep, step, ['l3'], font,'Gh6-=,./<>!@#$%^&*()_,./',20* 25400,20 * 25400,2 * 25400,
+                            num_X*1000000, num_y*1000000, polarity,0, attributes, 0)
+                num_X = 26
+            num_y=num_y + 1
+        #GUI.show_layer(job_ep, step, 'l3')
 
-
-        GUI.show_layer(job_ep, step, 'l2')
         # 2.增加线条
         Layers.add_line(job_ep, step, ['l2'], 'r5', 10000000, 30000000, 30000000, 30000000,
                         True, [{'.fiducial_name': '0'}, {'.area': ''}])
@@ -122,6 +146,8 @@ class TestGraphicAdd:
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l2'],'r7.874', 40*1000000, 25*1000000,
         40*1000000, 31*1000000, 40*1000000, 28*1000000, True, True, attributes)
+
+
 
 
         save_job(job_ep, temp_ep_path)
