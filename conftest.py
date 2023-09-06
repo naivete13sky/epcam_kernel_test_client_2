@@ -169,7 +169,7 @@ def g():
     global driver_g
 
     if RunConfig.driver_type_g == "g":
-        driver_g = G(RunConfig.gateway_path)  # 拿到G软件
+        driver_g = G(RunConfig.gateway_path,gSetupType=RunConfig.gSetupType, GENESIS_DIR=RunConfig.GENESIS_DIR,gUserName=RunConfig.gUserName)  # 拿到G软件
 
     else:
         raise NameError("driver_g驱动类型定义错误！")
@@ -182,7 +182,6 @@ def g():
 @pytest.fixture(scope='function', autouse=False)
 def prepare_test_job_clean_g():
     # 删除所有料号
-    # g = G(RunConfig.gateway_path)
     g = RunConfig.driver_g
     g.clean_g_all_pre_get_job_list(r'//vmware-host/Shared Folders/share/job_list.txt')
     g.clean_g_all_do_clean(r'C:\cc\share\job_list.txt')

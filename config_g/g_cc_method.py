@@ -2,18 +2,27 @@ import json
 import os,shutil
 import subprocess
 import time
-from cc.cc_method import Print,DMS
-from pathlib import Path
+from cc.cc_method import DMS
 from config import RunConfig
 
 LAYER_COMPARE_JSON = 'layer_compare.json'
 
 class G():
-    def __init__(self,gateway_path):
-        self.gateway_path=gateway_path
-        command0 = 'SET GENESIS_DIR=C:/Program Files/shareg'
-        command = '{} 1'.format(self.gateway_path)
-        self.process = subprocess.Popen(command0 + "&" + command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    def __init__(self,gateway_path,gSetupType='vmware',GENESIS_DIR='C:/genesis',gUserName = '1'):
+        self.gateway_path = gateway_path
+        self.gUserName = gUserName
+        command = '{} {}'.format(self.gateway_path,self.gUserName)#“1”是G软件的登录用户名
+        if gSetupType == 'vmware':
+            command0 = 'SET GENESIS_DIR=C:/Program Files/shareg'
+            self.process = subprocess.Popen(command0 + "&" + command, stdout=subprocess.PIPE, stdin=subprocess.PIPE,
+                                            stderr=subprocess.STDOUT, shell=True)
+        if gSetupType == 'local':
+            command0 = 'SET GENESIS_DIR={}'.format(GENESIS_DIR)
+            self.process = subprocess.Popen(command0 + "&" + command, stdout=subprocess.PIPE, stdin=subprocess.PIPE,
+                                            stderr=subprocess.STDOUT, shell=True)
+
+
+
 
     def __del__(self):
         os.system('taskkill /f /im gateway.exe')
@@ -26,7 +35,7 @@ class G():
         return ret
 
     def import_odb_folder(self, jobpath,*args,**kwargs):
-        Print.print_with_delimiter('import job')
+        print('import job'.center(190,'*'))
         results=[]
         self.jobpath = jobpath
         if "job_name" in kwargs:
@@ -43,7 +52,7 @@ class G():
         return results
 
     def layer_compare_g_open_2_job(self, *args,**kwargs):
-        Print.print_with_delimiter('comare_open_2_job')
+        print('comare_open_2_job'.center(198,'*'))
         job1 = kwargs['job1']
         step1 = kwargs['step1']
         step2 = kwargs['step2']
@@ -63,7 +72,7 @@ class G():
             results.append(ret)
 
     def layer_compare_one_layer(self, *args,**kwargs):
-        Print.print_with_delimiter("do_comare")
+        print("do_comare".center(198,'*'))
         results_cmd = []
         result = '未比对'#比对结果
         self.job1 = kwargs['job1']
@@ -123,9 +132,9 @@ class G():
             result = '正常'
         elif comp_result_text == 'yes':
             result = '错误'
-            Print.print_with_delimiter("第一次比图未通过")
+            print("第一次比图未通过".center(198,'*'))
             if layer_type == 'drill' and kwargs['adjust_position']:
-                Print.print_with_delimiter("再给一次较正孔位置的机会！")
+                print("再给一次较正孔位置的机会！".center(198,'*'))
                 #先获取坐标，算出偏移量，然后用G移。
                 temp_path_local_g_info1_folder = r'{}\info1'.format(temp_path)
                 temp_path_remote_g_info1_folder = r'\\vmware-host\Shared Folders\share\{}\info1'.format(os.path.basename(temp_path))
@@ -146,7 +155,7 @@ class G():
                 # print("dx:", dx, "dy:", dy)
                 #开始移
                 self.move_one_layer_by_x_y(layer=self.layer1, dx=dx, dy=dy)
-                Print.print_with_delimiter("已经移了孔位置！")
+                print("已经移了孔位置！".center(100,'*'))
                 #再比一次图
                 cmd_list = [
                     'COM compare_layers,layer1={},job2={},step2={},layer2={},layer2_ext={},tol={},area=global,consider_sr=yes,ignore_attr=,map_layer={},map_layer_res={}'.format(
@@ -168,13 +177,13 @@ class G():
                 elif comp_result_text == 'yes':
                     result = '错误'
 
-                Print.print_with_delimiter("第二次比图结束！结果是：",result)
+                print("第二次比图结束！结果是：",result)
 
         print("比对结果：",result)
         return result
 
     def layer_compare_do_compare(self, *args,**kwargs):
-        Print.print_with_delimiter("do_comare")
+        print("do_comare".center(198,'*'))
         results = []
         try:
             self.step1 = kwargs['step1']
@@ -215,7 +224,7 @@ class G():
         time.sleep(1)
 
     def save_job(self, job):
-        Print.print_with_delimiter("save")
+        print("save".center(198,'*'))
         results = []
 
         cmd_list1 = [
@@ -232,7 +241,7 @@ class G():
         time.sleep(1)
 
     def get_info_layer_features_first_coor(self,*args,**kwargs):
-        Print.print_with_delimiter('get_info_layer_features_first_coor')
+        print('get_info_layer_features_first_coor'.center(198,'*'))
         results = []
         temp_path_local_g_info_folder = kwargs['temp_path_local_g_info_folder']
         temp_path_remote_g_info_folder = kwargs['temp_path_remote_g_info_folder']
@@ -258,7 +267,7 @@ class G():
         return (coor_x,coor_y)
 
     def move_one_layer_by_x_y(self, *args,**kwargs):
-        Print.print_with_delimiter('move_one_layer_by_x_y')
+        print('move_one_layer_by_x_y'.center(198,'*'))
         results=[]
         layer = kwargs['layer']
         dx = kwargs['dx']
@@ -427,7 +436,7 @@ class G():
         return result
 
     def layer_compare_close_job(self, *args,**kwargs):
-        Print.print_with_delimiter('close job',sign='-')
+        print('close job'.center(198,'*'))
         results = []
         self.job1 = kwargs['job1']
         self.job2 = kwargs['job2']
@@ -454,6 +463,61 @@ class G():
                 print('inner error')
                 return results
         time.sleep(1)
+
+    def layer_compare(self,*args,temp_path,temp_path_g,job1,step1='orig',job2,step2='orig',layerInfo,adjust_position=False,jsonPath,**kwargs):
+        global g_vs_total_result_flag
+        adjust_position = adjust_position
+
+
+        data_g = {}
+        g_vs_total_result_flag = True  # True表示最新一次G比对通过
+        # 读取配置文件
+        with open(jsonPath, encoding='utf-8') as f:
+            cfg = json.load(f)
+        tol = cfg['g']['vs']['vs_tol_g']
+        map_layer_res = cfg['g']['vs']['map_layer_res']
+
+
+        # G打开要比图的2个料号
+
+        g_compare_result_folder = job1 + '_compare_result'
+        temp_g_compare_result_path = os.path.join(temp_path, g_compare_result_folder)
+        if not os.path.exists(temp_g_compare_result_path):
+            os.mkdir(temp_g_compare_result_path)
+
+        # temp_path_remote_g_compare_result = os.path.join(temp_path_vm_parent,os.path.basename(temp_path),g_compare_result_folder)
+        temp_path_remote_g_compare_result = os.path.join(temp_path_g, g_compare_result_folder)
+
+        temp_path_local_g_compare_result = os.path.join(temp_path, g_compare_result_folder)
+
+
+
+
+
+        all_result_g = {}
+        for each in layerInfo:
+            layer = each['layer'].lower()
+            layer_type = each['layer_type']
+            map_layer = layer + '-com'
+            result = self.layer_compare_one_layer(job1=job1, step1=step1, layer1=layer, job2=job2,
+                                               step2=step2, layer2=layer, layer2_ext='_copy', tol=tol,
+                                               map_layer=map_layer, map_layer_res=map_layer_res,
+                                               result_path_remote=temp_path_remote_g_compare_result,
+                                               result_path_local=temp_path_local_g_compare_result,
+                                               layer_type=layer_type,adjust_position=adjust_position,
+                                                  temp_path=temp_path,temp_path_g=temp_path_g)
+            all_result_g[layer] = result
+            if result != "正常":
+                g_vs_total_result_flag = False
+
+        data_g['all_result_g'] = all_result_g
+        self.save_job(job1)
+        self.save_job(job2)
+        self.layer_compare_close_job(job1=job1, job2=job2)
+
+        return data_g
+
+
 
     def layer_compare_dms(self,*args,job_id,vs_time_g,temp_path,job1,step1='orig',all_layers_list_job1,job2,step2='orig',all_layers_list_job2,adjust_position=False,**kwargs):
         global g_vs_total_result_flag
@@ -529,6 +593,11 @@ class G():
         data_g['g_vs_total_result_flag'] = g_vs_total_result_flag
 
         return data_g
+
+
+
+
+
 
     def clean_g(self, paras):
         print("begin clean!")
@@ -812,7 +881,7 @@ class G():
 
 
         try:
-            Print.print_with_delimiter("开始定位")
+            print("开始定位".center(198,'*'))
             # layer_all = [each for each in DMS().get_job_layer_fields_from_dms_db_pandas(job_id, field='layer')]
             # print("layer_all []:",layer_all)
             print(path.replace(' ', '-').replace('(', '-').replace(')', '-'))
@@ -850,7 +919,7 @@ class G():
             else:
                 print("我不是孔Excellon2!")
 
-            Print.print_with_delimiter("结束定位")
+            print("结束定位".center(198,'*'))
         except:
             print("有异常啊！")
 
@@ -1038,7 +1107,7 @@ class G():
         return results
 
     def g_export(self,job,export_to_path):
-        Print.print_with_delimiter("导出--开始")
+        print("导出--开始".center(198,'*'))
         cmd_list1 = [
             'COM export_job,job={},path={},mode=tar_gzip,submode=full,overwrite=yes'.format(job,export_to_path),
         ]
@@ -1050,7 +1119,7 @@ class G():
             if ret != 0:
                 print('inner error')
                 return False
-        Print.print_with_delimiter("导出--结束")
+        print("导出--结束".center(198,'*'))
         return True
 
     def get_info_by_info(self,job,*,step='orig',out_file=r'//vmware-host/Shared Folders/share/temp_info/info.txt'):
@@ -1157,7 +1226,7 @@ class GInput(object):
 
         if layer_info_from_obj == 'dms':
             try:
-                Print.print_with_delimiter("开始定位")
+                print("开始定位".center(198,"*"))
                 print(self.para['path'].replace(' ', '-').replace('(', '-').replace(')', '-'))
                 print(os.path.basename(self.para['path']).replace(' ', '-').replace('(', '-').replace(')', '-'))
                 layer_e2=DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,filter=os.path.basename(self.para['path']).replace(' ', '-').replace('(', '-').replace(')', '-'))
@@ -1188,7 +1257,7 @@ class GInput(object):
                 else:
                     print("我不是孔Excellon2!")
 
-                Print.print_with_delimiter("结束定位")
+                print("结束定位".center(198,"*"))
             except:
                 print("有异常啊！")
 
@@ -1268,11 +1337,4 @@ def getFlist(path):
 
 
 if __name__ == '__main__':
-    from config import RunConfig
-    g = G(RunConfig.gateway_path)
-
-    #删除所有料号
-    # g.clean_g_all_pre_get_job_list(r'//vmware-host/Shared Folders/share/job_list.txt')
-    # g.clean_g_all_do_clean(r'C:\cc\share\job_list.txt')
-    g.import_odb_folder(r'Z:/share/temp_502_1666269720/g/500a001w1-r.g')
-    # g.import_odb_folder(r'')
+    pass
