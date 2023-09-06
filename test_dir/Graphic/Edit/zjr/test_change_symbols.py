@@ -231,13 +231,9 @@ class TestGraphicEditChangesymbols:
         layer = 'gts'
         symbol = 'r200'
         Selection.set_attribute_filter(0,[{'.rout_chain':'1'}])
-        # Selection.select_feature_by_id(job_ep, step, layer, [447])
         Selection.select_features_by_filter(job_ep, step, [layer])
-        GUI.show_layer(job_ep,step,layer)
         Layers.change_feature_symbols(job_ep, step, [layer], symbol, False)
-        GUI.show_layer(job_ep, step, layer)
         Selection.reset_select_filter()
-        # GUI.show_layer(job_ep, step, layer)
         test_cases = test_cases + 1
 
         save_job(job_ep, temp_ep_path)
