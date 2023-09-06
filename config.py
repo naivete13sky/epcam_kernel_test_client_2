@@ -1,4 +1,5 @@
 import json
+import os.path
 
 
 class RunConfig:
@@ -7,23 +8,11 @@ class RunConfig:
     """
 
     #配置EPCAM路径，只要换了版本就要更改
-    with open(r'C:\cc\python\epwork\epcam_kernel_test_client_2\my_config.json', encoding='utf-8') as f:
+    with open(os.path.join(os.path.dirname(__file__),r'my_config.json'), encoding='utf-8') as f:
         cfg = json.load(f)
 
     ep_cam_path = cfg['epcam']['path']
-    print("epcam_path:", ep_cam_path)
-
-
-
-    # ep_cam_path = r'C:\cc\ep_local\product\EP-CAM\version\20221017\EP-CAM_beta_2.29.055_s15_jiami\Release'
-    # ep_cam_path=r'C:\cc\ep_local\product\EP-CAM\version\20220920\EP-CAM_beta_2.28.054_s37_jiami\Release'
-    # ep_cam_path=r'C:\cc\ep_local\product\EP-CAM\version\20220920\EP-CAM_beta_2.28.054_s38_jiami\Release'
-    # ep_cam_path = r'C:\cc\ep_local\product\EP-CAM\version\20220921\EP-CAM_beta_2.28.054_s39_jiami\Release'
-    # ep_cam_path = r'C:\cc\ep_local\product\EP-CAM\version\20220922\EP-CAM_beta_2.28.054_s43_jiami\Release'
-    # ep_cam_path = r'C:\cc\ep_local\product\EP-CAM\version\20220928\EP-CAM_beta_2.29.055_s1_u3_jiami\Release'
-    # ep_cam_path = r'C:\cc\ep_local\product\EP-CAM\version\20220930\EP-CAM_beta_2.29.055_s6_jiami\Release'
-    # ep_cam_path = r'C:\cc\ep_local\product\EP-CAM\version\20221010\EP-CAM_beta_2.29.055_s13_jiami\Release'
-    # ep_cam_path = r'C:\cc\ep_local\product\EP-CAM\version\20221013\EP-CAM_beta_2.29.055_s14_test_jiami\Release'
+    dms_ip = cfg['dms']['ip']
 
 
 

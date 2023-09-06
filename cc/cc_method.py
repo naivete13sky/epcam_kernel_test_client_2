@@ -58,7 +58,7 @@ class DMS():
         if os.path.exists(need_file_path) == False:  # 判断是否存在文件
 
             # 文件url
-            file_url = 'http://10.97.80.119/media/files/{}'.format(os.path.basename(need_file_path))
+            file_url = 'http://{}/media/files/{}'.format(RunConfig.dms_ip,os.path.basename(need_file_path))
 
             # 文件基准路径
             # basedir = os.path.abspath(os.path.dirname(__file__))
@@ -84,7 +84,7 @@ class DMS():
 
     def get_job_fields_from_dms_db_sql(self,sql):
         pass
-        conn = psycopg2.connect(database="epdms", user="readonly", password="123456", host="10.97.80.119", port="5432")
+        conn = psycopg2.connect(database="epdms", user="readonly", password="123456", host=RunConfig.dms_ip, port="5432")
         cursor = conn.cursor()
         sql = sql
         print('sql:', sql)
@@ -98,7 +98,7 @@ class DMS():
         sql = '''SELECT a.* from eptest_job_for_test a
                 where a.id = {}
                 '''.format(job_id)
-        engine = create_engine('postgresql+psycopg2://readonly:123456@10.97.80.119/epdms')
+        engine = create_engine('postgresql+psycopg2://readonly:123456@{}/epdms'.format(RunConfig.dms_ip))
         pd_job_current = pd.read_sql(sql=sql, con=engine).loc[0]
         if 'field' in kwargs:
             return pd_job_current[kwargs['field']]
@@ -109,7 +109,7 @@ class DMS():
         sql = '''SELECT a.* from eptest_layer a
             where a.job_id = {}
                 '''.format(job_id)
-        engine = create_engine('postgresql+psycopg2://readonly:123456@10.97.80.119/epdms')
+        engine = create_engine('postgresql+psycopg2://readonly:123456@{}/epdms'.format(RunConfig.dms_ip))
         pd_job_current_layers = pd.read_sql(sql=sql, con=engine)
         if 'field' in kwargs:
             return pd_job_current_layers[kwargs['field']]
@@ -122,7 +122,7 @@ class DMS():
             where a.job_id = {} and lower(a.layer)='{}'
                 '''.format(job_id,layer)
         # print("sql:",sql)
-        engine = create_engine('postgresql+psycopg2://readonly:123456@10.97.80.119/epdms')
+        engine = create_engine('postgresql+psycopg2://readonly:123456@{}/epdms'.format(RunConfig.dms_ip))
         pd_job_current_layer = pd.read_sql(sql=sql, con=engine)
         return pd_job_current_layer
 
@@ -132,7 +132,7 @@ class DMS():
             where a.job_id = {} and a.status = 'published' and a.layer_file_type = 'excellon2'
                 '''.format(job_id)
         # print("sql:",sql)
-        engine = create_engine('postgresql+psycopg2://readonly:123456@10.97.80.119/epdms')
+        engine = create_engine('postgresql+psycopg2://readonly:123456@{}/epdms'.format(RunConfig.dms_ip))
         pd_job_current_layer_drill = pd.read_sql(sql=sql, con=engine)
         return pd_job_current_layer_drill
 
@@ -213,7 +213,7 @@ class DMS():
             where a.job_id = {} and a.status = 'published' and a.layer_file_type = 'excellon2' and a.layer_type = 'rout'
                 '''.format(job_id)
         # print("sql:",sql)
-        engine = create_engine('postgresql+psycopg2://readonly:123456@10.97.80.119/epdms')
+        engine = create_engine('postgresql+psycopg2://readonly:123456@{}/epdms'.format(RunConfig.dms_ip))
         pd_job_current_layer_rout = pd.read_sql(sql=sql, con=engine)
         return pd_job_current_layer_rout
 

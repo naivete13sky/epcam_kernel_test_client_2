@@ -64,14 +64,14 @@ class MyInput(object):
     def get_job_layer_info_from_dms(self):
         job_id = self.job_id
         sql = '''SELECT a.* from eptest_layer a where a.job_id = {}'''.format(job_id)
-        engine = create_engine('postgresql+psycopg2://readonly:123456@10.97.80.119/epdms')
+        engine = create_engine('postgresql+psycopg2://readonly:123456@{}/epdms'.format(RunConfig.dms_ip))
         pd_job_layer_info = pd.read_sql(sql=sql, con=engine)
         self.pd_job_layer_info = pd_job_layer_info
 
     def input_folder(self):
         '''
         函数：把指定路径下的所有Gerber274X或Excello2文件全部转换到指定名称的料号，并保存到指定路径。
-        命名关键字参数save_path，用来保存料号的路径，未传此参数时，默认路径为r'C:\job\test\odb'。
+        命名关键字参数save_path，用来保存料号的路径，未传此参数时，默认路径为'C:/job/test/odb'。
         '''
 
         folder_path = self.folder_path
