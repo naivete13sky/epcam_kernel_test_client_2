@@ -18,15 +18,10 @@ class TestInputOutputBasicGerber274X:
         '''
 
         g = RunConfig.driver_g#拿到G软件
-
         data = {}#存放比对结果信息
-        vs_time_g = str(int(time.time()))#比对时间
-        data["vs_time_g"] = vs_time_g#比对时间存入字典
-        data["job_id"] = job_id
 
-        # 取到临时目录
+        # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
-        # shutil.rmtree(temp_path) if os.path.exists(temp_path) else None
         if os.path.exists(temp_path):
             if RunConfig.gSetupType == 'local':
                 # os.remove(self.tempGerberPath)#此方法容易因权限问题报错
@@ -42,7 +37,6 @@ class TestInputOutputBasicGerber274X:
                 command = r'cmd /c {} "{}"'.format(command_operator, command_folder_path)
                 myRemoteCMD.run_cmd(command)
                 print("remote delete finish")
-
 
 
 
