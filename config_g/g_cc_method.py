@@ -511,6 +511,7 @@ class G():
                 g_vs_total_result_flag = False
 
         data_g['all_result_g'] = all_result_g
+        data_g['g_vs_total_result_flag'] = g_vs_total_result_flag
         self.save_job(job1)
         self.save_job(job2)
         self.layer_compare_close_job(job1=job1, job2=job2)

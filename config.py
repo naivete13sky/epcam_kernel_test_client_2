@@ -12,12 +12,13 @@ class RunConfig:
         cfg = json.load(f)
 
     ep_cam_path = cfg['epcam']['path']
-    dms_ip = cfg['dms']['ip']
+    dms_ip = cfg['general']['dmsIpPort']
 
     gateway_path = cfg['g']['gateway_path']
     gSetupType = cfg['g']['gSetupType']
     GENESIS_DIR = cfg['g']['GENESIS_DIR']
     gUserName = cfg['g']['gUserName']
+    temp_path_g = cfg['g']['temp_path_g']
 
 
 
@@ -60,7 +61,7 @@ class RunConfig:
     NEW_REPORT = None
 
     # 当前执行电脑的临时目录
-    temp_path_base = r'C:\cc\share\temp'
+    temp_path_base = r'C:\cc\share\epcam_kernel'
 
     # 悦谱出gerber的配置默认參數
     config_ep_output = r'config_ep\outcfg.json'

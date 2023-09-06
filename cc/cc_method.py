@@ -217,7 +217,37 @@ class DMS():
         pd_job_current_layer_rout = pd.read_sql(sql=sql, con=engine)
         return pd_job_current_layer_rout
 
+class RemoteCMD():
+    import subprocess
 
+
+    def __init__(self,psexec_path,computer,username,password):
+        # 获取当前PATH的值
+        current_path = os.environ.get('PATH', '')
+        # 将要添加的路径加入PATH变量
+        os.environ['PATH'] = f"{psexec_path};{current_path}"
+
+
+        self.computer = computer  # 远程计算机名
+        self.username = username  # 远程计算机用户名
+        self.password = password  # 远程计算机密码
+
+
+
+
+        # 通过net use命令进行身份验证，使得subprocess能够执行远程命令
+        self.net_use_command = f'net use \\\\{self.computer} /user:{self.username} {self.password}'
+        self.subprocess.call(self.net_use_command, shell=True)
+
+
+
+    def run_cmd(self,command):
+        pass
+        self.command = command  # 远程cmd命令
+
+        # 执行远程命令
+        self.remote_command = f'psexec \\\\{self.computer} {self.command}'
+        self.subprocess.call(self.remote_command, shell=True)
 
 class Print():
     @staticmethod
