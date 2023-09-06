@@ -2,7 +2,7 @@ import pytest,os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
 from config_ep.epcam_cc_method import MyInput
-from config_ep.epcam_jerry_method import Pretreatment
+from config_ep.epcam_cc_method import Pretreatment
 from epkernel import Input,GUI,BASE
 from epkernel.Action import Information
 from epkernel.Edition import Matrix
