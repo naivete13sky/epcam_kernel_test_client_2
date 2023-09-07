@@ -120,10 +120,10 @@ class TestInputOutputBasicGerber274X:
         gerberList = getFlist(file_path)
         print(gerberList)
         g_temp_path = RunConfig.temp_path_g
-        gerberList_path = []
-        for each in gerberList:
-            gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job_ep, r'orig', each))
-        print(gerberList_path)
+        # gerberList_path = []
+        # for each in gerberList:
+        #     gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job_ep, r'orig', each))
+        # print(gerberList_path)
 
         temp_out_put_gerber_g_input_path = os.path.join(temp_path, 'g2')
         if os.path.exists(temp_out_put_gerber_g_input_path):
@@ -131,7 +131,33 @@ class TestInputOutputBasicGerber274X:
         os.mkdir(temp_out_put_gerber_g_input_path)
         out_path = temp_out_put_gerber_g_input_path
 
-        g.gerber_to_odb_batch(job_g2, step, gerberList_path, out_path, job_id, drill_para='epcam_default')
+        # g.gerber_to_odb_batch(job_g2, step, gerberList_path, out_path, job_id, drill_para='epcam_default')
+        gerberList_path = []
+
+        for each in gerberList:
+            each_dict = {}
+            each_dict['path'] = os.path.join(g_temp_path, r'output_gerber', job_ep, r'orig', each)
+            layer_e2 = DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,
+                                                                               filter=each.replace(
+                                                                                   ' ', '(', '-').replace(')', '-'))
+            if layer_e2.status.values[0] == 'published' and layer_e2.layer_file_type.values[0]=='excellon2':
+                each_dict['file_type'] = 'excellon'
+                each_dict_para = {}
+                each_dict_para['zeroes'] = layer_e2.zeroes_omitted_g.values[0].lower()
+                each_dict_para['nf1'] = int(layer_e2.number_format_A_g.values[0])
+                each_dict_para['nf2'] = int(layer_e2.number_format_B_g.values[0])
+                each_dict_para['units'] = layer_e2.units_g.values[0].lower()
+                # g软件的tool_units没有mils选项
+                if layer_e2.tool_units_g.values[0].lower() == 'mils':
+                    each_dict_para['tool_units'] = 'inch'
+                else:
+                    each_dict_para['tool_units'] = layer_e2.tool_units_g.values[0].lower()
+                each_dict['para'] = each_dict_para
+                gerberList_path.append(each_dict)
+            else:#不是孔就当作是gerber处理
+                each_dict['file_type'] = 'gerber'
+                gerberList_path.append(each_dict)
+        g.input_init(job=job_g2, step=step, gerberList_path=gerberList_path,jsonPath=r'D:\cc\python\epwork\epcam_kernel_test_client_2\my_config.json')
         # 输出tgz到指定目录
         g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
 

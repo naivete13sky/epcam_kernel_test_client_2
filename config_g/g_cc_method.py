@@ -521,78 +521,8 @@ class G():
 
 
     def layer_compare_dms(self,*args,job_id,vs_time_g,temp_path,job1,step1='orig',all_layers_list_job1,job2,step2='orig',all_layers_list_job2,adjust_position=False,**kwargs):
-        global g_vs_total_result_flag
-        adjust_position = adjust_position
-
 
         data_g = {}
-        g_vs_total_result_flag = True  # True表示最新一次G比对通过
-        # 读取配置文件
-        # print("ccc:", os.path.dirname(__file__))
-        with open(os.path.join(os.path.dirname(__file__),r'config.json'), encoding='utf-8') as f:
-            cfg = json.load(f)
-        tol = cfg['job_manage']['vs']['vs_tol_g']
-        map_layer_res = cfg['job_manage']['vs']['map_layer_res']
-
-
-        # G打开要比图的2个料号
-        self.layer_compare_g_open_2_job(job1=job1, step1=step1, job2=job2,step2=step2)
-        g_compare_result_folder = job1 + '_compare_result'
-        temp_g_compare_result_path = os.path.join(temp_path, g_compare_result_folder)
-        if not os.path.exists(temp_g_compare_result_path):
-            os.mkdir(temp_g_compare_result_path)
-        temp_path_remote_g_compare_result = r'//vmware-host/Shared Folders/share/{}/{}'.format(
-            'temp' + "_" + str(job_id) + "_" + vs_time_g, g_compare_result_folder)
-        temp_path_local_g_compare_result = os.path.join(temp_path, g_compare_result_folder)
-
-        drill_layers = [each.lower() for each in DMS().get_job_layer_drill_from_dms_db_pandas_one_job(job_id)['layer']]
-
-        all_result_g = {}
-        for layer in all_layers_list_job1:
-            if layer in all_layers_list_job2:
-                layer_type = ""
-                if layer in drill_layers:
-                    print("我是孔层哈！")
-                    layer_type = 'drill'
-
-
-                map_layer = layer + '-com'
-                result = self.layer_compare_one_layer(job1=job1, step1=step1, layer1=layer, job2=job2,
-                                                   step2=step2, layer2=layer, layer2_ext='_copy', tol=tol,
-                                                   map_layer=map_layer, map_layer_res=map_layer_res,
-                                                   result_path_remote=temp_path_remote_g_compare_result,
-                                                   result_path_local=temp_path_local_g_compare_result,
-                                                   layer_type=layer_type,adjust_position=adjust_position,
-                                                      temp_path=temp_path)
-                all_result_g[layer] = result
-                if result != "正常":
-                    g_vs_total_result_flag = False
-            else:
-                print("悦谱转图中没有此层")
-        data_g['all_result_g'] = all_result_g
-        self.save_job(job1)
-        self.save_job(job2)
-        self.layer_compare_close_job(job1=job1, job2=job2)
-
-        # 开始查看比对结果
-        # 获取原始层文件信息，最全的
-        all_layer_from_org = [each for each in DMS().get_job_layer_fields_from_dms_db_pandas(job_id, field='layer_org')]
-        all_result = {}  # all_result存放原始文件中所有层的比对信息
-        for layer_org in all_layer_from_org:
-            layer_org_find_flag = False
-            layer_org_vs_value = ''
-            for each_layer_g_result in all_result_g:
-                if each_layer_g_result == str(layer_org).lower().replace(" ", "-").replace("(", "-").replace(")", "-"):
-                    layer_org_find_flag = True
-                    layer_org_vs_value = all_result_g[each_layer_g_result]
-            if layer_org_find_flag == True:
-                all_result[layer_org] = layer_org_vs_value
-            else:
-                all_result[layer_org] = 'G转图中无此层'
-        data_g['all_result'] = all_result
-
-        data_g['g_vs_total_result_flag'] = g_vs_total_result_flag
-
         return data_g
 
 
@@ -752,6 +682,132 @@ class G():
                 return False
         return True
 
+
+    def input_init(self, *, job: str,step='orig',gerberList_path:list,jsonPath:str):
+        self.job = job
+        self.step = step
+        self.gerberList_path = gerberList_path
+        self.jsonPath = jsonPath
+        self.input_set_para_default(self.jsonPath)
+        kw = {}
+        self.in_put(self.job,self.step,self.gerberList_path,**kw)
+
+    def input_set_para_default(self,jsonPath):
+        # 设置默认导入参数
+        # with open(r'settings\epvs.json', 'r') as cfg:
+        with open(jsonPath, 'r',encoding='utf-8') as cfg:
+            self.para = json.load(cfg)['g']['input']  # (json格式数据)字符串 转化 为字典
+            print("self.para::",self.para)
+
+    def input_set_para_customer(self,customer_para:dict):
+        pass
+        print('customer_para:',customer_para)
+        for each in customer_para:
+            print(each)
+            self.para[each] = customer_para[each]
+        print(self.para)
+        print("cc")
+
+
+    def in_put(self,job_name, step, gerberList_path,*args,**kwargs):
+        # 先创建job, step
+        jobpath = r'C:\genesis\fw\jobs' + '/' + job_name
+        results = []
+        if os.path.exists(jobpath):
+            shutil.rmtree(jobpath)
+        self.Create_Entity(job_name, step)
+        for each in gerberList_path:
+            result = {}
+            result['gerberPath'] = each["path"]
+            result['result'] = self.gerber_to_odb_one_file(each,*args,**kwargs)
+            results.append(result)
+        self.save_job(self.job)
+        return results
+
+    def gerber_to_odb_one_file(self,eachGerberInfo, *args,**kwargs):
+        self.para['job'] = self.job
+        self.para['step'] = self.step
+        self.para['format'] = 'Gerber274x'
+        self.para['separator'] = '*'
+        self.para['path'] = eachGerberInfo['path']
+        self.para['layer'] = os.path.basename(eachGerberInfo['path']).lower()
+        self.para['layer']=self.para['layer'].replace(' ','-').replace('(', '-').replace(')', '-')
+        print("iamcc",'kwargs:',kwargs)
+        file_type = eachGerberInfo["file_type"]
+
+
+        if file_type == 'excellon':
+            print("I am drill")
+            self.para['format'] = 'Excellon2'
+            if eachGerberInfo.get('para'):
+                self.para['zeroes'] = eachGerberInfo['para']['zeroes']
+                self.para['nf1'] = eachGerberInfo['para']['nf1']
+                self.para['nf2'] = eachGerberInfo['para']['nf2']
+                self.para['units'] = eachGerberInfo['para']['units']
+                self.para['tool_units'] = eachGerberInfo['para']['tool_units']
+                self.para['separator'] = 'nl'
+            else:
+                self.para['zeroes'] = 'leading'
+                self.para['nf1'] = "2"
+                self.para['nf2'] = "4"
+                self.para['units'] = 'inch'
+                self.para['tool_units'] = 'inch'
+                self.para['separator'] = 'nl'
+
+
+
+        trans_COM = 'COM input_manual_set,'
+        trans_COM += 'path={},job={},step={},format={},data_type={},units={},coordinates={},zeroes={},'.format(
+            self.para['path'].replace("\\","/"),
+            self.para['job'],
+            self.para['step'],
+            self.para['format'],
+            self.para['data_type'],
+            self.para['units'],
+            self.para['coordinates'],
+            self.para['zeroes'])
+        trans_COM += 'nf1={},nf2={},decimal={},separator={},tool_units={},layer={},wheel={},wheel_template={},'.format(
+            self.para['nf1'],
+            self.para['nf2'],
+            self.para['decimal'],
+            self.para['separator'],
+            self.para['tool_units'],
+            self.para['layer'],
+            self.para['wheel'],
+            self.para['wheel_template'])
+        trans_COM += 'nf_comp={},multiplier={},text_line_width={},signed_coords={},break_sr={},drill_only={},'.format(
+            self.para['nf_comp'],
+            self.para['multiplier'],
+            self.para['text_line_width'],
+            self.para['signed_coords'],
+            self.para['break_sr'],
+            self.para['drill_only'])
+        # trans_COM += 'merge_by_rule={},threshold={},resolution={},drill_type=unknown'.format(
+        trans_COM += 'merge_by_rule={},threshold={},resolution={}'.format(
+            self.para['merge_by_rule'],
+            self.para['threshold'],
+            self.para['resolution'])
+
+
+
+        cmd_list1 = [
+            'COM input_manual_reset',
+            trans_COM,
+            ('COM input_manual,script_path={}'.format(''))
+        ]
+
+
+        for cmd in cmd_list1:
+            print(cmd)
+            ret = self.exec_cmd(cmd)
+            if ret != 0:
+                print('inner error')
+                return False
+        return True
+
+
+
+
     def Gerber2ODB(self, paras, _type):
         # print("*"*100,"gerber2odb")
         try:
@@ -845,7 +901,7 @@ class G():
 
 
 
-    def gerber_to_odb_one_file(self, paras, _type,job_id,*args,**kwargs):
+    def gerber_to_odb_one_file0(self, paras, _type,job_id,*args,**kwargs):
         # print("*"*100,"gerber2odb")
         try:
             path = paras['path']
@@ -883,8 +939,7 @@ class G():
 
         try:
             print("开始定位".center(198,'*'))
-            # layer_all = [each for each in DMS().get_job_layer_fields_from_dms_db_pandas(job_id, field='layer')]
-            # print("layer_all []:",layer_all)
+
             print(path.replace(' ', '-').replace('(', '-').replace(')', '-'))
             print(os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
             print("fuck!")
@@ -1106,6 +1161,13 @@ class G():
             results.append(result)
         self.gerber_to_odb_one_file(paras, 1,job_id,*args,**kwargs)#保存
         return results
+
+
+
+
+
+
+
 
     def g_export(self,job,export_to_path):
         print("导出--开始".center(198,'*'))
