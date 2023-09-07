@@ -1,4 +1,4 @@
-import pytest, os, time
+import pytest, os, shutil
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS
 from epkernel import Input, GUI, BASE
@@ -14,15 +14,26 @@ class TestSavejob():
         本用例测试 Rename、Save功能。料号ID：21648
         导入tgz删除step、删除layer，更改step、job名之后save
         '''
-        print('分割线'.center(192, "-"))
 
-        data = {}  # 存放比对结果信息
-        vs_time_g = str(int(time.time()))  # 比对时间
-        data["vs_time_g"] = vs_time_g  # 比对时间存入字典
-        data["job_id"] = job_id
+        # 取到临时目录，如果存在旧目录，则删除
+        temp_path = RunConfig.temp_path_base
+        if os.path.exists(temp_path):
+            if RunConfig.gSetupType == 'local':
+                # os.remove(self.tempGerberPath)#此方法容易因权限问题报错
+                shutil.rmtree(temp_path)
+            if RunConfig.gSetupType == 'vmware':
+                # 使用PsExec通过命令删除远程机器的文件
+                from cc.cc_method import RemoteCMD
+                myRemoteCMD = RemoteCMD(psexec_path='cc', computer='192.168.1.3',
+                                        username='administrator',
+                                        password='cc')
+                command_operator = 'rd /s /q'
+                command_folder_path = os.path.join(RunConfig.temp_path_g)
+                command = r'cmd /c {} "{}"'.format(command_operator, command_folder_path)
+                myRemoteCMD.run_cmd(command)
+                print("remote delete finish")
 
         # 取到临时目录
-        temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
         temp_compressed_path = os.path.join(temp_path, 'compressed')
 
         # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
