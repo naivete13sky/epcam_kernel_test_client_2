@@ -1,14 +1,10 @@
 import pytest, os, time, json, shutil, sys
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI, BASE
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input
 from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
-from epkernel.Edition import Matrix
 
 # @pytest.mark.Feature index
 class TestGraphicEditFeatureIndex:

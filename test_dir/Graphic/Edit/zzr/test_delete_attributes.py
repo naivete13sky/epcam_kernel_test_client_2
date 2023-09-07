@@ -1,10 +1,8 @@
 import pytest, os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS
-from epkernel import Input, GUI, BASE
+from epkernel import Input
 from epkernel.Action import Information
-from epkernel.Edition import Matrix, Job
-from epkernel.Action import Selection
 from epkernel.Edition import Layers
 
 
