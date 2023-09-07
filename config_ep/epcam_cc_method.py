@@ -177,8 +177,8 @@ class MyOutput(object):
     def set_para_default(self):
 
         # 设置导出参数
-        with open(RunConfig.config_ep_output, 'r') as cfg:
-            infos_ = json.load(cfg)['paras']  # (json格式数据)字符串 转化 为字典
+        with open(RunConfig.config_my_settings, 'r') as cfg:
+            infos_ = json.load(cfg)['epcam']['output_paras']   # (json格式数据)字符串 转化 为字典
 
             self.para = {}
             # self.para['_type'] = infos_['type']

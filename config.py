@@ -64,13 +64,9 @@ class RunConfig:
     temp_path_base = r'C:\cc\share\epcam_kernel'
 
     # 悦谱出gerber的配置默认參數
-    config_ep_output = r'config_ep\outcfg.json'
+    config_my_settings = r'my_config.json'
 
-    # 调用G的管道
-    # gateway_path = r'config_g\bin\gateway.exe'
 
-    # g软件导入默认参数
-    config_g_input = r'config_g\config.json'
 
 
     # test_item = ['1','2','3','4','5','6','7']
