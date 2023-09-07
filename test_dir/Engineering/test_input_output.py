@@ -304,17 +304,30 @@ class TestOutputGerber274XParas():
         print(para_gerber_output)
 
         g = RunConfig.driver_g  # 拿到G软件
-
         data = {}  # 存放比对结果信息
-        vs_time_g = str(int(time.time()))  # 比对时间
-        data["vs_time_g"] = vs_time_g  # 比对时间存入字典
-        data["job_id"] = job_id
 
-        # 取到临时目录
-        temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
+
+
+        # 取到临时目录，如果存在旧目录，则删除
+        temp_path = RunConfig.temp_path_base
         temp_compressed_path = os.path.join(temp_path, 'compressed')
-        temp_ep_path = os.path.join(temp_path, 'ep')
-        temp_g_path = os.path.join(temp_path, 'g')
+        if os.path.exists(temp_path):
+            if RunConfig.gSetupType == 'local':
+                # os.remove(self.tempGerberPath)#此方法容易因权限问题报错
+                shutil.rmtree(temp_path)
+            if RunConfig.gSetupType == 'vmware':
+                # 使用PsExec通过命令删除远程机器的文件
+                from cc.cc_method import RemoteCMD
+                myRemoteCMD = RemoteCMD(psexec_path='cc', computer='192.168.1.3',
+                                        username='administrator',
+                                        password='cc')
+                command_operator = 'rd /s /q'
+                command_folder_path = os.path.join(RunConfig.temp_path_g)
+                command = r'cmd /c {} "{}"'.format(command_operator, command_folder_path)
+                myRemoteCMD.run_cmd(command)
+                print("remote delete finish")
+
+
 
         # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
         job = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
@@ -357,7 +370,8 @@ class TestOutputGerber274XParas():
                 file_path = os.path.join(temp_path, ep_out_put_gerber_folder)
                 gerberList = getFlist(file_path)
                 print(gerberList)
-                g_temp_path = r'//vmware-host/Shared Folders/share/temp_{}_{}'.format(job_id, vs_time_g)
+                # g_temp_path = r'//vmware-host/Shared Folders/share/temp_{}_{}'.format(job_id, vs_time_g)
+                g_temp_path = RunConfig.temp_path_g
                 gerberList_path = []
                 for each in gerberList:
                     gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job, step_name, each))
@@ -378,10 +392,25 @@ class TestOutputGerber274XParas():
 
                 # ----------------------------------------开始用G软件比图，g与g2---------------------------------------------------
                 # 先导入
-                job_g_remote_path = r'\\vmware-host\Shared Folders\share/{}/compressed/{}'.format(
-                    'temp' + "_" + str(job_id) + "_" + vs_time_g, job)
+                # job_g_remote_path = r'\\vmware-host\Shared Folders\share/{}/compressed/{}'.format(
+                #     'temp' + "_" + str(job_id) + "_" + vs_time_g, job)
+                job_g_remote_path = os.path.join(RunConfig.temp_path_g,'compressed',job)
                 # 导入要比图的资料
                 g.import_odb_folder(job_g_remote_path)
+
+                layerInfo = []
+                for each in all_layers_list_job:
+                    each_dict = {}
+                    each_dict["layer"] = each.lower()
+                    each_dict['layer_type'] = 'drill' if each in drill_layers else ''
+                    layerInfo.append(each_dict)
+
+                print("layerInfo:", layerInfo)
+
+                job1, job2 = job, job_g2
+                step1, step2 = step_name, step_name
+                # 打开要比图的资料
+                g.layer_compare_g_open_2_job(job1=job1, step1=step1, job2=job2, step2=step2)
 
                 # 校正孔用
                 temp_path_local_info1 = os.path.join(temp_path, 'info1')
@@ -393,32 +422,35 @@ class TestOutputGerber274XParas():
 
                 # 以G转图为主来比对
                 # G打开要比图的2个料号g和g2。g就是原始，g2是悦谱输出的gerber又input得到的
-                r = g.layer_compare_dms(job_id=job_id, vs_time_g=vs_time_g, temp_path=temp_path,
-                                        job1=job, step1=step_name, all_layers_list_job1=all_layers_list_job, job2=job_g2,step2=step_name,
-                                        all_layers_list_job2=all_layers_list_job, adjust_position=True)
-                data["all_result_g"] = r['all_result_g']
+                compareResult = g.layer_compare(temp_path=temp_path, temp_path_g=RunConfig.temp_path_g,
+                                                job1=job1, step1=step1,
+                                                job2=job2, step2=step2,
+                                                layerInfo=layerInfo,
+                                                adjust_position=True, jsonPath=r'my_config.json')
+                print('compareResult_input_vs:', compareResult)
+                data["all_result_g"] = compareResult['all_result_g']
+                data['g_vs_total_result_flag'] = compareResult['g_vs_total_result_flag']
+                assert len(all_layers_list_job) == len(compareResult['all_result_g'])
 
-                data['g_vs_total_result_flag'] = r['g_vs_total_result_flag']
-                Print.print_with_delimiter("断言--看一下G转图中的层是不是都有比对结果")
-                assert len(all_layers_list_job) == len(r['all_result_g'])
+
 
                 # ----------------------------------------开始验证结果--------------------------------------------------------
-                Print.print_with_delimiter('比对结果信息展示--开始')
+                print('比对结果信息展示--开始'.center(192,'*'))
                 if data['g_vs_total_result_flag'] == True:
                     print("恭喜您！料号导入比对通过！")
                 if data['g_vs_total_result_flag'] == False:
                     print("Sorry！料号导入比对未通过，请人工检查！")
-                Print.print_with_delimiter('分割线', sign='-')
+                print('分割线'.center(192,'-'))
                 print('G转图的层：', data["all_result_g"])
 
-                Print.print_with_delimiter('比对结果信息展示--结束')
+                print('比对结果信息展示--结束'.center(192,'*'))
 
-                Print.print_with_delimiter("断言--开始")
+                print("断言--开始".center(192,'*'))
                 assert data['g_vs_total_result_flag'] == True
                 for key in data['all_result_g']:
                     assert data['all_result_g'][key] == "正常"
 
-                Print.print_with_delimiter("断言--结束")
+                print("断言--结束".center(192,'*'))
             else:
                 print('无此step!')
 
