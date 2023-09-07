@@ -142,15 +142,22 @@ class TestInputOutputBasicGerber274X:
                 each_dict['file_type'] = 'excellon'
                 each_dict_para = {}
                 print('layer_e2cc:',layer_e2)
-                each_dict_para['zeroes'] = layer_e2.zeroes_omitted.values[0].lower()
-                each_dict_para['nf1'] = int(layer_e2.number_format_A.values[0])
-                each_dict_para['nf2'] = int(layer_e2.number_format_B.values[0])
-                each_dict_para['units'] = layer_e2.units.values[0].lower()
-                # g软件的tool_units没有mils选项
-                if layer_e2.tool_units_g.values[0].lower() == 'mils':
-                    each_dict_para['tool_units'] = 'inch'
-                else:
-                    each_dict_para['tool_units'] = layer_e2.tool_units_g.values[0].lower()
+                # each_dict_para['zeroes'] = layer_e2.zeroes_omitted.values[0].lower()
+                # each_dict_para['nf1'] = int(layer_e2.number_format_A.values[0])
+                # each_dict_para['nf2'] = int(layer_e2.number_format_B.values[0])
+                # each_dict_para['units'] = layer_e2.units.values[0].lower()
+                # # g软件的tool_units没有mils选项
+                # if layer_e2.tool_units_g.values[0].lower() == 'mils':
+                #     each_dict_para['tool_units'] = 'inch'
+                # else:
+                #     each_dict_para['tool_units'] = layer_e2.tool_units_g.values[0].lower()
+
+                each_dict_para['units'] = 'inch'
+                each_dict_para['zeroes'] = 'none'
+                each_dict_para['nf1'] = "2"
+                each_dict_para['nf2'] = "6"
+                each_dict_para['tool_units'] = 'mm'
+
                 each_dict['para'] = each_dict_para
                 gerberList_path.append(each_dict)
             else:#不是孔就当作是gerber处理
