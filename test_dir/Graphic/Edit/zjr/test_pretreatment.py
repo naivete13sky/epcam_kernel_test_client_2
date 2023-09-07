@@ -1,14 +1,12 @@
-import pytest,os, time,json,shutil,sys
+import pytest,os, time
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput,MyOutput
+from cc.cc_method import GetTestData, DMS, Print
+from config_ep.epcam_cc_method import MyInput
 from config_ep.epcam_cc_method import Pretreatment
-from config_g.g_cc_method import GInput
-from epkernel import Input, GUI,BASE,Guide,Analysis,Configuration
+from epkernel import Input, GUI,BASE,Configuration
 from epkernel.Action import Information,Selection
-from epkernel.Edition import Layers,Matrix
+from epkernel.Edition import Layers
 from epkernel.Output import save_job
-import re
 from datetime import datetime
 
 class TestPretreatment:
