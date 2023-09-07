@@ -40,3 +40,50 @@ le_size': 60795.0, 'format': 'Gerber274x', 'max_numbers': {'first': 348000016.52
             print("比对异常！未能比对！")
             result = '错误'
             return result
+
+
+
+ # each_dict_para['zeroes'] = layer_e2.zeroes_omitted.values[0].lower()
+                # each_dict_para['nf1'] = int(layer_e2.number_format_A.values[0])
+                # each_dict_para['nf2'] = int(layer_e2.number_format_B.values[0])
+                # each_dict_para['units'] = layer_e2.units.values[0].lower()
+                # # g软件的tool_units没有mils选项
+                # if layer_e2.tool_units_g.values[0].lower() == 'mils':
+                #     each_dict_para['tool_units'] = 'inch'
+                # else:
+                #     each_dict_para['tool_units'] = layer_e2.tool_units_g.values[0].lower()
+
+
+# ----------------------------------------开始用EP软件比图，g和g2--------------------------------------------------
+        # all_result_ep_vs_g_g2 = {}
+        # # 打开job_g
+        # # 前面打开过的。直接show下看看
+        # # GUI.show_layer(job_g, 'orig', 'top')
+        #
+        # # 打开 job_g2
+        # #先解压tgz
+        # CompressTool.untgz(os.path.join(temp_g2_path, os.listdir(temp_g2_path)[0]),temp_g2_path)
+        # Input.open_job(job_g2, temp_g2_path)
+        # # GUI.show_layer(job_g2, 'orig', 'top')
+        #
+        # # 开始用kernel比对
+        # for each_layer_g in all_layers_list_job_g:
+        #     print('EP VS'.center(192,'-'))
+        #     print('层名称：',each_layer_g)
+        #     ep_layer_compare_result = BASE.layer_compare_point(job_g, 'orig', each_layer_g, job_g2, 'orig', each_layer_g, 22860,True, True, 5080000)
+        #     ep_layer_compare_result = json.loads(ep_layer_compare_result)
+        #     print(ep_layer_compare_result)
+        #     print(len(ep_layer_compare_result['result']))
+        #     if len(ep_layer_compare_result['result']) > 0:
+        #         all_result_ep_vs_g_g2[each_layer_g] = '错误'
+        #         print('错误！')
+        #         # Layers.layer_compare(job_g, 'orig', each_layer_g, job_g2, 'orig', each_layer_g, 22860,True, True, each_layer_g + '-com', 5080000)
+        #         # GUI.show_layer(job_g, 'orig', each_layer_g)
+        #     if len(ep_layer_compare_result['result']) == 0:
+        #         all_result_ep_vs_g_g2[each_layer_g] = '正常'
+        #         print('正常！')
+        #
+        # assert len(all_result_ep_vs_g_g2) == len(all_layers_list_job_g)
+
+
+
