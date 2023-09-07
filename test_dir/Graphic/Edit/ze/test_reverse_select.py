@@ -1,13 +1,12 @@
 import pytest, os, time, json, shutil, sys
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
+from cc.cc_method import GetTestData, DMS, Print
+
 from epkernel import Input, GUI, BASE
 from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
+
 
 class TestGraphicReverse_select:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Reverse_select'))
