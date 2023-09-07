@@ -404,10 +404,10 @@ class TestOutputGerber274XParas():
                 print(gerberList)
                 # g_temp_path = r'//vmware-host/Shared Folders/share/temp_{}_{}'.format(job_id, vs_time_g)
                 g_temp_path = RunConfig.temp_path_g
-                gerberList_path = []
-                for each in gerberList:
-                    gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job, step_name, each))
-                print(gerberList_path)
+                # gerberList_path = []
+                # for each in gerberList:
+                #     gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job, step_name, each))
+                # print(gerberList_path)
 
                 temp_out_put_gerber_g_input_path = os.path.join(temp_path, 'g2')
                 if os.path.exists(temp_out_put_gerber_g_input_path):
@@ -415,10 +415,31 @@ class TestOutputGerber274XParas():
                 os.mkdir(temp_out_put_gerber_g_input_path)
                 out_path = temp_out_put_gerber_g_input_path
 
-                GInput(job=job_g2, step=step, gerberList_path=gerberList_path, out_path=out_path, job_id=job_id,
-                       drill_para='epcam_default', layer_info_from_obj='job_tgz_file',
-                       layer_list=all_layers_list_job, gerber_layer_list=common_layers, drill_layer_list=drill_layers,
-                       rout_layer_list=rout_layers)
+
+
+                gerberList_path = []
+                for each in gerberList:
+                    each_dict = {}
+                    each_dict['path'] = os.path.join(g_temp_path, r'output_gerber', job, r'orig', each)
+                    if each in drill_layers:
+                        each_dict['file_type'] = 'excellon'
+                        each_dict_para = {}
+                        each_dict_para['units'] = 'inch'
+                        each_dict_para['zeroes'] = 'none'
+                        each_dict_para['nf1'] = "2"
+                        each_dict_para['nf2'] = "6"
+                        each_dict_para['tool_units'] = 'mm'
+
+                        each_dict['para'] = each_dict_para
+                        gerberList_path.append(each_dict)
+                    else:  # 不是孔就当作是gerber处理
+                        each_dict['file_type'] = 'gerber'
+                        gerberList_path.append(each_dict)
+                g.input_init(job=job_g2, step=step, gerberList_path=gerberList_path,
+                             jsonPath=r'D:\cc\python\epwork\epcam_kernel_test_client_2\my_config.json')
+
+
+
                 # 输出tgz到指定目录
                 g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
 
