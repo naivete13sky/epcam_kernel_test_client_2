@@ -129,7 +129,7 @@ class TestInputOutputBasicGerber274X:
             else:#不是孔就当作是gerber处理
                 each_dict['file_type'] = 'gerber'
                 gerberList_path.append(each_dict)
-        g.input_init(job=job_g2, step=step, gerberList_path=gerberList_path,jsonPath=r'D:\cc\python\epwork\epcam_kernel_test_client_2\my_config.json')
+        g.input_init(job=job_g2, step=step, gerberList_path=gerberList_path,jsonPath=r'my_config.json')
         # 输出tgz到指定目录
         g.g_export(job_g2, os.path.join(RunConfig.temp_path_g, r'g2'))
 
@@ -254,8 +254,6 @@ class TestOutputGerber274XParas():
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
 
-
-
         # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
         temp_compressed_path = os.path.join(temp_path, 'compressed')
@@ -276,10 +274,8 @@ class TestOutputGerber274XParas():
                 print("remote delete finish")
 
 
-
         # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
         job = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
-
         # 用悦谱CAM打开料号
         Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
         all_layers_list_job = Information.get_layers(job)
@@ -292,7 +288,6 @@ class TestOutputGerber274XParas():
                 # 区分层别类型
                 drill_layers = list(map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['drill'])))
                 rout_layers = list(map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['rout'])))
-
 
                 print('drill_layers:', drill_layers)
                 print('rout_layers:', rout_layers)
@@ -318,20 +313,13 @@ class TestOutputGerber274XParas():
                 file_path = os.path.join(temp_path, ep_out_put_gerber_folder)
                 gerberList = getFlist(file_path)
                 print(gerberList)
-                # g_temp_path = r'//vmware-host/Shared Folders/share/temp_{}_{}'.format(job_id, vs_time_g)
                 g_temp_path = RunConfig.temp_path_g
-                # gerberList_path = []
-                # for each in gerberList:
-                #     gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job, step_name, each))
-                # print(gerberList_path)
 
                 temp_out_put_gerber_g_input_path = os.path.join(temp_path, 'g2')
                 if os.path.exists(temp_out_put_gerber_g_input_path):
                     shutil.rmtree(temp_out_put_gerber_g_input_path)
                 os.mkdir(temp_out_put_gerber_g_input_path)
                 out_path = temp_out_put_gerber_g_input_path
-
-
 
                 gerberList_path = []
                 for each in gerberList:
@@ -345,15 +333,13 @@ class TestOutputGerber274XParas():
                         each_dict_para['nf1'] = "2"
                         each_dict_para['nf2'] = "6"
                         each_dict_para['tool_units'] = 'mm'
-
                         each_dict['para'] = each_dict_para
                         gerberList_path.append(each_dict)
                     else:  # 不是孔就当作是gerber处理
                         each_dict['file_type'] = 'gerber'
                         gerberList_path.append(each_dict)
                 g.input_init(job=job_g2, step=step, gerberList_path=gerberList_path,
-                             jsonPath=r'D:\cc\python\epwork\epcam_kernel_test_client_2\my_config.json')
-
+                             jsonPath=r'my_config.json')
 
 
                 # 输出tgz到指定目录
