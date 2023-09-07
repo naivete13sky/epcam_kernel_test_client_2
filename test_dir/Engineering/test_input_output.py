@@ -137,16 +137,15 @@ class TestInputOutputBasicGerber274X:
         for each in gerberList:
             each_dict = {}
             each_dict['path'] = os.path.join(g_temp_path, r'output_gerber', job_ep, r'orig', each)
-            layer_e2 = DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,
-                                                                               filter=each.replace(
-                                                                                   ' ', '(', '-').replace(')', '-'))
+            layer_e2 = DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,filter=each.replace(' ', '-').replace('(', '-').replace(')', '-'))
             if layer_e2.status.values[0] == 'published' and layer_e2.layer_file_type.values[0]=='excellon2':
                 each_dict['file_type'] = 'excellon'
                 each_dict_para = {}
-                each_dict_para['zeroes'] = layer_e2.zeroes_omitted_g.values[0].lower()
-                each_dict_para['nf1'] = int(layer_e2.number_format_A_g.values[0])
-                each_dict_para['nf2'] = int(layer_e2.number_format_B_g.values[0])
-                each_dict_para['units'] = layer_e2.units_g.values[0].lower()
+                print('layer_e2cc:',layer_e2)
+                each_dict_para['zeroes'] = layer_e2.zeroes_omitted.values[0].lower()
+                each_dict_para['nf1'] = int(layer_e2.number_format_A.values[0])
+                each_dict_para['nf2'] = int(layer_e2.number_format_B.values[0])
+                each_dict_para['units'] = layer_e2.units.values[0].lower()
                 # g软件的tool_units没有mils选项
                 if layer_e2.tool_units_g.values[0].lower() == 'mils':
                     each_dict_para['tool_units'] = 'inch'
