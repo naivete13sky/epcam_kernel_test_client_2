@@ -324,7 +324,7 @@ class TestOutputGerber274XParas():
                 gerberList_path = []
                 for each in gerberList:
                     each_dict = {}
-                    each_dict['path'] = os.path.join(g_temp_path, r'output_gerber', job, r'orig', each)
+                    each_dict['path'] = os.path.join(g_temp_path, r'output_gerber', job, step, each)
                     if each in drill_layers:
                         each_dict['file_type'] = 'excellon'
                         each_dict_para = {}
