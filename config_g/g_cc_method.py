@@ -133,25 +133,25 @@ class G():
         time.sleep(1)
 
 
-    def input_init(self, *, job: str, step='orig', gerberList_path: list, jsonPath: str):
+    def input_init(self, *, job: str,step='orig',gerberList_path:list,jsonPath:str):
         self.job = job
         self.step = step
         self.gerberList_path = gerberList_path
         self.jsonPath = jsonPath
         self.input_set_para_default(self.jsonPath)
         kw = {}
-        self.in_put(self.job, self.step, self.gerberList_path, **kw)
+        self.in_put(self.job,self.step,self.gerberList_path,**kw)
 
-    def input_set_para_default(self, jsonPath):
+    def input_set_para_default(self,jsonPath):
         # 设置默认导入参数
         # with open(r'settings\epvs.json', 'r') as cfg:
-        with open(jsonPath, 'r', encoding='utf-8') as cfg:
+        with open(jsonPath, 'r',encoding='utf-8') as cfg:
             self.para = json.load(cfg)['g']['input']  # (json格式数据)字符串 转化 为字典
-            print("self.para::", self.para)
+            print("self.para::",self.para)
 
-    def input_set_para_customer(self, customer_para: dict):
+    def input_set_para_customer(self,customer_para:dict):
         pass
-        print('customer_para:', customer_para)
+        print('customer_para:',customer_para)
         for each in customer_para:
             print(each)
             self.para[each] = customer_para[each]
@@ -159,7 +159,7 @@ class G():
         print("cc")
 
 
-    def in_put(self, job_name, step, gerberList_path, *args, **kwargs):
+    def in_put(self,job_name, step, gerberList_path,*args,**kwargs):
         # 先创建job, step
         jobpath = r'C:\genesis\fw\jobs' + '/' + job_name
         results = []
@@ -169,20 +169,20 @@ class G():
         for each in gerberList_path:
             result = {}
             result['gerberPath'] = each["path"]
-            result['result'] = self.gerber_to_odb_one_file(each, *args, **kwargs)
+            result['result'] = self.gerber_to_odb_one_file(each,*args,**kwargs)
             results.append(result)
         self.save_job(self.job)
         return results
 
-    def gerber_to_odb_one_file(self, eachGerberInfo, *args, **kwargs):
+    def gerber_to_odb_one_file(self,eachGerberInfo, *args,**kwargs):
         self.para['job'] = self.job
         self.para['step'] = self.step
         self.para['format'] = 'Gerber274x'
         self.para['separator'] = '*'
         self.para['path'] = eachGerberInfo['path']
         self.para['layer'] = os.path.basename(eachGerberInfo['path']).lower()
-        self.para['layer'] = self.para['layer'].replace(' ', '-').replace('(', '-').replace(')', '-')
-        print("iamcc", 'kwargs:', kwargs)
+        self.para['layer']=self.para['layer'].replace(' ','-').replace('(', '-').replace(')', '-')
+        print("iamcc",'kwargs:',kwargs)
         file_type = eachGerberInfo["file_type"]
 
 
@@ -208,7 +208,7 @@ class G():
 
         trans_COM = 'COM input_manual_set,'
         trans_COM += 'path={},job={},step={},format={},data_type={},units={},coordinates={},zeroes={},'.format(
-            self.para['path'].replace("\\", "/"),
+            self.para['path'].replace("\\","/"),
             self.para['job'],
             self.para['step'],
             self.para['format'],
@@ -303,7 +303,7 @@ class G():
                 coor_y = features_info_first_all_data.split(" ")[2].strip()
                 return (coor_x, coor_y)
             except:
-                return (0, 0)
+                return (0,0)
 
 
     def move_one_layer_by_x_y(self, *args,**kwargs):
