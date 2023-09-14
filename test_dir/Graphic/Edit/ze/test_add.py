@@ -1,9 +1,7 @@
 import pytest, os, time, json, shutil, sys
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-
 from epkernel import Input, GUI, BASE
-
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
 
@@ -49,6 +47,8 @@ class TestGraphicEditFeatureIndex:
 
         # 用悦谱CAM打开料号
         Input.open_job(job_ep,temp_compressed_path)  # 用悦谱CAM打开料号
+
+
 
         # 1.增加正极性文字，字体为standard
         attributes = [{'.text': '2'}]  # 定义文字属性
