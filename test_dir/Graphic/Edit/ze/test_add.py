@@ -139,8 +139,64 @@ class TestGraphicEditFeatureIndex:
         #GUI.show_layer(job_ep, step, 'l3')
 
         # 2.增加线条
-        Layers.add_line(job_ep, step, ['l2'], 'r5', 10000000, 30000000, 30000000, 30000000,
-                        True, [{'.fiducial_name': '0'}, {'.area': ''}])
+        Layers.add_line(job_ep, step, ['l2'], 'r5', 42*1000000, 24*1000000, 42*1000000, 30*1000000,
+                        True, [{'.fiducial_name': '0'}, {'.area': ''}])#单层增加线条
+
+        # Layers.add_line(job_ep, step, ['l2','l3'], 'r5', 43 * 1000000, 24 * 1000000, 43 * 1000000, 30 * 1000000,
+        #                 True, [{'.fiducial_name': '0'}, {'.area': ''}])  #多层增加线条
+
+        '''
+        测试用例名称: 单层添加不同形状大小的正、负极性线段
+        预期结果: 正确添加
+        执行测试用例数: 8个
+        '''
+
+        symbols = ['r5', 's5','r10', 's10']#线段形状大小
+        polaritys = [True ,False]  # 线段极性
+        num_x1 = 43  # x轴坐标
+        attributes = [{'.fiducial_name': '0'}, {'.area': ''}]  # 定义线段属性
+        for symbol in symbols:
+            num_y1 = 23  # y轴坐标
+            num_y2 = 30
+            for polarity in polaritys:
+                Layers.add_line(job_ep, step, ['l2'], symbol, num_x1 * 1000000, num_y1 * 1000000,
+                                num_x1 * 1000000,
+                                num_y2 * 1000000, polarity, attributes)  # 多层增加线条
+                num_x1 = num_x1 - 1
+                num_y1 = num_y1 - 10
+                num_y2 = num_y2 - 10
+
+        # GUI.show_layer(job_ep, step, 'l2')
+
+        '''
+         测试用例名称: 多层添加不同形状大小的正、负极性线段
+         预期结果: 正确添加
+         执行测试用例数: 8个
+        '''
+
+        symbols = ['r5', 's5','r10', 's10']  # 线段形状大小
+        polaritys = [True, False]  # 线段极性
+        num_x2 = 43  # x轴坐标
+        attributes = [{'.fiducial_name': '0'}, {'.area': ''}]  # 定义线段属性
+        for symbol in symbols:
+            num_y3 = 23  # y轴坐标
+            num_y4 = 30
+            for polarity in polaritys:
+                Layers.add_line(job_ep, step, ['l4','l6'], symbol, num_x2 * 1000000, num_y3 * 1000000,
+                                num_x2 * 1000000,
+                                num_y4 * 1000000, polarity, attributes)  # 多层增加线条
+                num_x2 = num_x2 - 1
+                num_y3 = num_y3 - 10
+                num_y4 = num_y4 - 10
+
+        # GUI.show_layer(job_ep, step, 'l6')
+
+
+
+
+
+
+
         #3.增加surface
         points_location = []
         points_location.append([50 * 1000000,25 * 1000000])
