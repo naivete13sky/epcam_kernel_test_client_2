@@ -1,4 +1,4 @@
-import pytest, os, time
+import pytest, os, time, json, shutil
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS
 from epkernel import Input
@@ -17,16 +17,31 @@ class TestDeleteAttributes():
         '''
         print('分割线'.center(192, "-"))
 
-        # g = RunConfig.driver_g  # 拿到G软件
-
+        g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
-        vs_time_g = str(int(time.time()))  # 比对时间
-        data["vs_time_g"] = vs_time_g  # 比对时间存入字典
-        data["job_id"] = job_id
+
 
         # 取到临时目录
-        temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
+        temp_path = RunConfig.temp_path_base
+        if os.path.exists(temp_path):
+            if RunConfig.gSetupType == 'local':
+                # os.remove(self.tempGerberPath)#此方法容易因权限问题报错
+                shutil.rmtree(temp_path)
+            if RunConfig.gSetupType == 'vmware':
+                # 使用PsExec通过命令删除远程机器的文件
+                from cc.cc_method import RemoteCMD
+                myRemoteCMD = RemoteCMD(psexec_path='cc', computer='192.168.1.3',
+                                        username='administrator',
+                                        password='cc')
+                command_operator = 'rd /s /q'
+                command_folder_path = os.path.join(RunConfig.temp_path_g)
+                command = r'cmd /c {} "{}"'.format(command_operator, command_folder_path)
+                myRemoteCMD.run_cmd(command)
+                print("remote delete finish")
+
+                # 取到临时目录
         temp_compressed_path = os.path.join(temp_path, 'compressed')
+        temp_ep_path = os.path.join(temp_path, 'ep')
 
         # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
         job = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')

@@ -7,7 +7,7 @@ from epkernel.Edition import Layers
 from epkernel.Output import save_job
 from epkernel.Edition import Matrix
 
-@pytest.mark.change_attributes
+# @pytest.mark.change_attributes
 class TestGraphicEditChangeAttributes:
     # @pytest.mark.Attributes
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Modify_attributes'))
