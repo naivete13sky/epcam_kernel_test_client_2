@@ -6,7 +6,7 @@ from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
 
-@pytest.mark.polarity
+# @pytest.mark.polarity
 class TestGraphicEditPositivePolarity:
     # @pytest.mark.PositivePolarity
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Polarity'))
