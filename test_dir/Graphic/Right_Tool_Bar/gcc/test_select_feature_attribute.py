@@ -115,6 +115,40 @@ class TestGraphicSelectFeatureAttribute:
         Layers.delete_feature(job_ep, step, ['bot'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
+        # 11、筛选单个属性范围内的物件
+        Selection.set_attr_range_filter(0, [{'attr_name': 'tool', 'min_value': 0, 'max_value': 10}])
+        Selection.select_features_by_filter(job_ep, step, ['5'])
+        Layers.delete_feature(job_ep, step, ['5'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 12、筛选多个属性范围内的物件
+        Selection.set_attr_range_filter(0, [{'attr_name': 'tool', 'min_value': 0, 'max_value': 10},
+                                            {'attr_name': '.drill_flag', 'min_value': 1, 'max_value': 5}])
+        Selection.select_features_by_filter(job_ep, step, ['bot'])
+        Layers.delete_feature(job_ep, step, ['bot'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 13、筛选A或者B属性范围内的物件
+        Selection.set_attr_range_filter(1, [{'attr_name': 'tool', 'min_value': 0, 'max_value': 10},
+                                            {'attr_name': '.drill_flag', 'min_value': 1, 'max_value': 5}])
+        Selection.select_features_by_filter(job_ep, step, ['1'])
+        Layers.delete_feature(job_ep, step, ['1'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 14、筛选单个属性范围之外的物件
+        Selection.set_exclude_attr_range_filter([{'attr_name': 'tool', 'min_value': 0, 'max_value': 10},
+                                                 {'attr_name': '.drill_flag', 'min_value': 1, 'max_value': 5}])
+        Selection.select_features_by_filter(job_ep, step, ['2'])
+        Layers.delete_feature(job_ep, step, ['2'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 15、筛选多个属性范围之外的物件
+        Selection.set_exclude_attr_range_filter([{'attr_name': 'tool', 'min_value': 0, 'max_value': 10},
+                                                 {'attr_name': '.drill_flag', 'min_value': 1, 'max_value': 5}])
+        Selection.select_features_by_filter(job_ep, step, ['bot'])
+        Layers.delete_feature(job_ep, step, ['bot'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
         GUI.show_layer(job_ep, step, 'top')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
