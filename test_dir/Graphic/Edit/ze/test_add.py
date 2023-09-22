@@ -140,9 +140,9 @@ class TestGraphicEditFeatureIndex:
         # GUI.show_layer(job_ep, step, 'l2')
 
         '''
-         测试用例名称: 多层添加不同形状大小的正、负极性线段
-         预期结果: 正确添加
-         执行测试用例数: 8个
+        测试用例名称: 多层添加不同形状大小的正、负极性线段
+        预期结果: 正确添加
+        执行测试用例数: 8个
         '''
 
         symbols = ['r5', 's5','r10', 's10']  # 线段形状大小
@@ -191,8 +191,42 @@ class TestGraphicEditFeatureIndex:
         #GUI.show_layer(job_ep, step, 'l2')
 
         #4增加pad
+        '''
+        测试用例名称:添加不同形状大小的正、负极性Pad
+        预期结果: 正确添加
+        执行测试用例数: 70个
+        '''
+        points_location = []
+        points_location.append([1 * 1000000, 12 * 1000000])
+        points_location.append([1 * 1000000, 22 * 1000000])
+        points_location.append([208 * 1000000, 22 * 1000000])
+        points_location.append([208 * 1000000, 12 * 1000000])
+        points_location.append([1 * 1000000, 12 * 1000000])
+        Layers.add_surface(job_ep, step, ['l5'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)  # 先添加一块正极性大同皮，后面在铜皮上添加负极性pad
         Layers.add_pad(job_ep, step, ['l2'], "s100", 25400000, 25400000, True,
                        9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)
+        symbols = ['r50', 's50', 'rect50x50', 'rect50x50xr25x2', 'rect50x50xr25x12', 'rect50x50xr25x123', 'rect50x50xr25',  'rect50x50','rect50x50xc25x2',
+                   'rect50x50xc25x12', 'rect50x50xc25x123', 'rect50x50xc25', 'oval50x50', 'di50x50', 'oct50x50x10', 'donut_r50x30', 'donut_s50x30',
+                   'hex_l50x50x10', 'hex_s50x30x10', 'bfr50', 'bfs50', 'tri50x30', 'oval_h50x30', 'thr60x30x1x3x10', 'ths60x30x1x3x10', 's_tho60x30x1x3x10', 'sr_ths60x30x1x3x10',
+                   'rc_ths60x30x1x3x10x10', 'rc_tho60x30x1x3x10x6', 'el50x20', 'moire60x30x1x30x10x10', 'hole20xvx1x1', 'hole50xnx2x2', 'hole80xpx2x2', 'null50000']  #设置pad形状大小(共35种类型)
+        polaritys = [True, False]  # 设置pad极性
+        num_x3 = 1  # x轴坐标
+        attributes = [{'.drill': 'via'}, {'.drill_first_last': 'first'}]  # 定义线段属性
+        for symbol in symbols:
+            num_y5 = 25  # y轴坐标
+            for polarity in polaritys:
+                Layers.add_pad(job_ep, step, ['l5'], symbol, num_x3*1000000, num_y5*1000000, polarity,
+                               9,attributes, 0)
+                num_x3 = num_x3 + 3
+                num_y5 = num_y5 - 8
+
+        Layers.add_pad(job_ep, step, ['l2'], "s100", 25400000, 25400000, True,
+                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)
+        GUI.show_layer(job_ep, step, 'l5')
+
+
+
         #5增加弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l2'],'r7.874', 40*1000000, 25*1000000,
