@@ -1,27 +1,31 @@
 import pytest, os, time, json, shutil, sys
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print
-from epkernel import Input
+from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
+from config_ep.epcam_cc_method import MyInput, MyOutput
+from epkernel import Input, GUI, BASE
 from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
+from config_g.g_cc_method import G
+from epkernel.Edition import Matrix
 
-# @pytest.mark.polarity
-class TestGraphicEditPositivePolarity:
-    # @pytest.mark.PositivePolarity
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Polarity'))
-    def test_polarity(self, job_id, g, prepare_test_job_clean_g):
+# @pytest.mark.Attributes
+class TestGraphicFillProfile:
+    # @pytest.mark.Attributes
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_Profile'))
+    def testfill_profile(self, job_id, g, prepare_test_job_clean_g):
+
         '''
-        本用例测试极性反转功能--Polarity,ID:11940
+        本用例测试根据外形轮廓填充实体--fill profile,ID:34663
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
 
-        step = 'net'  # 定义需要执行比对的step名
-        # layers = ['l1', 'l6', 'l7', 'l8', 'l7+1', 'l8+1', 'l2', 'l3','l4','l4+1','l5','l1+1','l6+1','l2+1']  # 定义需要比对的层
-
-        # 取到临时目录，如果存在旧目录，则删除
+        step = 'prepare'  # 定义需要执行比对的step名
+        # layers = ['drl1-10+1', 'l4+1', 'l5+1','l1+1','l6+1', 'l7+1', 'l7-neg', 'l2+1']  # 定义需要比对的层
+        # layers = ['l1','l2','l3','l4','l5','l6','l7','l8']
+        # 取到临时目录
         temp_path = RunConfig.temp_path_base
         if os.path.exists(temp_path):
             if RunConfig.gSetupType == 'local':
@@ -38,11 +42,9 @@ class TestGraphicEditPositivePolarity:
                 command = r'cmd /c {} "{}"'.format(command_operator, command_folder_path)
                 myRemoteCMD.run_cmd(command)
                 print("remote delete finish")
-
         temp_compressed_path = os.path.join(temp_path, 'compressed')
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
-
 
         # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
         # 测试用例料号
@@ -54,70 +56,74 @@ class TestGraphicEditPositivePolarity:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        #1.整层正负资料极性反向转换为负（Invert）
-        Layers.change_polarity(job_ep, step, ['l1'], 2, 1)
+        # 1.验证填充方式为实铜，其余参数默认
+        Layers.fill_profile(job_ep, step, ['l1'], 0, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l1')
 
-        #2整层负资料极性反向转换为正（Invert）
-        Layers.change_polarity(job_ep, step, ['l6'], 2, 1)
+        # 2.验证填充方式为网格铜，其余参数默认
+        # Layers.delete_feature(job_ep, step, ['l2'])
+        Layers.set_fill_grid_param(0, 2540000, 2540000, 254000, 0, 0)
+        Layers.fill_profile(job_ep, step, ['l2'], 2, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l2')
 
-        #3单选正物件极性反转为负（Invert）
-        Selection.select_feature_by_id(job_ep, step, 'l7', [2])
-        Layers.change_polarity(job_ep, step, ['l7'], 2, 0)
+        # 3.验证填充方式为line填充，其余参数默认
+        Layers.delete_feature(job_ep, step, ['l3'])
+        Layers.set_fill_solid_param(False, 12700, False)
+        Layers.fill_profile(job_ep, step, ['l3'], 1, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l3')
 
-        # 4单选负物件极性反转为正（Invert）
-        Selection.select_feature_by_id(job_ep, step, 'l8', [20])
-        Layers.change_polarity(job_ep, step, ['l8'], 2, 0)
+        # 4.验证填充方式为铜皮，其余参数默认
+        Layers.delete_feature(job_ep, step, ['l4'])
+        Layers.set_fill_solid_param(False, 12700, True)
+        Layers.fill_profile(job_ep, step, ['l4'], 1, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l4')
 
-        #5多选负物件极性反转为正（Invert）
-        Selection.select_feature_by_id(job_ep, step, 'l7+1', [42,44,38])
-        Layers.change_polarity(job_ep, step, ['l7+1'], 2, 0)
+        # 5.验证填充方式为指定symbol，其余参数默认
+        Layers.delete_feature(job_ep, step, ['l5'])
+        Layers.set_fill_pattern_param('s36', True, False, 2540000,
+                                      2540000, True, False, False, 0, 0, 0, 0)
+        Layers.fill_profile(job_ep, step, ['l5'], 3, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l5')
 
-        #6多选正物件极性反转为正（Invert）
-        Selection.select_feature_by_id(job_ep, step, 'l8+1', [289,563,621,840,0])
-        Layers.change_polarity(job_ep, step, ['l8+1'], 2, 0)
+        # 5.1.验证填充方式为指定symbol，odd_offset奇数行偏移0.3inch
+        Layers.delete_feature(job_ep, step, ['l6'])
+        Layers.set_fill_pattern_param('donut_r50x25', True, False, 7620000,
+                                      7620000, True, False, False, 0, 0, 12700000, 0)
+        Layers.fill_profile(job_ep, step, ['l6'], 3, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l6')
 
-        #7.整层资料正极性反转负极性,转正极性(Negative,Positive)
-        Layers.change_polarity(job_ep, step, ['l2'], 1, 1)
-        Layers.change_polarity(job_ep, step, ['l2'], 0, 1)
+        # 5.2.验证填充方式为指定symbol，even_offset偶数行偏移0.2inch
+        Layers.delete_feature(job_ep, step, ['l7'])
+        Layers.set_fill_pattern_param('hex_l100x60x15', True, False, 5080000,
+                                      5080000, True, False, False, 0, 5080000, 0, 0)
+        Layers.fill_profile(job_ep, step, ['l7'], 3, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l7')
 
-        #8多选物件正极性反转
-        Selection.select_feature_by_id(job_ep, step, 'l3', [603,430])
-        Layers.change_polarity(job_ep, step, ['l3'], 2, 0)
-
-        #9单选物件正极性反转负极性
-        Selection.select_feature_by_id(job_ep, step, 'l4', [866])
-        Layers.change_polarity(job_ep, step, ['l4'], 1, 0)
-
-        #10单选物件负极性反转负极性
-        Selection.select_feature_by_id(job_ep, step, 'l4+1', [39])
-        Layers.change_polarity(job_ep, step, ['l4+1'], 1, 0)
-
-        #11.单选物件负极性反转正极性（Positive）
-        Selection.select_feature_by_id(job_ep, step, 'l5', [39])
-        Layers.change_polarity(job_ep, step, ['l5'], 0, 0)
-
-        #12多选物件负极性反转正极性（Positive）
-        Selection.select_feature_by_id(job_ep, step, 'l1+1', [39,40,42,45])
-        Layers.change_polarity(job_ep, step, ['l1+1'], 0, 0)
-
-        #13整层负极性反转正极性（Positive）
-        Selection.select_feature_by_id(job_ep, step, 'l6+1', [39, 40, 42, 45])
-        Layers.change_polarity(job_ep, step, ['l6+1'], 0, 1)
-
-        #14多选正极性反转正极性（Positive）
-        Selection.select_feature_by_id(job_ep, step, 'l2+1', [496, 530, 838])
-        Layers.change_polarity(job_ep, step, ['l2+1'], 0, 0)
+        # 5.3.验证填充方式为指定symbol，角度旋转45
+        Layers.delete_feature(job_ep, step, ['l8'])
+        Layers.set_fill_pattern_param('tri20x40', True, False, 2540000,
+                                      2540000, True, False, False, 0, 0, 0, 45)
+        Layers.fill_profile(job_ep, step, ['l8'], 3, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l8')
 
 
 
         save_job(job_ep, temp_ep_path)
-        # GUI.show_layer(job_case,step,'l5')
+        # GUI.show_layer(job_case,step,'drl1-10')
 
         # ----------------------------------------开始比图：G与EP---------------------------------------------------------
         print('比图--G转图VS悦谱转图'.center(190, '-'))
-        job_g_remote_path = os.path.join(RunConfig.temp_path_g,'g',job_g)
+        job_g_remote_path = os.path.join(RunConfig.temp_path_g, 'g', job_g)
         print("job_yg_remote_path:", job_g_remote_path)
-        job_ep_remote_path = os.path.join(RunConfig.temp_path_g,'ep',job_ep)
+        job_ep_remote_path = os.path.join(RunConfig.temp_path_g, 'ep', job_ep)
         print("job_testcase_remote_path:", job_ep_remote_path)
         # # 导入要比图的资料
         g.import_odb_folder(job_g_remote_path)
@@ -134,7 +140,7 @@ class TestGraphicEditPositivePolarity:
 
         print("layerInfo:", layerInfo)
         job1, job2 = job_g, job_ep
-        step1, step2 = 'net', 'net'
+        step1, step2 = 'prepare', 'prepare'
         g.layer_compare_g_open_2_job(job1=job1, step1=step1, job2=job2, step2=step2)
 
         # 校正孔用

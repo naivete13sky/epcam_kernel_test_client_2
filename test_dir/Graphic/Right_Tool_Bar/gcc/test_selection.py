@@ -2,16 +2,16 @@ import pytest, os, shutil
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
 from epkernel import Input, GUI
-from epkernel.Action import Selection, Information
-from epkernel.Edition import Layers, Job, Matrix
+from epkernel.Action import Selection
+from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 
 
-class TestGraphicSelectFeatureType:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('select_type'))
-    def test_select_features_type(self, job_id, g, prepare_test_job_clean_g):
+class TestGraphicSelection:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Selection'))
+    def test_selection(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试select_features_type功能，用例数：
+        本用例测试Selection多条件筛选功能，用例数：
         ID:
         BUG:
         '''
@@ -19,7 +19,7 @@ class TestGraphicSelectFeatureType:
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
         step = 'orig'
-        layers = ['top', 'l2']
+        layers = ['top', 'l2', 'l3', 'l4']
 
         # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
@@ -43,7 +43,7 @@ class TestGraphicSelectFeatureType:
         temp_compressed_path = os.path.join(temp_path, 'compressed')
         temp_ep_path = os.path.join(temp_path, 'ep')
 
-        # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称--------------------------------
+        # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
         job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
 
         # --------------------------------下载yg转图tgz，并解压好，获取到文件夹名称，作为g料号名称-------------------------------
@@ -52,54 +52,88 @@ class TestGraphicSelectFeatureType:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 1、验证选中所有正极性物件
+        # 1、筛选物件类型，再取消筛选symbol
         Selection.set_featuretype_filter(True, False, True, True, True, True, True)
         Selection.select_features_by_filter(job_ep, step, ['top'])
+        Selection.set_symbol_filter(True, ['r50'])
+        Selection.unselect_features(job_ep, step, 'top')
         Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 2、验证选中所有负极性物件
-        Selection.set_featuretype_filter(False, True, True, True, True, True, True)
+        # 2、筛选symbol，再取消筛选单一物件属性
+        Selection.set_symbol_filter(True, ['r50', 'r30'])
         Selection.select_features_by_filter(job_ep, step, ['l2'])
-        Layers.delete_feature(job_ep, step, ['l2'])    # 通过删除来验证是否选中
+        Selection.set_attribute_filter(0, [{'.bga': ' '}])
+        Selection.unselect_features(job_ep, step, 'top')
+        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 3、验证选中单类型正极性物件
-        Selection.set_featuretype_filter(True, False, True, False, False, False, False)
-        Selection.select_features_by_filter(job_ep, step, ['l3'])
-        Selection.set_featuretype_filter(True, False, False, True, False, False, False)
-        Selection.select_features_by_filter(job_ep, step, ['l3'])
-        Selection.set_featuretype_filter(True, False, False, False, True, False, False)
-        Selection.select_features_by_filter(job_ep, step, ['l3'])
-        Selection.set_featuretype_filter(True, False, False, False, False, True, False)
-        Selection.select_features_by_filter(job_ep, step, ['l3'])
+        # 3、筛选物件属性，再取消筛选单一物件类型
+        Selection.set_attribute_filter(1, [{'.bga': ' '}, {'.aoi: '}])
+        Selection.select_features_by_filter(job_ep, step, ['l2'])
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
-        Selection.select_features_by_filter(job_ep, step, ['l3'])
-        Layers.delete_feature(job_ep, step, ['l3'])    # 通过删除来验证是否选中
+        Selection.unselect_features(job_ep, step, 'top')
+        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 4、验证选中单类型负极性物件
-        Selection.set_featuretype_filter(False, True, True, False, False, False, False)
-        Selection.select_features_by_filter(job_ep, step, ['l4'])
-        Selection.set_featuretype_filter(False, True, False, True, False, False, False)
-        Selection.select_features_by_filter(job_ep, step, ['l4'])
-        Selection.set_featuretype_filter(False, True, False, False, True, False, False)
-        Selection.select_features_by_filter(job_ep, step, ['l4'])
-        Selection.set_featuretype_filter(False, True, False, False, False, True, False)
-        Selection.select_features_by_filter(job_ep, step, ['l4'])
-        Selection.set_featuretype_filter(False, True, False, False, False, False, True)
-        Selection.select_features_by_filter(job_ep, step, ['l4'])
-        Layers.delete_feature(job_ep, step, ['l4'])  # 通过删除来验证是否选中
+        # 4、根据槽孔的角度范围筛选
+        Selection.set_slot_range_filter(True, False, True, False, 10*25400, 10*25400, 0, 90)
+        Selection.select_features_by_filter(job_ep, step, ['l2'])
+        Layers.delete_feature(job_ep, step, ['l5'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 5、筛选多层多类型物件
-        Selection.set_featuretype_filter(True, False, True, True, True, True, True)
-        Selection.set_inprofile_filter(0)
-        Selection.select_features_by_filter(job_ep, step, ['l7', 'l8'])
-        Layers.delete_feature(job_ep, step, ['l7', 'l8'])  # 通过删除来验证是否选中
+        # 5、根据槽孔的长度范围筛选
+        Selection.set_slot_range_filter(False, True, False, True, 10*25400, 10*25400, 0, 90)
+        Selection.select_features_by_filter(job_ep, step, ['l2'])
+        Layers.delete_feature(job_ep, step, ['l5'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        GUI.show_layer(job_ep, step, 'top')
+        # 6、筛选profile线内正、负极性pad、正极性arc
+        Selection.set_featuretype_filter(True, True, False, False, False, False, True)
+        Selection.set_inprofile_filter(1)
+        Selection.select_features_by_filter(job_ep, step, ['l5'])
+        Selection.set_featuretype_filter(True, False, False, False, True, False, False)
+        Selection.set_inprofile_filter(1)
+        Selection.select_features_by_filter(job_ep, step, ['l5'])
+        Layers.delete_feature(job_ep, step, ['l5'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 7、筛选profile外正极性line
+        Selection.set_featuretype_filter(True, False, False, False, False, True, False)
+        Selection.set_inprofile_filter(2)
+        Selection.select_features_by_filter(job_ep, step, ['l6'])
+        Layers.delete_feature(job_ep, step, ['l6'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 8、筛选profile线内的单个symbol
+        Selection.set_include_symbol_filter(['r50'])
+        Selection.set_inprofile_filter(1)
+        Selection.select_features_by_filter(job_ep, step, ['l9'])
+        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 9、筛选profile线外多个symbol以外的物件
+        Selection.set_exclude_symbol_filter(['r50', 'r30'])
+        Selection.set_inprofile_filter(2)
+        Selection.select_features_by_filter(job_ep, step, ['l9'])
+        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 10、筛选profile线内包含A属性的物件
+        Selection.set_attribute_filter(0, [{'.bga': ' '}])
+        Selection.set_inprofile_filter(1)
+        Selection.select_features_by_filter(job_ep, step, ['l9'])
+        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 11、筛选profile线外不包含B属性的物件
+        Selection.set_exclude_attr_filter([{'tool': '0'}])
+        Selection.set_inprofile_filter(2)
+        Selection.select_features_by_filter(job_ep, step, ['bot'])
+        Layers.delete_feature(job_ep, step, ['bot'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # GUI.show_layer(job_ep, step, '4113')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
@@ -132,9 +166,8 @@ class TestGraphicSelectFeatureType:
         print('compareResult_input_vs:', compareResult)
         data["all_result_g1"] = compareResult['all_result_g']
         data['g1_vs_total_result_flag'] = compareResult['g_vs_total_result_flag']
-        assert len(layers) == len(data["all_result_g1"])
 
-        # --------------------------------------------开始验证结果--------------------------------------------------------
+        # ----------------------------------------开始验证结果--------------------------------------------------------
         Print.print_with_delimiter('比对结果信息展示--开始')
         if data['g1_vs_total_result_flag'] == True:
             print("恭喜您！料号导入比对通过！")

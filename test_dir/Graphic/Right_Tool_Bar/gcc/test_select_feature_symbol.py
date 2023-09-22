@@ -100,40 +100,26 @@ class TestGraphicSelectFeatureSymbol:
         Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 9、筛选profile线内的单个symbol
-        Selection.set_include_symbol_filter(['r50'])
-        Selection.set_inprofile_filter(1)
-        Selection.select_features_by_filter(job_ep, step, ['l9'])
-        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
-        Selection.reset_select_filter()
-
-        # 10、筛选profile线外多个symbol以外的物件
-        Selection.set_exclude_symbol_filter(['r50', 'r30'])
-        Selection.set_inprofile_filter(2)
-        Selection.select_features_by_filter(job_ep, step, ['l9'])
-        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
-        Selection.reset_select_filter()
-
-        # 11、筛选单个symbol范围之内的物件（圆形）
+        # 9、筛选单个symbol范围之内的物件（圆形）
         Selection.set_symbol_range_filter([{'symbol_type': 'r', 'min_value': '3000', 'max_value': '200'}])
         Selection.select_features_by_filter(job_ep, step, ['l9'])
         Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 12、筛选多个symbol范围之内的物件（圆形、方行）
+        # 10、筛选多个symbol范围之内的物件（圆形、方行）
         Selection.set_symbol_range_filter([{'symbol_type': 'r', 'min_value': '3000', 'max_value': '200'},
                                            {'symbol_type': 's', 'min_value': '3000', 'max_value': '200'}])
         Selection.select_features_by_filter(job_ep, step, ['l9'])
         Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 13、筛选单个symbol范围之外的物件（方形）
+        # 11、筛选单个symbol范围之外的物件（方形）
         Selection.set_exclude_symbol_range_filter([{'symbol_type': 's', 'min_value': '3000', 'max_value': '200'}])
         Selection.select_features_by_filter(job_ep, step, ['l9'])
         Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 14、筛选多个symbol范围之外的物件（圆形、方行）
+        # 12、筛选多个symbol范围之外的物件（圆形、方行）
         Selection.set_exclude_symbol_range_filter([{'symbol_type': 'r', 'min_value': '3000', 'max_value': '200'},
                                            {'symbol_type': 's', 'min_value': '3000', 'max_value': '200'}])
         Selection.select_features_by_filter(job_ep, step, ['l9'])
