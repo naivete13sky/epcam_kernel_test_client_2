@@ -9,14 +9,14 @@ from epkernel.Output import save_job
 from config_g.g_cc_method import G
 from epkernel.Edition import Matrix
 
-# @pytest.mark.Attributes
+
 class TestGraphicClipAreaUseManual:
-    # @pytest.mark.Attributes
+    # @pytest.mark.Clip_area_use_manual
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Clip_area_use_manual'))
     def testClip_area_use_manual(self, job_id, g, prepare_test_job_clean_g):
 
         '''
-        本用例测试删除指定框选区域的feature--Clip_area_use_manual,ID:12226
+        本用例测试删除指定框选区域的feature--Clip_area_use_manual,ID:31201
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -292,13 +292,6 @@ class TestGraphicClipAreaUseManual:
                                      {'ix': add_left_x1, 'iy': add_left_y1}], -254000000, True, True, True, True, True, True,
                                     True)
         # GUI.show_layer(job_ep, step, 'l10-5')
-
-        #
-        # # 20.验证Clip area_use_reference功能,指定参考层的物件删除工作层，参数默认
-        # Layers.clip_area_use_reference(job_ep, step, ['l1'], 'l2', 0,
-        #                                False, True, True, True, True, True)
-        # GUI.show_layer(job_ep, step, 'l10-5')
-
 
 
         save_job(job_ep, temp_ep_path)
