@@ -4,6 +4,7 @@ from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
 from epkernel import Input, GUI, BASE
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
+from epkernel import Application
 
 class TestGraphicEditFeatureIndex:
     # @pytest.mark.Feature index
@@ -161,21 +162,34 @@ class TestGraphicEditFeatureIndex:
 
         # GUI.show_layer(job_ep, step, 'l6')
 
-
-
-
-
-
-
-        #3.增加surface
+         #3.增加正极性surface
         points_location = []
-        points_location.append([50 * 1000000,25 * 1000000])
-        points_location.append([55 * 1000000, 25 * 1000000])
-        points_location.append([55 * 1000000, 36 * 1000000])
-        points_location.append([50 * 1000000, 36 * 1000000])
-        points_location.append([50 * 1000000,25 * 1000000])
+        points_location.append([66 * 1000000, 1* 1000000])
+        points_location.append([66 * 1000000, 6 * 1000000])
+        points_location.append([71 * 1000000, 6 * 1000000])
+        points_location.append([71 * 1000000, 1 * 1000000])
+        points_location.append([66 * 1000000, 1* 1000000])
         Layers.add_surface(job_ep, step, ['l2'], True,
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)
+
+        # 3.增加负极性surface
+        points_location = []
+        points_location.append([68 * 1000000, 3 * 1000000])
+        points_location.append([68 * 1000000, 4 * 1000000])
+        points_location.append([69 * 1000000, 4 * 1000000])
+        points_location.append([69 * 1000000, 3 * 1000000])
+        points_location.append([68 * 1000000, 3 * 1000000])
+        Layers.add_surface(job_ep, step, ['l2'], False,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)
+
+        #添加正极性圆形surface
+        Application.add_round_surface_jwApp(job_ep, step, ['l2'], True, {'.bga': '', '.cm': ''},68 * 1000000, 8 * 1000000, 50 * 25400)
+        #GUI.show_layer(job_ep, step, 'l2')
+        #添加负极性圆形surface
+        Application.add_round_surface_jwApp(job_ep, step, ['l2'], False, {'.bga': '', '.cm': ''}, 67 * 1000000,
+                                            5 * 1000000, 30 * 25400)
+        #GUI.show_layer(job_ep, step, 'l2')
+
         #4增加pad
         Layers.add_pad(job_ep, step, ['l2'], "s100", 25400000, 25400000, True,
                        9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)
