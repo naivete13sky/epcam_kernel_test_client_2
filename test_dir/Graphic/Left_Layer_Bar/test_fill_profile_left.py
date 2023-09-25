@@ -12,7 +12,7 @@ from epkernel.Edition import Matrix
 # @pytest.mark.Attributes
 class TestGraphicFillProfile:
     # @pytest.mark.Attributes
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_Profile'))
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_Profile_left'))
     def testfill_profile(self, job_id, g, prepare_test_job_clean_g):
 
         '''
