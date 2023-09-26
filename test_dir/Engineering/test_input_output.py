@@ -536,20 +536,21 @@ class TestOutputGerber274XParas():
         # 导入要比图的资料
         g.import_odb_folder(job_g_remote_path)
 
-        layerInfo = []
-        for each in all_layers_list_job:
-            each_dict = {}
-            each_dict["layer"] = each.lower()
-            each_dict['layer_type'] = 'drill' if each in drill_layers else ''
-            layerInfo.append(each_dict)
+
 
         main_job_type = None
-        print("layerInfo:", layerInfo)
         g_vs_step_list = ['set', 'panel', 'pnl']  # 设置用原稿比对的step
         for job_g2 in dict_job_step:
             if dict_job_step[job_g2] in g_vs_step_list:
                 main_job_type = 'orig'#主料号类型是原稿
                 job1,job2 = job,job_g2
+                layerInfo = []
+                for each in all_layers_list_job:
+                    each_dict = {}
+                    each_dict["layer"] = each.lower()
+                    each_dict['layer_type'] = 'drill' if each in drill_layers else ''
+                    layerInfo.append(each_dict)
+                print("layerInfo_orig:", layerInfo)
             else:
                 main_job_type = 'ep_output' #主料号类型是EPCAM输出的gerber又用G导入的
                 job1, job2 = job_g2,job
@@ -567,7 +568,7 @@ class TestOutputGerber274XParas():
                     each_dict["layer"] = each.lower()
                     each_dict['layer_type'] = 'drill' if each in drill_layers else ''
                     layerInfo.append(each_dict)
-
+                print("layerInfo_ep_output:", layerInfo)
 
 
 
