@@ -235,9 +235,11 @@ class MyOutput(object):
 
         # 建立output_gerber文件夹，里面用来放epcam输出的gerber。
         temp_out_put_gerber_path = os.path.join(self.temp_path, 'output_gerber')
-        if os.path.exists(temp_out_put_gerber_path):
-            shutil.rmtree(temp_out_put_gerber_path)
-        os.mkdir(temp_out_put_gerber_path)
+        # if os.path.exists(temp_out_put_gerber_path):
+        #     shutil.rmtree(temp_out_put_gerber_path)
+        # os.mkdir(temp_out_put_gerber_path)
+        os.mkdir(temp_out_put_gerber_path) if not os.path.exists(temp_out_put_gerber_path) else None
+
 
 
         para = self.para
@@ -245,9 +247,13 @@ class MyOutput(object):
         layers = Information.get_layers(self.job)
         file_path = os.path.join(temp_out_put_gerber_path, self.job)
         file_path_file = Path(file_path)
-        if file_path_file.exists():
-            shutil.rmtree(file_path_file)  # 已存在gerber文件夹删除掉，再新建
-        os.mkdir(file_path)
+        # if file_path_file.exists():
+        #     shutil.rmtree(file_path_file)  # 已存在gerber文件夹删除掉，再新建
+        # os.mkdir(file_path)
+        os.mkdir(file_path) if not file_path_file.exists() else None
+
+
+
 
         # step = 'orig'
         step = self.step
@@ -337,7 +343,7 @@ class MyOutput(object):
                     hh.write(json.dumps(ret_json, sort_keys=True, indent=4, separators=(',', ': ')))
 
         # GUI.show_layer(job_ep, "orig", "layer")
-        Job.close_job(self.job)
+        # Job.close_job(self.job)
 
         Print.print_with_delimiter('输出gerber完成')
 

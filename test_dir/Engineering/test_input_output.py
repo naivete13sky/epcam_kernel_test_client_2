@@ -1,4 +1,6 @@
 import pytest, os, time, json, shutil, sys
+from epkernel.Edition import Job
+
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
 from config_ep.epcam_cc_method import MyInput, MyOutput
@@ -409,4 +411,188 @@ class TestOutputGerber274XParas():
             else:
                 print('无此step!')
 
+        Job.close_job(job)
 
+    # @pytest.mark.parametrize('step_name',['orig','panel'])
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
+    def test_odb_output_gerber274x(self, job_id, g, prepare_test_job_clean_g, para_gerber_output):
+        '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
+        print("test_odb_output_gerber274x")
+        print('分割线'.center(192, "-"))
+        print(para_gerber_output)
+
+        g = RunConfig.driver_g  # 拿到G软件
+        data = {}  # 存放比对结果信息
+
+        # 取到临时目录，如果存在旧目录，则删除
+        temp_path = RunConfig.temp_path_base
+        temp_compressed_path = os.path.join(temp_path, 'compressed')
+        if os.path.exists(temp_path):
+            if RunConfig.gSetupType == 'local':
+                # os.remove(self.tempGerberPath)#此方法容易因权限问题报错
+                shutil.rmtree(temp_path)
+            if RunConfig.gSetupType == 'vmware':
+                # 使用PsExec通过命令删除远程机器的文件
+                from cc.cc_method import RemoteCMD
+                myRemoteCMD = RemoteCMD(psexec_path='cc', computer='192.168.1.3',
+                                        username='administrator',
+                                        password='cc')
+                command_operator = 'rd /s /q'
+                command_folder_path = os.path.join(RunConfig.temp_path_g)
+                command = r'cmd /c {} "{}"'.format(command_operator, command_folder_path)
+                myRemoteCMD.run_cmd(command)
+                print("remote delete finish")
+
+        # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
+        job = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
+
+        # 建立g导出路径
+        temp_out_put_gerber_g_input_path = os.path.join(temp_path, 'g2')
+        if os.path.exists(temp_out_put_gerber_g_input_path):
+            shutil.rmtree(temp_out_put_gerber_g_input_path)
+        os.mkdir(temp_out_put_gerber_g_input_path)
+
+        vs_job = {}  # 定义一个空字典，存放料号和step
+
+        # 用悦谱CAM打开料号
+        Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
+        all_layers_list_job = Information.get_layers(job)
+        all_step_list_job = Information.get_steps(job)
+        user_step_list = ['org', 'orig', 'set', 'panel', 'pnl']# 设置需要测试输入/输出的step
+
+        for user_step in user_step_list:
+            for job_step in all_step_list_job:
+                if user_step in job_step:
+                    print('all_layer_list_job:', all_layers_list_job)
+                    # 区分层别类型
+                    drill_layers = list(
+                        map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['drill'])))
+                    rout_layers = list(
+                        map(lambda x: x['name'], Information.get_layer_info(job, context='board', type=['rout'])))
+
+                    print('drill_layers:', drill_layers)
+                    print('rout_layers:', rout_layers)
+                    common_layers = []
+                    for each in all_layers_list_job:
+                        if each not in drill_layers:
+                            common_layers.append(each)
+                    print('common_layers:', common_layers)
+
+                    # 导出
+                    customer_para = {}
+                    customer_para['numberFormatL'] = para_gerber_output.numberFormatL
+                    customer_para['numberFormatR'] = para_gerber_output.numberFormatR
+
+                    MyOutput(temp_path=temp_path, job=job, job_id=job_id,
+                                    step=job_step, layer_info_from_obj='job_tgz_file',
+                                    customer_para=customer_para)
+
+                    # ----------------------------------------开始用G软件input--------------------------------------------------------
+                    ep_out_put_gerber_folder = os.path.join(temp_path, r'output_gerber', job, job_step)
+                    job_g2 = os.listdir(temp_compressed_path)[
+                                 0].lower() + '_' + job_step + '_g2'  # epcam输出gerber，再用g软件input。
+                    # step = 'orig'
+                    step = job_step
+                    file_path = os.path.join(temp_path, ep_out_put_gerber_folder)
+                    gerberList = getFlist(file_path)
+                    print(gerberList)
+                    g_temp_path = RunConfig.temp_path_g
+                    print("g_temp_path", g_temp_path)
+
+                    # out_path = temp_out_put_gerber_g_input_path
+
+                    gerberList_path = []
+                    for each in gerberList:
+                        each_dict = {}
+                        each_dict['path'] = os.path.join(g_temp_path, r'output_gerber', job, step, each)
+                        if each in drill_layers:
+                            each_dict['file_type'] = 'excellon'
+                            each_dict_para = {}
+                            each_dict_para['units'] = 'inch'
+                            each_dict_para['zeroes'] = 'none'
+                            each_dict_para['nf1'] = "2"
+                            each_dict_para['nf2'] = "6"
+                            each_dict_para['tool_units'] = 'mm'
+                            each_dict['para'] = each_dict_para
+                            gerberList_path.append(each_dict)
+                        else:  # 不是孔就当作是gerber处理
+                            each_dict['file_type'] = 'gerber'
+                            gerberList_path.append(each_dict)
+                    g.input_init(job=job_g2, step=step, gerberList_path=gerberList_path,
+                                 jsonPath=r'my_config.json')
+
+                    # 输出tgz到指定目录
+                    g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
+
+                    vs_job[job_g2] = job_step
+                else:
+                    print('无此step!')
+
+        # ----------------------------------------开始用G软件比图，g与g2---------------------------------------------------
+        # 先导入原稿
+        # job_g_remote_path = r'\\vmware-host\Shared Folders\share/{}/compressed/{}'.format(
+        #     'temp' + "_" + str(job_id) + "_" + vs_time_g, job)
+        job_g_remote_path = os.path.join(RunConfig.temp_path_g, 'compressed', job)
+        # 导入要比图的资料
+        g.import_odb_folder(job_g_remote_path)
+
+        layerInfo = []
+        for each in all_layers_list_job:
+            each_dict = {}
+            each_dict["layer"] = each.lower()
+            each_dict['layer_type'] = 'drill' if each in drill_layers else ''
+            layerInfo.append(each_dict)
+
+        print("layerInfo:", layerInfo)
+        for job_g2 in vs_job:
+            job1 = job
+            job2 = job_g2
+            g_vs_step_list = ['set', 'panel', 'pnl']# 设置用原稿比对的step
+            for step in set(vs_job.values()):
+                if step in g_vs_step_list:
+                    job1 = job
+                    job2 = job_g2
+                    print(f"{step}是拼版,job1是:{job1},job2是:{job2}")
+            step1, step2 = vs_job[job_g2], vs_job[job_g2]
+            # 打开要比图的资料
+            g.layer_compare_g_open_2_job(job1=job1, step1=step1, job2=job2, step2=step2)
+
+            # 校正孔用
+            temp_path_local_info1 = os.path.join(temp_path, 'info1')
+            if not os.path.exists(temp_path_local_info1):
+                os.mkdir(temp_path_local_info1)
+            temp_path_local_info2 = os.path.join(temp_path, 'info2')
+            if not os.path.exists(temp_path_local_info2):
+                os.mkdir(temp_path_local_info2)
+
+            # 以G转图为主来比对
+            # G打开要比图的2个料号g和g2。g就是原始，g2是悦谱输出的gerber又input得到的
+            compareResult = g.layer_compare(temp_path=temp_path, temp_path_g=RunConfig.temp_path_g,
+                                                job1=job1, step1=step1,
+                                                job2=job2, step2=step2,
+                                                layerInfo=layerInfo,
+                                                adjust_position=True, jsonPath=r'my_config.json')
+            print('compareResult_input_vs:', compareResult)
+            data["all_result_g"] = compareResult['all_result_g']
+            data['g_vs_total_result_flag'] = compareResult['g_vs_total_result_flag']
+            assert len(all_layers_list_job) == len(compareResult['all_result_g'])
+
+            # ----------------------------------------开始验证结果--------------------------------------------------------
+            print('比对结果信息展示--开始'.center(192, '*'))
+            if data['g_vs_total_result_flag'] == True:
+                print("恭喜您！料号导入比对通过！")
+            if data['g_vs_total_result_flag'] == False:
+                print("Sorry！料号导入比对未通过，请人工检查！")
+            print('分割线'.center(192, '-'))
+            print('G转图的层：', data["all_result_g"])
+
+            print('比对结果信息展示--结束'.center(192, '*'))
+
+            print("断言--开始".center(192, '*'))
+            assert data['g_vs_total_result_flag'] == True
+            for key in data['all_result_g']:
+                assert data['all_result_g'][key] == "正常"
+
+            print("断言--结束".center(192, '*'))
+
+        Job.close_job(job)
