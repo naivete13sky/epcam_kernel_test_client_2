@@ -458,7 +458,7 @@ class TestOutputGerber274XParas():
         Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
         all_layers_list_job = Information.get_layers(job)
         all_step_list_job = Information.get_steps(job)
-        user_step_list = ['org', 'orig', 'set', 'panel', 'pnl']# 设置需要测试输入/输出的step
+        user_step_list = ['org', 'orig', 'edit', 'set', 'panel', 'pnl']# 设置需要测试输入/输出的step
 
         for user_step in user_step_list:
             for job_step in all_step_list_job:
