@@ -562,6 +562,46 @@ class G():
                 # return
         return "input reset finish!"
 
+
+    def get_layer_list_by_step(self,job_name,step_name,info_path_g,info_path):
+        pass
+        cmd_list = [
+            'COM info, out_file={}/{}.txt,args=  -t step -e {}/{} -m script -d LAYERS_LIST'.format(
+                info_path_g, step_name, job_name, step_name),
+        ]
+
+        for cmd in cmd_list:
+            print(cmd)
+            ret = self.exec_cmd(cmd)
+            print(ret)
+            if ret != 0:
+                print('inner error')
+                # return
+
+        #返回结果
+        # 打开并读取文本文件
+        with open(os.path.join(info_path,step_name+'.txt'), 'r') as file:
+            content = file.read()
+        # print(content)
+        # 在 with 代码块退出后，文件会自动关闭
+        # 使用正则表达式提取字符串
+        import re
+        pattern = r"'(.*?)'"
+        matches = re.findall(pattern, content)
+
+        # 创建列表
+        layers_list = list(matches)
+        return layers_list
+
+
+
+
+
+
+
+
+
+
     # ************************************本类以下函数作废****************************************
 
 

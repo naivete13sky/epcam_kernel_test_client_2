@@ -452,7 +452,7 @@ class TestOutputGerber274XParas():
             shutil.rmtree(temp_out_put_gerber_g_input_path)
         os.mkdir(temp_out_put_gerber_g_input_path)
 
-        vs_job = {}  # 定义一个空字典，存放料号和step
+        dict_job_step = {}  # 定义一个空字典，存放料号名和step名,key是料号名，value是step名。
 
         # 用悦谱CAM打开料号
         Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
@@ -524,7 +524,7 @@ class TestOutputGerber274XParas():
                     # 输出tgz到指定目录
                     g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
 
-                    vs_job[job_g2] = job_step
+                    dict_job_step[job_g2] = job_step
                 else:
                     print('无此step!')
 
@@ -543,17 +543,35 @@ class TestOutputGerber274XParas():
             each_dict['layer_type'] = 'drill' if each in drill_layers else ''
             layerInfo.append(each_dict)
 
+        main_job_type = None
         print("layerInfo:", layerInfo)
-        for job_g2 in vs_job:
-            job1 = job
-            job2 = job_g2
-            g_vs_step_list = ['set', 'panel', 'pnl']# 设置用原稿比对的step
-            for step in set(vs_job.values()):
-                if step in g_vs_step_list:
-                    job1 = job
-                    job2 = job_g2
-                    print(f"{step}是拼版,job1是:{job1},job2是:{job2}")
-            step1, step2 = vs_job[job_g2], vs_job[job_g2]
+        g_vs_step_list = ['set', 'panel', 'pnl']  # 设置用原稿比对的step
+        for job_g2 in dict_job_step:
+            if dict_job_step[job_g2] in g_vs_step_list:
+                main_job_type = 'orig'#主料号类型是原稿
+                job1,job2 = job,job_g2
+            else:
+                main_job_type = 'ep_output' #主料号类型是EPCAM输出的gerber又用G导入的
+                job1, job2 = job_g2,job
+                # 根据输出的gerber并导入G的tgz来判断有哪些层
+                layerInfo = []
+                info_layer_path = os.path.join(temp_path,'info_layer',job1)
+                if not os.path.exists(info_layer_path):
+                    # os.mkdir(info_layer_path)
+                    os.makedirs(info_layer_path, exist_ok=True)# 创建多级目录，如果不存在
+                job1_layer_list = g.get_layer_list_by_step(job1,dict_job_step[job1],
+                                                           os.path.join(RunConfig.temp_path_g,'info_layer',job1),
+                                                           os.path.join(RunConfig.temp_path_base,'info_layer',job1))
+                for each in job1_layer_list:
+                    each_dict = {}
+                    each_dict["layer"] = each.lower()
+                    each_dict['layer_type'] = 'drill' if each in drill_layers else ''
+                    layerInfo.append(each_dict)
+
+
+
+
+            step1, step2 = dict_job_step[job_g2], dict_job_step[job_g2]
             # 打开要比图的资料
             g.layer_compare_g_open_2_job(job1=job1, step1=step1, job2=job2, step2=step2)
 
@@ -575,7 +593,11 @@ class TestOutputGerber274XParas():
             print('compareResult_input_vs:', compareResult)
             data["all_result_g"] = compareResult['all_result_g']
             data['g_vs_total_result_flag'] = compareResult['g_vs_total_result_flag']
-            assert len(all_layers_list_job) == len(compareResult['all_result_g'])
+
+            if main_job_type == 'orig':  #主料号是原稿
+                assert len(all_layers_list_job) == len(compareResult['all_result_g'])
+            if main_job_type == 'ep_output':#这种情况下说明：主料号是EPCAM输出的gerber后又导入G的料号
+                assert len(job1_layer_list) == len(compareResult['all_result_g'])
 
             # ----------------------------------------开始验证结果--------------------------------------------------------
             print('比对结果信息展示--开始'.center(192, '*'))

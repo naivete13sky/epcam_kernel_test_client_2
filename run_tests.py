@@ -39,6 +39,7 @@ def run(m):
         html_report = os.path.join(RunConfig.NEW_REPORT, "report.html")
         xml_report = os.path.join(RunConfig.NEW_REPORT, "junit-xml.xml")
         pytest.main(["-s", "-v", RunConfig.cases_path,
+                     # "-k",'test_odb_output_gerber274x',
                      "--html=" + html_report,
                      "--junit-xml=" + xml_report,
                      "--self-contained-html",
