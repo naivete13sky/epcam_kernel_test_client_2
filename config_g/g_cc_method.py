@@ -524,8 +524,15 @@ class G():
             layer = each['layer'].lower()
             layer_type = each['layer_type']
             map_layer = layer + '-com'
+            if 'map_layer' in kwargs:
+                if kwargs['map_layer'] == 'with_step':
+                    map_layer = layer + '-' + step1 + 'com'
+            layer2_ext='_copy'
+            if 'layer2_ext' in kwargs:
+                layer2_ext = kwargs['layer2_ext']
+
             result = self.layer_compare_one_layer(job1=job1, step1=step1, layer1=layer, job2=job2,
-                                               step2=step2, layer2=layer, layer2_ext='_copy', tol=tol,
+                                               step2=step2, layer2=layer, layer2_ext=layer2_ext, tol=tol,
                                                map_layer=map_layer, map_layer_res=map_layer_res,
                                                result_path_remote=temp_path_remote_g_compare_result,
                                                result_path_local=temp_path_local_g_compare_result,

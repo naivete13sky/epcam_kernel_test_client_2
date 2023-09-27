@@ -599,7 +599,9 @@ class TestOutputGerber274XParas():
                                                 job1=job1, step1=step1,
                                                 job2=job2, step2=step2,
                                                 layerInfo=layerInfo,
-                                                adjust_position=True, jsonPath=r'my_config.json')
+                                                adjust_position=True, jsonPath=r'my_config.json',
+                                            map_layer = 'with_step',
+                                            layer2_ext= '_'+step1+'_'+'copy')
             print('compareResult_input_vs:', compareResult)
             data["all_result_g"] = compareResult['all_result_g']
             data['g_vs_total_result_flag'] = compareResult['g_vs_total_result_flag']
