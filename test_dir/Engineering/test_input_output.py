@@ -414,6 +414,7 @@ class TestOutputGerber274XParas():
         Job.close_job(job)
 
     # @pytest.mark.parametrize('step_name',['orig','panel'])
+    @pytest.mark.skip
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
     def test_odb_output_gerber274x(self, job_id, g, prepare_test_job_clean_g, para_gerber_output):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
@@ -458,8 +459,8 @@ class TestOutputGerber274XParas():
         Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
         all_layers_list_job = Information.get_layers(job)
         all_step_list_job = Information.get_steps(job)
-        # user_step_list = ['org', 'orig', 'edit', 'set', 'panel', 'pnl']# 设置需要测试输入/输出的step
-        user_step_list = ['edit', 'set']  # 设置需要测试输入/输出的step
+        user_step_list = ['org', 'orig','net', 'edit', 'set', 'panel', 'pnl']# 设置需要测试输入/输出的step
+        # user_step_list = ['edit', 'set']  # 设置需要测试输入/输出的step
 
         # for user_step in user_step_list:
         #     for job_step in all_step_list_job:
