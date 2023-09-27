@@ -458,11 +458,17 @@ class TestOutputGerber274XParas():
         Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
         all_layers_list_job = Information.get_layers(job)
         all_step_list_job = Information.get_steps(job)
-        user_step_list = ['org', 'orig', 'edit', 'set', 'panel', 'pnl']# 设置需要测试输入/输出的step
+        # user_step_list = ['org', 'orig', 'edit', 'set', 'panel', 'pnl']# 设置需要测试输入/输出的step
+        user_step_list = ['edit', 'set']  # 设置需要测试输入/输出的step
 
-        for user_step in user_step_list:
-            for job_step in all_step_list_job:
+        # for user_step in user_step_list:
+        #     for job_step in all_step_list_job:
+        #         if user_step in job_step:
+        for job_step in all_step_list_job:
+            find_flag = False
+            for user_step in user_step_list:
                 if user_step in job_step:
+                    find_flag = True
                     print('all_layer_list_job:', all_layers_list_job)
                     # 区分层别类型
                     drill_layers = list(
@@ -525,8 +531,10 @@ class TestOutputGerber274XParas():
                     g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
 
                     dict_job_step[job_g2] = job_step
-                else:
-                    print('无此step!')
+
+                    break
+            if find_flag == False:
+                print(f"step：{job_step}未参与测试！")
 
         # ----------------------------------------开始用G软件比图，g与g2---------------------------------------------------
         # 先导入原稿
@@ -541,7 +549,8 @@ class TestOutputGerber274XParas():
         main_job_type = None
         g_vs_step_list = ['set', 'panel', 'pnl']  # 设置用原稿比对的step
         for job_g2 in dict_job_step:
-            if dict_job_step[job_g2] in g_vs_step_list:
+            result = any(element in dict_job_step[job_g2] for element in g_vs_step_list)
+            if result:
                 main_job_type = 'orig'#主料号类型是原稿
                 job1,job2 = job,job_g2
                 layerInfo = []
