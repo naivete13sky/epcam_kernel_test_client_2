@@ -221,16 +221,32 @@ class TestGraphicEditFeatureIndex:
                 num_x3 = num_x3 + 3
                 num_y5 = num_y5 - 8
 
+        #添加一个长方形pad
+
         Layers.add_pad(job_ep, step, ['l2'], "s100", 25400000, 25400000, True,
                        9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)
-        GUI.show_layer(job_ep, step, 'l5')
+        #GUI.show_layer(job_ep, step, 'l5')
 
 
-
-        #5增加弧
+        #顺时针填加一个正极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l2'],'r7.874', 40*1000000, 25*1000000,
         40*1000000, 31*1000000, 40*1000000, 28*1000000, True, True, attributes)
+
+        #顺时针填加一个负极性弧
+        attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
+        Layers.add_arc(job_ep, step, ['l2'], 'r10', 50 * 1000000, 35 * 1000000,
+                       50 * 1000000, 41 * 1000000, 50 * 1000000, 38 * 1000000, True, False, attributes)
+
+        #逆时针填加一个正极性弧
+        attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
+        Layers.add_arc(job_ep, step, ['l2'], 'r10', 50 * 1000000, 35 * 1000000,
+                       20 * 1000000, 21 * 1000000, 30 * 1000000, 18 * 1000000, False, True, attributes)
+        #逆时针填加一个负极性弧
+        attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
+        Layers.add_arc(job_ep, step, ['l2'], 'r10', 50 * 1000000, 35 * 1000000,
+                       20 * 1000000, 21 * 1000000, 30 * 1000000, 18 * 1000000, False, False, attributes)
+        GUI.show_layer(job_ep, step, 'l2')
 
 
         save_job(job_ep, temp_ep_path)
