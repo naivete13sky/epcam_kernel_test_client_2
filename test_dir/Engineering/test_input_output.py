@@ -459,6 +459,39 @@ class TestOutputGerber274XParas():
         Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
         all_layers_list_job = Information.get_layers(job)
         all_step_list_job = Information.get_steps(job)
+
+        dict_step_layer_info = {}
+        drill_layer_list = Information.get_drill_layers(job)
+        for each_step in all_step_list_job:
+            pass
+            dict_step = {}
+
+            for each_layer in all_layers_list_job:
+                pass
+                dict_layer = {}
+                is_drill = False
+                if each_layer in drill_layer_list:
+                    pass
+                    is_drill = True
+                dict_layer['is_drill'] = is_drill
+
+                has_feature = False
+                if Information.get_layer_feature_count(job,each_step,each_layer) > 0:
+                    has_feature = True
+                dict_layer['has_feature'] = has_feature
+                dict_step[each_layer] = dict_layer
+            dict_step_layer_info[each_step]= dict_step
+        dict_step_out_count = {}
+        for key_step in dict_step_layer_info:
+            step_layer_count = 0
+            for key_layer  in dict_step_layer_info[key_step]:
+                if dict_step_layer_info[key_step][key_layer]['is_drill'] == True and dict_step_layer_info[key_step][key_layer]['has_feature'] == False:
+                    pass
+                    continue
+                step_layer_count = step_layer_count + 1
+            dict_step_out_count[key_step] = step_layer_count
+
+
         user_step_list = ['org', 'orig','net', 'edit', 'set', 'panel', 'pnl']# 设置需要测试输入/输出的step
         # user_step_list = ['edit', 'set']  # 设置需要测试输入/输出的step
 
@@ -627,6 +660,10 @@ class TestOutputGerber274XParas():
             assert data['g_vs_total_result_flag'] == True
             for key in data['all_result_g']:
                 assert data['all_result_g'][key] == "正常"
+
+            # 为了防止EP输出了层，但是G导入失败而漏报，此外要验证一下
+            current_step_layer_out_count = dict_step_out_count.get(step1)
+            assert current_step_layer_out_count == len(compareResult['all_result_g'])
 
             print("断言--结束".center(192, '*'))
 
