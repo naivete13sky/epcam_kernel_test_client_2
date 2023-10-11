@@ -11,15 +11,15 @@ class TestGraphicSelectFeatureAttribute:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Select_attribute'))
     def test_select_features_attribute(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试select_features_attribute功能，用例数：
-        ID:
+        本用例测试select_features_attribute功能，用例数：12
+        ID:35563
         BUG:
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
         step = 'orig'
-        layers = ['top', 'l2']
+        layers = ['spt', 'smt', 'top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'bot']
 
         # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
@@ -53,89 +53,82 @@ class TestGraphicSelectFeatureAttribute:
         Input.open_job(job_ep, temp_compressed_path)
 
         # 1、筛选包含单个属性的物件
-        Selection.set_attribute_filter(0, [{'.bga': ' '}])
+        Selection.set_attribute_filter(0, [{'.bga': ''}])
+        Selection.select_features_by_filter(job_ep, step, ['spt'])
+        Layers.delete_feature(job_ep, step, ['spt'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 2、筛选包含多个属性的物件
+        Selection.set_attribute_filter(0, [{'.bga': ''}, {'.dj_pad': ''}])
+        Selection.select_features_by_filter(job_ep, step, ['smt'])
+        Layers.delete_feature(job_ep, step, ['smt'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 3、筛选包含A或者B属性的物件
+        Selection.set_attribute_filter(1, [{'.bga': ''}, {'.dj_pad': ''}])
         Selection.select_features_by_filter(job_ep, step, ['top'])
         Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 2、筛选包含多个属性的物件
-        Selection.set_attribute_filter(0, [{'.bga': ' '}, {'.aoi: '}])
+        # 4、不用属性筛选条件（参数2）
+        Selection.set_attribute_filter(2, [{'total_features': '1'}])
         Selection.select_features_by_filter(job_ep, step, ['l2'])
         Layers.delete_feature(job_ep, step, ['l2'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 3、筛选包含A或者B属性的物件
-        Selection.set_attribute_filter(1, [{'.bga': ' '}, {'.aoi: '}])
+        # 5、筛选不包含单个属性的物件
+        Selection.set_exclude_attr_filter([{'total_features': '1'}])
         Selection.select_features_by_filter(job_ep, step, ['l3'])
         Layers.delete_feature(job_ep, step, ['l3'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 4、筛选不包含单个属性的物件（第一种方法）
-        Selection.set_attribute_filter(2, [{'.bga': ' '}])
+        # 6、筛选不包含多个属性的物件
+        Selection.set_exclude_attr_filter([{'.bga': ''}, {'.aoi': ''}])
         Selection.select_features_by_filter(job_ep, step, ['l4'])
         Layers.delete_feature(job_ep, step, ['l4'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 5、筛选不包含单个属性的物件（第二种方法）
-        Selection.set_exclude_attr_filter([{'tool': '0'}])
+        # 7、筛选包含A属性，不包含B属性的物件
+        Selection.set_attribute_filter(0, [{'.bga': ''}])
+        Selection.set_exclude_attr_filter([{'.aoi': ''}])
         Selection.select_features_by_filter(job_ep, step, ['l6'])
         Layers.delete_feature(job_ep, step, ['l6'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 6、筛选不包含多个属性的物件（第一种方法）
-        Selection.set_attribute_filter(2, [{'.bga': ' '}, {'.aoi: '}])
-        Selection.select_features_by_filter(job_ep, step, ['l5'])
-        Layers.delete_feature(job_ep, step, ['l5'])  # 通过删除来验证是否选中
-        Selection.reset_select_filter()
-
-        # 7、筛选不包含多个属性的物件（第二种方法）
-        Selection.set_exclude_attr_filter([{'tool': '0'}, {'.drill_flag': '10'}])
+        # 8、筛选单个属性范围内的物件
+        Selection.set_attr_range_filter(0, [{'attr_name': 'nominal_line', 'min_value': 2, 'max_value': 10}])
         Selection.select_features_by_filter(job_ep, step, ['l7'])
         Layers.delete_feature(job_ep, step, ['l7'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 8、筛选包含A属性，不包含B属性的物件
-        Selection.set_attribute_filter(0, [{'.bga': ' '}])
-        Selection.set_exclude_attr_filter([{'tool': '0'}])
+        # 9、筛选多个属性范围内的物件
+        Selection.set_attr_range_filter(0, [{'attr_name': 'nominal_line', 'min_value': 2, 'max_value': 10},
+                                            {'attr_name': 'total_features', 'min_value': 1, 'max_value': 3}])
         Selection.select_features_by_filter(job_ep, step, ['l8'])
         Layers.delete_feature(job_ep, step, ['l8'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 9、筛选单个属性范围内的物件
-        Selection.set_attr_range_filter(0, [{'attr_name': 'tool', 'min_value': 0, 'max_value': 10}])
-        Selection.select_features_by_filter(job_ep, step, ['5'])
-        Layers.delete_feature(job_ep, step, ['5'])  # 通过删除来验证是否选中
+        # 10、筛选A或者B属性范围内的物件
+        Selection.set_attr_range_filter(1, [{'attr_name': 'nominal_line', 'min_value': 2, 'max_value': 10},
+                                            {'attr_name': 'total_features', 'min_value': 1, 'max_value': 3}])
+        Selection.select_features_by_filter(job_ep, step, ['l9'])
+        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 10、筛选多个属性范围内的物件
-        Selection.set_attr_range_filter(0, [{'attr_name': 'tool', 'min_value': 0, 'max_value': 10},
-                                            {'attr_name': '.drill_flag', 'min_value': 1, 'max_value': 5}])
+        # 11、筛选单个属性范围之外的物件
+        Selection.set_exclude_attr_range_filter([{'attr_name': 'nominal_line', 'min_value': 2, 'max_value': 10}])
         Selection.select_features_by_filter(job_ep, step, ['bot'])
         Layers.delete_feature(job_ep, step, ['bot'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 11、筛选A或者B属性范围内的物件
-        Selection.set_attr_range_filter(1, [{'attr_name': 'tool', 'min_value': 0, 'max_value': 10},
-                                            {'attr_name': '.drill_flag', 'min_value': 1, 'max_value': 5}])
-        Selection.select_features_by_filter(job_ep, step, ['1'])
-        Layers.delete_feature(job_ep, step, ['1'])  # 通过删除来验证是否选中
+        # 12、筛选多个属性范围之外的物件
+        Selection.set_exclude_attr_range_filter([{'attr_name': 'nominal_line', 'min_value': 2, 'max_value': 10},
+                                                 {'attr_name': 'total_features', 'min_value': 1, 'max_value': 3}])
+        Selection.select_features_by_filter(job_ep, step, ['smb'])
+        Layers.delete_feature(job_ep, step, ['smb'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 12、筛选单个属性范围之外的物件
-        Selection.set_exclude_attr_range_filter([{'attr_name': 'tool', 'min_value': 0, 'max_value': 10},
-                                                 {'attr_name': '.drill_flag', 'min_value': 1, 'max_value': 5}])
-        Selection.select_features_by_filter(job_ep, step, ['2'])
-        Layers.delete_feature(job_ep, step, ['2'])  # 通过删除来验证是否选中
-        Selection.reset_select_filter()
-
-        # 13、筛选多个属性范围之外的物件
-        Selection.set_exclude_attr_range_filter([{'attr_name': 'tool', 'min_value': 0, 'max_value': 10},
-                                                 {'attr_name': '.drill_flag', 'min_value': 1, 'max_value': 5}])
-        Selection.select_features_by_filter(job_ep, step, ['bot'])
-        Layers.delete_feature(job_ep, step, ['bot'])  # 通过删除来验证是否选中
-        Selection.reset_select_filter()
-
-        GUI.show_layer(job_ep, step, 'top')
+        # GUI.show_layer(job_ep, step, 'l2')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
