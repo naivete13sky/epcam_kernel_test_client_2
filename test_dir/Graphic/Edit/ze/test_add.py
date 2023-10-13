@@ -246,7 +246,7 @@ class TestGraphicEditFeatureIndex:
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l2'], 'r10', 50 * 1000000, 35 * 1000000,
                        20 * 1000000, 21 * 1000000, 30 * 1000000, 18 * 1000000, False, False, attributes)
-        GUI.show_layer(job_ep, step, 'l2')
+        #GUI.show_layer(job_ep, step, 'l2')
 
 
         save_job(job_ep, temp_ep_path)
@@ -261,7 +261,7 @@ class TestGraphicEditFeatureIndex:
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         layerInfo = []
-        for each in ['l1','l2','l3']:
+        for each in ['l1','l2','l3','l4','l5','l6']:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''
