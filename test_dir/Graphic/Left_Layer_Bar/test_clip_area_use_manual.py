@@ -95,7 +95,7 @@ class TestGraphicClipAreaUseManual:
         Layers.clip_area_use_manual(job_ep, step, ['l3'],
                                     [{'ix': add_left_x1, 'iy': add_left_y1}, {'ix': add_left_x2, 'iy': add_left_y2},
                                      {'ix': add_left_x3, 'iy': add_left_y3}, {'ix': add_left_x4, 'iy': add_left_y4},
-                                     {'ix': add_left_x1, 'iy': add_left_y1}], 0, False, True, True, True, True, True,
+                                     {'ix': add_left_x1, 'iy': add_left_y1}], 0, False, False, True, True, True, True,
                                     True)
         # GUI.show_layer(job_ep, step, 'l3')
 
@@ -107,7 +107,7 @@ class TestGraphicClipAreaUseManual:
         Layers.clip_area_use_manual(job_ep, step, ['l4'],
                                     [{'ix': add_left_x1, 'iy': add_left_y1}, {'ix': add_left_x2, 'iy': add_left_y1},
                                      {'ix': add_left_x2, 'iy': add_left_y2}, {'ix': add_left_x1, 'iy': add_left_y2},
-                                     {'ix': add_left_x1, 'iy': add_left_y1}], 0, True, True, True, True, True, True,
+                                     {'ix': add_left_x1, 'iy': add_left_y1}], 0, True, False, True, True, True, True,
                                     True)
         # GUI.show_layer(job_ep, step, 'l4')
 
