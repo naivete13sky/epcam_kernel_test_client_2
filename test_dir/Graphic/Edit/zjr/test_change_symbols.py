@@ -277,6 +277,7 @@ class TestGraphicEditChangesymbols:
         job1, job2 = job_g, job_ep
         step1, step2 = 'orig', 'orig'
         # 导入要比图的资料,并打开
+
         job_g_remote_path = os.path.join(RunConfig.temp_path_g, r'g', job_g)
         job_ep_remote_path = os.path.join(RunConfig.temp_path_g, r'ep', job_ep)
         g.import_odb_folder(job_g_remote_path)
@@ -300,6 +301,23 @@ class TestGraphicEditChangesymbols:
         data["all_result_g"] = compareResult['all_result_g']
         data['g_vs_total_result_flag'] = compareResult['g_vs_total_result_flag']
         assert len(all_layers_list_job_g) == len(compareResult['all_result_g'])
+
+        # ----------------------------------------开始验证结果--------------------------------------------------------
+        print('比对结果信息展示--开始'.center(192, '*'))
+        if data['g_vs_total_result_flag'] == True:
+            print("恭喜您！料号导入比对通过！")
+        if data['g_vs_total_result_flag'] == False:
+            print("Sorry！料号导入比对未通过，请人工检查！")
+        print('分割线'.center(192, '-'))
+        print('G转图的层：', data["all_result_g"])
+
+        print('比对结果信息展示--结束'.center(192, '*'))
+
+        print("断言--开始".center(192, '*'))
+        assert data['g_vs_total_result_flag'] == True
+        for key in data['all_result_g']:
+            assert data['all_result_g'][key] == "正常"
+        print("断言--结束".center(192, '*'))
 
         # # 获取原始层文件信息，最全的
         #
