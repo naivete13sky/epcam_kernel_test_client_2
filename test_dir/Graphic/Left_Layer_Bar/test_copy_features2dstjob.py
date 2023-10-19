@@ -1,30 +1,28 @@
 import pytest, os, time, json, shutil, sys
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from epkernel import Input, GUI, BASE
-from epkernel.Action import Information, Selection
+from cc.cc_method import GetTestData, DMS, Print
+from epkernel import Input
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
 from epkernel.Edition import Matrix
+from epkernel import Input, GUI
+from epkernel.Action import Information
 
-
-class TestGraphicLayerCompare:
-    # @pytest.mark.Layer_Compare
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Layer_Compare'))
-    def testLayer_compare(self, job_id, g, prepare_test_job_clean_g):
-
+# @pytest.mark.Copy_features2dstjob
+class TestGraphicCopy_features2dstjob:
+    # @pytest.mark.Copy_features2dstjob
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Copy_features2dstjob'))
+    def testCopy_features2dstjob(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试料号比对功能-Graphic Compare Cross Layer，ID：36052
+        本用例测试跨料号层别复制--Copy_features2dstjob,ID:12226
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
 
-        step = 'panel'  # 定义需要执行比对的step名
-        # layers = ['l2-n-com', 'l3-n-com', 'gtl-y-com','gbl-y-com']  # 定义需要比对的层
-        # layers = ['l1']
+        step = 'net'  # 定义需要执行比对的step名
+        # layers = ['l4']  # 定义需要比对的层
+        # layers = ['l1++', 'l2', 'l4', 'l6']
         # 取到临时目录
         temp_path = RunConfig.temp_path_base
         if os.path.exists(temp_path):
@@ -42,6 +40,7 @@ class TestGraphicLayerCompare:
                 command = r'cmd /c {} "{}"'.format(command_operator, command_folder_path)
                 myRemoteCMD.run_cmd(command)
                 print("remote delete finish")
+
         temp_compressed_path = os.path.join(temp_path, 'compressed')
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
@@ -55,30 +54,25 @@ class TestGraphicLayerCompare:
 
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)  # 用悦谱CAM打开料号
-        Input.open_job("42819_compare_g", r"C:\Users\Administrator\Downloads\ep")   #悦谱cam导入指定路径下的资料
+        Input.open_job(job_g, temp_g_path)
+        # Input.open_job('760_single_layer_copy_g', r"C:\Users\Administrator\Downloads\ep\1")
 
+        # 1.指定料号整层复制到目标料号，替换，不反转极性
+        Matrix.create_layer(job_ep, 'l1++', -1)
+        Layers.copy_features2dstjob( '760_single_layer_copy_g', step, 'l1', job_ep, step, 'l1++',True, False)
+        # GUI.show_layer(job_ep, step, 'l1++')
 
+        # 2.指定料号整层复制到目标料号，追加，不反转极性
+        Layers.copy_features2dstjob('760_single_layer_copy_g', step, 'l3', job_ep, step, 'l2', False, False)
+        # GUI.show_layer(job_ep, step, 'l2')
 
-        # 1.验证compare功能,公差0.9mil，比对区域全局，不考虑SR拼版
-        Layers.layer_compare(job_ep, step, 'l2', "42819_compare_g", step, 'l2', 22860,
-                             True, False, 'l2-n-com', 5080000)
-        GUI.show_layer(job_ep, step, 'l2-n-com')
+        # 3.指定料号整层复制到目标料号，追加，反转极性
+        Layers.copy_features2dstjob('760_single_layer_copy_g', step, 'l7', job_ep, step, 'l4', False, True)
+        # GUI.show_layer(job_ep, step, 'l4')
 
-        # # 2.验证compare功能,公差0.3mil，比对区域Profile以内，不考虑SR拼版
-        # Layers.layer_compare(job_ep, step, 'l3', "42819_compare_g", step, 'l3', 7620,
-        #                      False, False, 'l3-n-com', 5080000)
-        # # GUI.show_layer(job_ep, step, 'l3')
-        #
-        # # 3.验证compare功能,公差1mil，比对区域Profile以内，考虑SR拼版
-        # Layers.layer_compare(job_ep, step, 'gtl', "42819_compare_g", step, 'gtl', 25400,
-        #                      False, True, 'gtl-y-com', 5080000)
-        # # GUI.show_layer(job_ep, step, 'gtl')
-        #
-        # # 4.验证compare功能,公差1mil，比对区域全局，考虑SR拼版
-        # Layers.layer_compare(job_ep, step, 'gbl', "42819_compare_g", step, 'gbl', 25400,
-        #                      True, True, 'gbl-y-com', 5080000)
-        # # GUI.show_layer(job_ep, step, 'gbl')
-
+        # 4.指定料号整层复制到目标料号，替换，反转极性
+        Layers.copy_features2dstjob('760_single_layer_copy_g', step, 'l5', job_ep, step, 'l6', True, True)
+        # GUI.show_layer(job_ep, step, 'l6')
 
         save_job(job_ep, temp_ep_path)
         # GUI.show_layer(job_case,step,'drl1-10')
@@ -94,9 +88,9 @@ class TestGraphicLayerCompare:
         g.import_odb_folder(job_ep_remote_path)
 
         layerInfo = []
-        # Input.open_job(job_g, temp_g_path)  # 用悦谱CAM打开料号
-        # all_layers_list_job_g = Information.get_layers(job_g)
-        for each in ['l2-n-com', 'l3-n-com', 'gtl-y-com', 'gbl-y-com']:
+        Input.open_job(job_g, temp_g_path)  # 用悦谱CAM打开料号
+        all_layers_list_job_g = Information.get_layers(job_g)
+        for each in all_layers_list_job_g:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''
@@ -123,7 +117,7 @@ class TestGraphicLayerCompare:
         print('compareResult_input_vs:', compareResult)
         data["all_result_g1"] = compareResult['all_result_g']
         data['g1_vs_total_result_flag'] = compareResult['g_vs_total_result_flag']
-        # assert len(all_layers_list_job_g) == len(compareResult['all_result_g'])
+        assert len(all_layers_list_job_g) == len(compareResult['all_result_g'])
 
         # ----------------------------------------开始验证结果--------------------------------------------------------
         Print.print_with_delimiter('比对结果信息展示--开始')
