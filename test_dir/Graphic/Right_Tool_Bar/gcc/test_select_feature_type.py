@@ -8,18 +8,18 @@ from epkernel.Output import save_job
 
 
 class TestGraphicSelectFeatureType:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('select_type'))
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Select_type'))
     def test_select_features_type(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试select_features_type功能，用例数：
-        ID:
+        本用例测试select_features_type功能，用例数：14
+        ID:36182
         BUG:
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
         step = 'orig'
-        layers = ['top', 'l2']
+        layers = ['top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8']
 
         # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
@@ -64,7 +64,7 @@ class TestGraphicSelectFeatureType:
         Layers.delete_feature(job_ep, step, ['l2'])    # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 3、验证选中单类型正极性物件
+        # 3-7、验证选中单类型正极性物件
         Selection.set_featuretype_filter(True, False, True, False, False, False, False)
         Selection.select_features_by_filter(job_ep, step, ['l3'])
         Selection.set_featuretype_filter(True, False, False, True, False, False, False)
@@ -78,7 +78,7 @@ class TestGraphicSelectFeatureType:
         Layers.delete_feature(job_ep, step, ['l3'])    # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 4、验证选中单类型负极性物件
+        # 8-12、验证选中单类型负极性物件
         Selection.set_featuretype_filter(False, True, True, False, False, False, False)
         Selection.select_features_by_filter(job_ep, step, ['l4'])
         Selection.set_featuretype_filter(False, True, False, True, False, False, False)
@@ -92,14 +92,19 @@ class TestGraphicSelectFeatureType:
         Layers.delete_feature(job_ep, step, ['l4'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 5、筛选多层多类型物件
-        Selection.set_featuretype_filter(True, False, True, True, True, True, True)
-        Selection.set_inprofile_filter(0)
+        # 13、筛选多层多类型正极性物件
+        Selection.set_featuretype_filter(True, False, False, False, True, True, True)
+        Selection.select_features_by_filter(job_ep, step, ['l5', 'l6'])
+        Layers.delete_feature(job_ep, step, ['l5', 'l6'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 14、筛选多层多类型负极性物件
+        Selection.set_featuretype_filter(False, True, True, True, False, False, False)
         Selection.select_features_by_filter(job_ep, step, ['l7', 'l8'])
         Layers.delete_feature(job_ep, step, ['l7', 'l8'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        GUI.show_layer(job_ep, step, 'top')
+        # GUI.show_layer(job_ep, step, 'top')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 

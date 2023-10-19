@@ -19,7 +19,7 @@ class TestGraphicSelectFeatureAttribute:
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
         step = 'orig'
-        layers = ['spt', 'smt', 'top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'bot']
+        layers = ['spt', 'smt', 'top', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'bot', 'smb']
 
         # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
