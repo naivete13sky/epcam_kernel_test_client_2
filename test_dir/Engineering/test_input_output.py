@@ -247,6 +247,7 @@ def para_gerber_output(request):
 @pytest.mark.cc
 class TestOutputGerber274XParas():
     # @pytest.mark.parametrize('step_name',['orig','panel'])
+    @pytest.mark.skip
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
     def test_output_gerber274x(self, job_id, g, prepare_test_job_clean_g, para_gerber_output):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
@@ -414,7 +415,6 @@ class TestOutputGerber274XParas():
         Job.close_job(job)
 
     # @pytest.mark.parametrize('step_name',['orig','panel'])
-    @pytest.mark.skip
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
     def test_odb_output_gerber274x(self, job_id, g, prepare_test_job_clean_g, para_gerber_output):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
