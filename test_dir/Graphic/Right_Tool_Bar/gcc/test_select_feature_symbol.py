@@ -11,15 +11,15 @@ class TestGraphicSelectFeatureSymbol:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Select_symbol'))
     def test_select_features_symbol(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试select_features_symbol功能，用例数：
-        ID:
+        本用例测试select_features_symbol功能，用例数：10
+        ID:36184
         BUG:
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
         step = 'orig'
-        layers = ['top', 'l2']
+        layers = ['spt', 'smt', 'top', 'l2', 'l4', 'l6', 'l7', 'l8', 'l9', 'bot']
 
         # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
@@ -53,80 +53,69 @@ class TestGraphicSelectFeatureSymbol:
         Input.open_job(job_ep, temp_compressed_path)
 
         # 1、筛选单个symbol（第一种方法）
-        Selection.set_include_symbol_filter(['r50'])
-        Selection.select_features_by_filter(job_ep, step, ['top'])
-        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
+        Selection.set_include_symbol_filter(['r5'])
+        Selection.select_features_by_filter(job_ep, step, ['spt'])
+        Layers.delete_feature(job_ep, step, ['spt'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
         # 2、筛选单个symbol（第二种方法）
-        Selection.set_symbol_filter(True, ['r50'])
-        Selection.select_features_by_filter(job_ep, step, ['top'])
-        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
+        Selection.set_symbol_filter(True, ['r5'])
+        Selection.select_features_by_filter(job_ep, step, ['smt'])
+        Layers.delete_feature(job_ep, step, ['smt'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
         # 3、筛选多个symbol（第一种方法）
-        Selection.set_include_symbol_filter(['r50', 'r30'])
+        Selection.set_include_symbol_filter(['r5', 'r4'])
         Selection.select_features_by_filter(job_ep, step, ['top'])
         Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
         # 4、筛选多个symbol（第二种方法）
-        Selection.set_symbol_filter(True, ['r50', 'r30'])
-        Selection.select_features_by_filter(job_ep, step, ['top'])
-        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
+        Selection.set_symbol_filter(True, ['s31.496', 'r15.748'])
+        Selection.select_features_by_filter(job_ep, step, ['l2'])
+        Layers.delete_feature(job_ep, step, ['l2'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 5、筛选单个symbol以外的物件（第一种方法）
-        Selection.set_symbol_filter(False, ['r50'])
-        Selection.select_features_by_filter(job_ep, step, ['top'])
-        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
+        # 5、筛选单个symbol以外的物件
+        Selection.set_exclude_symbol_filter(['r15.748'])
+        Selection.select_features_by_filter(job_ep, step, ['l4'])
+        Layers.delete_feature(job_ep, step, ['l4'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 6、筛选单个symbol以外的物件（第二种方法）
-        Selection.set_exclude_symbol_filter(['r50'])
-        Selection.select_features_by_filter(job_ep, step, ['top'])
-        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
+        # 6、筛选多个symbol以外的物件
+        Selection.set_exclude_symbol_filter(['r5', 'r8'])
+        Selection.select_features_by_filter(job_ep, step, ['l6'])
+        Layers.delete_feature(job_ep, step, ['l6'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 7、筛选多个symbol以外的物件（第一种方法）
-        Selection.set_symbol_filter(False, ['r50', 'r30'])
-        Selection.select_features_by_filter(job_ep, step, ['top'])
-        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
+        # 7、筛选单个symbol范围之内的物件（圆形）
+        Selection.set_symbol_range_filter([{'symbol_type': 'r', 'min_value': 4*25400, 'max_value': 8*25400}])
+        Selection.select_features_by_filter(job_ep, step, ['l7'])
+        Layers.delete_feature(job_ep, step, ['l7'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 8、筛选多个symbol以外的物件（第二种方法）
-        Selection.set_exclude_symbol_filter(['r50', 'r30'])
-        Selection.select_features_by_filter(job_ep, step, ['top'])
-        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
+        # 8、筛选多个symbol范围之内的物件（圆形、方行）
+        Selection.set_symbol_range_filter([{'symbol_type': 'r', 'min_value': 8*25400, 'max_value': 35.039*25400},
+                                           {'symbol_type': 's', 'min_value': 30*25400, 'max_value': 100*25400}])
+        Selection.select_features_by_filter(job_ep, step, ['l8'])
+        Layers.delete_feature(job_ep, step, ['l8'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 9、筛选单个symbol范围之内的物件（圆形）
-        Selection.set_symbol_range_filter([{'symbol_type': 'r', 'min_value': '3000', 'max_value': '200'}])
+        # 9、筛选单个symbol范围之外的物件（方形）
+        Selection.set_exclude_symbol_range_filter([{'symbol_type': 'r', 'min_value': 5*25400, 'max_value': 8*25400}])
         Selection.select_features_by_filter(job_ep, step, ['l9'])
         Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 10、筛选多个symbol范围之内的物件（圆形、方行）
-        Selection.set_symbol_range_filter([{'symbol_type': 'r', 'min_value': '3000', 'max_value': '200'},
-                                           {'symbol_type': 's', 'min_value': '3000', 'max_value': '200'}])
-        Selection.select_features_by_filter(job_ep, step, ['l9'])
-        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
+        # 10、筛选多个symbol范围之外的物件（圆形、方行）
+        Selection.set_exclude_symbol_range_filter([{'symbol_type': 'r', 'min_value': 8*25400, 'max_value': 15*25400},
+                                                  {'symbol_type': 's', 'min_value': 23.618*25400,
+                                                   'max_value': 35.429*25400}])
+        Selection.select_features_by_filter(job_ep, step, ['bot'])
+        Layers.delete_feature(job_ep, step, ['bot'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 11、筛选单个symbol范围之外的物件（方形）
-        Selection.set_exclude_symbol_range_filter([{'symbol_type': 's', 'min_value': '3000', 'max_value': '200'}])
-        Selection.select_features_by_filter(job_ep, step, ['l9'])
-        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
-        Selection.reset_select_filter()
-
-        # 12、筛选多个symbol范围之外的物件（圆形、方行）
-        Selection.set_exclude_symbol_range_filter([{'symbol_type': 'r', 'min_value': '3000', 'max_value': '200'},
-                                           {'symbol_type': 's', 'min_value': '3000', 'max_value': '200'}])
-        Selection.select_features_by_filter(job_ep, step, ['l9'])
-        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
-        Selection.reset_select_filter()
-
-        GUI.show_layer(job_ep, step, 'top')
+        # GUI.show_layer(job_ep, step, 'l9')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 
