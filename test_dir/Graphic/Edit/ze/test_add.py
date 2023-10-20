@@ -197,19 +197,20 @@ class TestGraphicEditFeatureIndex:
         执行测试用例数: 70个
         '''
         points_location = []
-        points_location.append([1 * 1000000, 12 * 1000000])
-        points_location.append([1 * 1000000, 22 * 1000000])
-        points_location.append([208 * 1000000, 22 * 1000000])
-        points_location.append([208 * 1000000, 12 * 1000000])
-        points_location.append([1 * 1000000, 12 * 1000000])
+        points_location.append([1 * 1000000, 29 * 1000000])
+        points_location.append([1 * 1000000, 36 * 1000000])
+        points_location.append([208 * 1000000, 36 * 1000000])
+        points_location.append([208 * 1000000, 29 * 1000000])
+        points_location.append([1 * 1000000, 29 * 1000000])
         Layers.add_surface(job_ep, step, ['l5'], True,
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)  # 先添加一块正极性大同皮，后面在铜皮上添加负极性pad
         Layers.add_pad(job_ep, step, ['l2'], "s100", 25400000, 25400000, True,
                        9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)
         symbols = ['r50', 's50', 'rect50x50', 'rect50x50xr25x2', 'rect50x50xr25x12', 'rect50x50xr25x123', 'rect50x50xr25',  'rect50x50','rect50x50xc25x2',
                    'rect50x50xc25x12', 'rect50x50xc25x123', 'rect50x50xc25', 'oval50x50', 'di50x50', 'oct50x50x10', 'donut_r50x30', 'donut_s50x30',
-                   'hex_l50x50x10', 'hex_s50x30x10', 'bfr50', 'bfs50', 'tri50x30', 'oval_h50x30', 'thr60x30x1x3x10', 'ths60x30x1x3x10', 's_tho60x30x1x3x10', 'sr_ths60x30x1x3x10',
-                   'rc_ths60x30x1x3x10x10', 'rc_tho60x30x1x3x10x6', 'el50x20', 'moire60x30x1x30x10x10', 'hole20xvx1x1', 'hole50xnx2x2', 'hole80xpx2x2', 'null50000']  #设置pad形状大小(共35种类型)
+                   'hex_l50x50x10', 'hex_s50x30x10', 'bfr50', 'bfs50', 'tri50x30', 'oval_h50x30', 'thr60x30x1x3x10', 'ths60x30x1x3x10', 'sr_ths60x30x1x3x10',
+                   'rc_ths60x30x1x3x10x10', 'el50x20', 'moire60x30x1x30x10x10', 'hole20xvx1x1', 'hole50xnx2x2', 'hole80xpx2x2', 'null50000']  #设置pad形状大小(共35种类型)}
+        #s_tho60x30x1x3x10", 'rc_tho60x30x1x3x10x6这两种Pad，G软件不识别，会报错（已提交bug）
         polaritys = [True, False]  # 设置pad极性
         num_x3 = 1  # x轴坐标
         attributes = [{'.drill': 'via'}, {'.drill_first_last': 'first'}]  # 定义线段属性
@@ -219,34 +220,27 @@ class TestGraphicEditFeatureIndex:
                 Layers.add_pad(job_ep, step, ['l5'], symbol, num_x3*1000000, num_y5*1000000, polarity,
                                9,attributes, 0)
                 num_x3 = num_x3 + 3
-                num_y5 = num_y5 - 8
-
-        #添加一个长方形pad
-
-        Layers.add_pad(job_ep, step, ['l2'], "s100", 25400000, 25400000, True,
-                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)
-        #GUI.show_layer(job_ep, step, 'l5')
-
+                num_y5 = num_y5 + 8
 
         #顺时针填加一个正极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
-        Layers.add_arc(job_ep, step, ['l2'],'r7.874', 40*1000000, 25*1000000,
-        40*1000000, 31*1000000, 40*1000000, 28*1000000, True, True, attributes)
+        Layers.add_arc(job_ep, step, ['l7'],'r10', 1*1000000, 26*1000000,
+        9*1000000, 34*1000000, 5*1000000, 30*1000000, True, True, attributes)
 
         #顺时针填加一个负极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
-        Layers.add_arc(job_ep, step, ['l2'], 'r10', 50 * 1000000, 35 * 1000000,
-                       50 * 1000000, 41 * 1000000, 50 * 1000000, 38 * 1000000, True, False, attributes)
+        Layers.add_arc(job_ep, step, ['l7'], 'r10', 1 * 1000000, 7 * 1000000,
+                       5 * 1000000, 11 * 1000000, 3 * 1000000, 9 * 1000000, True, False, attributes)
 
         #逆时针填加一个正极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
-        Layers.add_arc(job_ep, step, ['l2'], 'r10', 50 * 1000000, 35 * 1000000,
-                       20 * 1000000, 21 * 1000000, 30 * 1000000, 18 * 1000000, False, True, attributes)
+        Layers.add_arc(job_ep, step, ['l7'], 'r10', 39 * 1000000, 26 * 1000000,
+                       25 * 1000000, 34 * 1000000, 32 * 1000000, 30 * 1000000, False, True, attributes)
         #逆时针填加一个负极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
-        Layers.add_arc(job_ep, step, ['l2'], 'r10', 50 * 1000000, 35 * 1000000,
-                       20 * 1000000, 21 * 1000000, 30 * 1000000, 18 * 1000000, False, False, attributes)
-        #GUI.show_layer(job_ep, step, 'l2')
+        Layers.add_arc(job_ep, step, ['l7'], 'r10', 20 * 1000000, 9 * 1000000,
+                       16 * 1000000, 11 * 1000000, 18 * 1000000, 10 * 1000000, False, False, attributes)
+        GUI.show_layer(job_ep, step, 'l7')
 
 
         save_job(job_ep, temp_ep_path)
@@ -261,7 +255,7 @@ class TestGraphicEditFeatureIndex:
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         layerInfo = []
-        for each in ['l1','l2','l3','l4','l5','l6']:
+        for each in ['l1','l2','l3','l4','l5','l6','l7']:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''
