@@ -1,10 +1,9 @@
-import pytest, os, time, json, shutil, sys
+import pytest, os, shutil
 from epkernel.Edition import Job
-
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
+from cc.cc_method import GetTestData, DMS, Print, getFlist
 from config_ep.epcam_cc_method import MyInput, MyOutput
-from epkernel import Input, GUI, BASE
+from epkernel import Input
 from epkernel.Action import Information
 
 
@@ -223,7 +222,7 @@ GerberOutputPara.__new__.__defaults__ = (0, 0, 1, 1, False, False, False, False,
                                          0, 0, False, False, 2, 6,
                                          2, 0)
 gerber_output_paras_to_test = (
-    GerberOutputPara(),#默认参数
+    GerberOutputPara(),  # 默认参数
     # GerberOutputPara(numberFormatR=5),#自定义参数
     # GerberOutputPara(numberFormatL=3),#自定义参数
 )
@@ -485,7 +484,9 @@ class TestOutputGerber274XParas():
         for key_step in dict_step_layer_info:
             step_layer_count = 0
             for key_layer  in dict_step_layer_info[key_step]:
-                if dict_step_layer_info[key_step][key_layer]['is_drill'] == True and dict_step_layer_info[key_step][key_layer]['has_feature'] == False:
+                if (dict_step_layer_info[key_step][key_layer]['is_drill']==True and
+                        dict_step_layer_info[key_step][key_layer]['has_feature']==False and 'set' not in key_step and
+                        'panel' not in key_step and 'pnl' not in key_step):
                     pass
                     continue
                 step_layer_count = step_layer_count + 1
