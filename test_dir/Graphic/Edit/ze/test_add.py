@@ -5,6 +5,7 @@ from epkernel import Input, GUI, BASE
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
 from epkernel import Application
+from epkernel.Action import Information, Selection
 
 class TestGraphicEditFeatureIndex:
     # @pytest.mark.Feature index
@@ -182,37 +183,6 @@ class TestGraphicEditFeatureIndex:
         Layers.add_surface(job_ep, step, ['l2'], False,
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)
 
-        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 1*1000000, True)#使用线填充铜物件，使用弧物件（Arc）填充
-
-        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 2*1000000, False)  # 使用线填充铜物件，不使用弧物件（Arc）填充
-
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，拆分基本元素构成的符号，并删除板框外的基本元素
-
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, False, False, False, False, 0, False, 0,
-                                         40 * 25400)  # 只要符号中的某个元素位于边框上或边框外，即删除整个符号
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, True, False, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，切除位于边框上的基本元素，创建轮廓化的铜面
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，当边框要切除基本元素时，删除符号
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, True, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，将原点设置为基准点
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，将原点设置为step边缘的(0.0)
-
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         82 * 25400, 42 * 25400, True, False, False, False, 0, Ture, 0,
-                                         40 * 25400)#为指定层填充铜物件，铜面以指定的距离间隔的符号的填充,轮廓线转换极性
-
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
-                                         40 * 25400)#为指定层填充铜物件，铜面以指定的距离间隔的符号的填充,轮廓线不转换极性
 
         #添加正极性圆形surface
         Application.add_round_surface_jwApp(job_ep, step, ['l2'], True, {'.bga': '', '.cm': ''},68 * 1000000, 8 * 1000000, 50 * 25400)
@@ -221,6 +191,68 @@ class TestGraphicEditFeatureIndex:
         Application.add_round_surface_jwApp(job_ep, step, ['l2'], False, {'.bga': '', '.cm': ''}, 67 * 1000000,
                                             5 * 1000000, 30 * 25400)
         #GUI.show_layer(job_ep, step, 'l2')
+
+
+        # 选中一个铜物件，使用线填充铜物件,不足的地方不使用弧线填充
+        points_location = []
+        points_location.append([66 * 1000000, 12 * 1000000])
+        points_location.append([66 * 1000000, 18 * 1000000])
+        points_location.append([71 * 1000000, 18 * 1000000])
+        points_location.append([71 * 1000000, 12 * 1000000])
+        points_location.append([66 * 1000000, 12 * 1000000])
+        Layers.add_surface(job_ep, step, ['l2'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)#先添加一块正极性铜皮
+        Selection.select_feature_by_id(job_ep, step, 'l2', [927])#选中刚添加的铜皮
+        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 5 * 254000, False)#使用线填充，线的最小间距为5Mil,弧度不足的地方不使用弧线填充
+        Selection.select_feature_by_id(job_ep, step, 'l2', [936])#选中其中一个线将其删除，以证明铜面被打散了
+        Layers.delete_feature(job_ep, step, ['l2'])
+        #GUI.show_layer(job_ep, step, 'l2')
+
+        #选中一个圆形铜物件，使用线填充铜物件,不足的地方使用弧线填充
+        Selection.select_feature_by_id(job_ep, step, 'l2', [925])#选中一个圆形铜皮
+        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 5 * 254000, True)  #使用线填充，线的最小间距为5Mil,弧度不足的地方使用弧线填充
+        Selection.select_feature_by_id(job_ep, step, 'l2', [927])  #选中其中一个弧线线将其删除，以证明铜面打散时不足的地方用弧线补充了
+        Layers.delete_feature(job_ep, step, ['l2'])
+        GUI.show_layer(job_ep, step, 'l2')
+
+
+
+
+
+
+
+
+
+        # Layers.use_solid_fill_contours(job_ep, step, ['l2'], 2*1000000, False)  # 使用线填充铜物件，不使用弧物件（Arc）填充
+        #
+        # Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
+        #                                  85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
+        #                                  40 * 25400)  # 为指定层填充铜物件，拆分基本元素构成的符号，并删除板框外的基本元素
+        #
+        # Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
+        #                                  85 * 25400, 45 * 25400, False, False, False, False, 0, False, 0,
+        #                                  40 * 25400)  # 只要符号中的某个元素位于边框上或边框外，即删除整个符号
+        # Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
+        #                                  85 * 25400, 45 * 25400, True, True, False, False, 0, False, 0,
+        #                                  40 * 25400)  # 为指定层填充铜物件，切除位于边框上的基本元素，创建轮廓化的铜面
+        # Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
+        #                                  85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
+        #                                  40 * 25400)  # 为指定层填充铜物件，当边框要切除基本元素时，删除符号
+        # Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
+        #                                  85 * 25400, 45 * 25400, True, False, True, False, 0, False, 0,
+        #                                  40 * 25400)  # 为指定层填充铜物件，将原点设置为基准点
+        # Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
+        #                                  85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
+        #                                  40 * 25400)  # 为指定层填充铜物件，将原点设置为step边缘的(0.0)
+        #
+        # Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
+        #                                  82 * 25400, 42 * 25400, True, False, False, False, 0, True, 0,
+        #                                  40 * 25400)  #为指定层填充铜物件，铜面以指定的距离间隔的符号的填充,轮廓线转换极性
+        #
+        # Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
+        #                                  85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
+        #                                  40 * 25400)  #为指定层填充铜物件，铜面以指定的距离间隔的符号的填充,轮廓线不转换极性
+
 
         #4增加pad
         '''
@@ -256,7 +288,7 @@ class TestGraphicEditFeatureIndex:
 
         #顺时针填加一个正极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
-        Layers.add_arc(job_ep, step, ['l7'],'r10', 1*1000000, 26*1000000,
+        Layers.add_arc(job_ep, step, ['l7'], 'r10', 1*1000000, 26*1000000,
         9*1000000, 34*1000000, 5*1000000, 30*1000000, True, True, attributes)
 
         #顺时针填加一个负极性弧
