@@ -11,15 +11,15 @@ class TestGraphicSelection:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Selection'))
     def test_selection(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试Selection多条件筛选功能，用例数：
-        ID:
+        本用例测试Selection多条件筛选功能，用例数：15
+        ID:36899
         BUG:
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
         step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l4']
+        layers = ['top', 'l2', 'l3', 'l3+1', 'l3+2', 'l3+3', 'l3+4', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'bot']
 
         # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
@@ -54,86 +54,117 @@ class TestGraphicSelection:
 
         # 1、筛选物件类型，再取消筛选symbol
         Selection.set_featuretype_filter(True, False, True, True, True, True, True)
-        Selection.select_features_by_filter(job_ep, step, ['top'])
-        Selection.set_symbol_filter(True, ['r50'])
-        Selection.unselect_features(job_ep, step, 'top')
-        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
+        Selection.select_features_by_filter(job_ep, step, ['smt'])
+        Selection.reset_select_filter()
+        Selection.set_symbol_filter(True, ['r13.78'])
+        Selection.unselect_features(job_ep, step, 'smt')
+        Layers.delete_feature(job_ep, step, ['smt'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
         # 2、筛选symbol，再取消筛选单一物件属性
-        Selection.set_symbol_filter(True, ['r50', 'r30'])
-        Selection.select_features_by_filter(job_ep, step, ['l2'])
-        Selection.set_attribute_filter(0, [{'.bga': ' '}])
+        Selection.set_symbol_filter(True, ['r4', 'r5', 'r10', 'r12', 'r14'])
+        Selection.select_features_by_filter(job_ep, step, ['top'])
+        Selection.set_attribute_filter(0, [{'.fy':''}])
         Selection.unselect_features(job_ep, step, 'top')
         Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
         # 3、筛选物件属性，再取消筛选单一物件类型
-        Selection.set_attribute_filter(1, [{'.bga': ' '}, {'.aoi: '}])
+        Selection.set_attribute_filter(1, [{'.pth_pad': ''}, {'.ball_pad': ''}, {'.npth_pad': ''}, {'.area': ''}])
         Selection.select_features_by_filter(job_ep, step, ['l2'])
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
-        Selection.unselect_features(job_ep, step, 'top')
-        Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
+        Selection.unselect_features(job_ep, step, 'l2')
+        Layers.delete_feature(job_ep, step, ['l2'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 4、根据槽孔的角度范围筛选
-        Selection.set_slot_range_filter(True, False, True, False, 10*25400, 10*25400, 0, 90)
-        Selection.select_features_by_filter(job_ep, step, ['l2'])
-        Layers.delete_feature(job_ep, step, ['l5'])  # 通过删除来验证是否选中
+        # 4、根据线的长度范围筛选
+        Selection.set_featuretype_filter(True, False, False, False, False, True, False)
+        Selection.set_slot_range_filter(True, False, True, False, 1*254000, 5*25400000, 0, 90)
+        Selection.select_features_by_filter(job_ep, step, ['l3'])
+        Layers.delete_feature(job_ep, step, ['l3'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 5、根据槽孔的长度范围筛选
-        Selection.set_slot_range_filter(False, True, False, True, 10*25400, 10*25400, 0, 90)
-        Selection.select_features_by_filter(job_ep, step, ['l2'])
-        Layers.delete_feature(job_ep, step, ['l5'])  # 通过删除来验证是否选中
+        # 5、根据线的角度范围筛选
+        Selection.set_featuretype_filter(True, False, False, False, False, True, False)
+        Selection.set_slot_range_filter(True, False, False, True, 1*254000, 5*25400000, 0, 45)
+        Selection.select_features_by_filter(job_ep, step, ['l3+1'])
+        Layers.delete_feature(job_ep, step, ['l3+1'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 6、筛选profile线内正、负极性pad、正极性arc
+        # 6、根据槽孔的长度范围筛选
+        Selection.set_include_symbol_filter(['oval100x50', 'oval50x20', 'oval50x200'])
+        Selection.set_slot_range_filter(False, True, True, False, 1*254000, 1*2540000, 0, 90)
+        Selection.select_features_by_filter(job_ep, step, ['l3+2'])
+        Layers.delete_feature(job_ep, step, ['l3+2'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 7、根据槽孔的角度范围筛选
+        Selection.set_include_symbol_filter(['oval100x50', 'oval50x20', 'oval50x200'])
+        Selection.set_slot_range_filter(False, True, False, True, 1*254000, 5*25400000, 0, 45)
+        Selection.select_features_by_filter(job_ep, step, ['l3+3'])
+        Layers.delete_feature(job_ep, step, ['l3+3'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 8、根据槽孔的长度角度范围筛选
+        Selection.set_include_symbol_filter(['oval100x50', 'oval50x20', 'oval50x200'])
+        Selection.set_slot_range_filter(False, True, True, True, 1*254000, 1*2540000, 0, 45)
+        Selection.select_features_by_filter(job_ep, step, ['l3+4'])
+        Layers.delete_feature(job_ep, step, ['l3+4'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 9、根据线的长度和角度范围筛选
+        Selection.set_featuretype_filter(True, False, False, False, False, True, False)
+        Selection.set_slot_range_filter(True, False, True, True, 1*254000, 5*25400000, 0, 45)
+        Selection.select_features_by_filter(job_ep, step, ['l3+4'])
+        Layers.delete_feature(job_ep, step, ['l3+4'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 10、筛选profile线内正、负极性pad、正极性arc
         Selection.set_featuretype_filter(True, True, False, False, False, False, True)
         Selection.set_inprofile_filter(1)
-        Selection.select_features_by_filter(job_ep, step, ['l5'])
+        Selection.select_features_by_filter(job_ep, step, ['l4'])
         Selection.set_featuretype_filter(True, False, False, False, True, False, False)
         Selection.set_inprofile_filter(1)
+        Selection.select_features_by_filter(job_ep, step, ['l4'])
+        Layers.delete_feature(job_ep, step, ['l4'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 11、筛选profile外正极性line、铜皮
+        Selection.set_featuretype_filter(True, False, False, False, False, True, False)
+        Selection.set_inprofile_filter(2)
         Selection.select_features_by_filter(job_ep, step, ['l5'])
         Layers.delete_feature(job_ep, step, ['l5'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 7、筛选profile外正极性line
-        Selection.set_featuretype_filter(True, False, False, False, False, True, False)
-        Selection.set_inprofile_filter(2)
+        # 12、筛选profile线内的多个symbol以外的物件
+        Selection.set_exclude_symbol_filter(['r15.748', 'r31.496'])
+        Selection.set_inprofile_filter(1)
         Selection.select_features_by_filter(job_ep, step, ['l6'])
         Layers.delete_feature(job_ep, step, ['l6'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 8、筛选profile线内的单个symbol
-        Selection.set_include_symbol_filter(['r50'])
-        Selection.set_inprofile_filter(1)
-        Selection.select_features_by_filter(job_ep, step, ['l9'])
-        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
+        # 13、筛选profile线外单个symbol
+        Selection.set_include_symbol_filter(['r8'])
+        Selection.set_inprofile_filter(2)
+        Selection.select_features_by_filter(job_ep, step, ['l7'])
+        Layers.delete_feature(job_ep, step, ['l7'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 9、筛选profile线外多个symbol以外的物件
-        Selection.set_exclude_symbol_filter(['r50', 'r30'])
+        # 14、筛选profile线内包含A属性的物件
+        Selection.set_attribute_filter(0, [{'.cu_surface': ''}])
+        Selection.set_inprofile_filter(1)
+        Selection.select_features_by_filter(job_ep, step, ['l8'])
+        Layers.delete_feature(job_ep, step, ['l8'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 15、筛选profile线外不包含B属性的物件
+        Selection.set_exclude_attr_filter([{'.imp_line': ''}])
         Selection.set_inprofile_filter(2)
         Selection.select_features_by_filter(job_ep, step, ['l9'])
         Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 10、筛选profile线内包含A属性的物件
-        Selection.set_attribute_filter(0, [{'.bga': ' '}])
-        Selection.set_inprofile_filter(1)
-        Selection.select_features_by_filter(job_ep, step, ['l9'])
-        Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
-        Selection.reset_select_filter()
-
-        # 11、筛选profile线外不包含B属性的物件
-        Selection.set_exclude_attr_filter([{'tool': '0'}])
-        Selection.set_inprofile_filter(2)
-        Selection.select_features_by_filter(job_ep, step, ['bot'])
-        Layers.delete_feature(job_ep, step, ['bot'])  # 通过删除来验证是否选中
-        Selection.reset_select_filter()
-
-        # GUI.show_layer(job_ep, step, '4113')
+        # GUI.show_layer(job_ep, step, 'l3+4')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
 

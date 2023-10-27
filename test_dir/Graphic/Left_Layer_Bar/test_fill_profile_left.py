@@ -1,7 +1,6 @@
 import pytest, os, time, json, shutil, sys
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
 from epkernel import Input, GUI, BASE
 from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers
@@ -68,14 +67,35 @@ class TestGraphicFillProfile:
                             0, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'l2')
 
-        # 3.验证填充方式为line填充，其余参数默认
+        # 2.1.验证填充方式为网格铜，角度旋转45
+        Layers.delete_feature(job_ep, step, ['l10'])
+        Layers.set_fill_grid_param(45, 15240000, 10160000, 508000, 0, 0)
+        Layers.fill_profile(job_ep, step, ['l10'], 2, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'l10')
+
+        # 2.2.验证填充方式为网格铜，x_offset偏移1inch
+        Layers.delete_feature(job_ep, step, ['smb'])
+        Layers.set_fill_grid_param(0, 15240000, 10160000, 508000, 25400000, 0)
+        Layers.fill_profile(job_ep, step, ['smb'], 2, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'smb')
+
+        # 2.3.验证填充方式为网格铜，y_offset偏移3inch
+        Layers.delete_feature(job_ep, step, ['smt'])
+        Layers.set_fill_grid_param(0, 10160000, 10160000, 508000, 0, 76200000 )
+        Layers.fill_profile(job_ep, step, ['smt'], 2, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'smt')
+
+        # 3.验证填充方式为line填充。不使用arc，其余参数默认
         Layers.delete_feature(job_ep, step, ['l3'])
         Layers.set_fill_solid_param(False, 12700, False)
         Layers.fill_profile(job_ep, step, ['l3'], 1, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'l3')
 
-        # 4.验证填充方式为铜皮，其余参数默认
+        # 4.验证填充方式为line，使用arc，其余参数默认
         Layers.delete_feature(job_ep, step, ['l4'])
         Layers.set_fill_solid_param(False, 12700, True)
         Layers.fill_profile(job_ep, step, ['l4'], 1, False, [], 0, 0, 0, 0, 0,
@@ -113,6 +133,15 @@ class TestGraphicFillProfile:
         Layers.fill_profile(job_ep, step, ['l8'], 3, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'l8')
+
+        # 5.4.验证填充方式为指定symbol，break_partial为false
+        Layers.delete_feature(job_ep, step, ['l9'])
+        Layers.set_fill_pattern_param('el100x60', False, False, 15240000,
+                                      10160000, True, False, False, 0, 0, 0, 0)
+        Layers.fill_profile(job_ep, step, ['l9'], 3, False, [], 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'l9')
+
 
 
 
