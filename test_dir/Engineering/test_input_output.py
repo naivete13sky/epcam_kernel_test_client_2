@@ -485,8 +485,7 @@ class TestOutputGerber274XParas():
             step_layer_count = 0
             for key_layer  in dict_step_layer_info[key_step]:
                 if (dict_step_layer_info[key_step][key_layer]['is_drill']==True and
-                        dict_step_layer_info[key_step][key_layer]['has_feature']==False and 'set' not in key_step and
-                        'panel' not in key_step and 'pnl' not in key_step):
+                        dict_step_layer_info[key_step][key_layer]['has_feature']==False and Information.get_sub_steps_name(job,key_step) == None):
                     pass
                     continue
                 step_layer_count = step_layer_count + 1

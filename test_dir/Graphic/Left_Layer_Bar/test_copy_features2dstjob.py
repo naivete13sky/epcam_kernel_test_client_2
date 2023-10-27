@@ -14,7 +14,7 @@ class TestGraphicCopy_features2dstjob:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Copy_features2dstjob'))
     def testCopy_features2dstjob(self, job_id, g, prepare_test_job_clean_g):
         '''
-        本用例测试跨料号层别复制--Copy_features2dstjob,ID:12226
+        本用例测试跨料号层别复制--Copy_features2dstjob,ID:36183
         '''
 
         g = RunConfig.driver_g  # 拿到G软件
@@ -98,7 +98,7 @@ class TestGraphicCopy_features2dstjob:
 
         print("layerInfo:", layerInfo)
         job1, job2 = job_g, job_ep
-        step1, step2 = 'prepare', 'prepare'
+        step1, step2 = 'net', 'net'
         g.layer_compare_g_open_2_job(job1=job1, step1=step1, job2=job2, step2=step2)
 
         # 校正孔用
