@@ -1,18 +1,15 @@
 import pytest,os, time
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
-from config_ep.epcam_cc_method import MyInput
 from config_ep.epcam_cc_method import Pretreatment
 from epkernel import Input,GUI,BASE
 from epkernel.Action import Information
 from epkernel.Edition import Matrix
-from epkernel.Output import save_job
-from datetime import datetime
 import shutil
 
-class TestSaveJob:
+class Test_MatrixSave:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Save'))
-    def test_save(self, job_id):
+    def test_matrix_save(self, job_id):
         '''
         本用例测试cam对料号执行增、删层别保存后，验证ui上的层别和layers文件夹下的层别是否一致，bugid:4665
         '''
@@ -89,10 +86,11 @@ class TestSaveJob:
         print("第二次ui最新layers名：", all_layers_list_job_ep_2)
         # GUI.show_matrix(job_ep)
 
-        # ----------------------------------------断言--------------------------------------------------------
+        # ----------------------------------------开始验证结果：G与EP---------------------------------------------------------
+        Print.print_with_delimiter('断言--开始')
         for ep_layer_name_1 in ep_folder_names_1:
             assert ep_layer_name_1 in all_layers_list_job_ep_1
         for ep_layer_name_2 in ep_folder_names_2:
             assert ep_layer_name_2 in all_layers_list_job_ep_2
-
+        Print.print_with_delimiter("断言--结束")
 
