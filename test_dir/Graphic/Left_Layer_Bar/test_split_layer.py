@@ -70,10 +70,18 @@ class TestGraphicSplitLayer:
         # GUI.show_layer(job_ep, step, 'l3')
 
         # 4、删除指定拆分的层别
-
         BASE.split_layer_with_featuretype(job_ep, step, 'l7')
         BASE.delete_splited_layers(job_ep,step,'l7')
         # GUI.show_layer(job_ep, step, 'l7')
+
+        # 5、无属性层别，根据属性拆分
+        BASE.split_layer_with_attribute(job_ep, step, 'l5')
+        GUI.show_layer(job_ep, step, 'l5')
+
+        # 6、合并有负极性的拆分层别（合并失败）
+        BASE.recovery_splited_layers(job_ep, step, 'l5')
+        GUI.show_layer(job_ep, step, 'l5')
+
 
         save_job(job_ep, temp_ep_path)
         # GUI.show_layer(job_case,step,'drl1-10')

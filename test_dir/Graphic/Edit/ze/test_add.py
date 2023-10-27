@@ -5,6 +5,7 @@ from epkernel import Input, GUI, BASE
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
 from epkernel import Application
+from epkernel.Action import Information, Selection
 
 class TestGraphicEditFeatureIndex:
     # @pytest.mark.Feature index
@@ -182,37 +183,6 @@ class TestGraphicEditFeatureIndex:
         Layers.add_surface(job_ep, step, ['l2'], False,
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)
 
-        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 1*1000000, True)#使用线填充铜物件，使用弧物件（Arc）填充
-
-        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 2*1000000, False)  # 使用线填充铜物件，不使用弧物件（Arc）填充
-
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，拆分基本元素构成的符号，并删除板框外的基本元素
-
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, False, False, False, False, 0, False, 0,
-                                         40 * 25400)  # 只要符号中的某个元素位于边框上或边框外，即删除整个符号
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, True, False, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，切除位于边框上的基本元素，创建轮廓化的铜面
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，当边框要切除基本元素时，删除符号
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, True, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，将原点设置为基准点
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
-                                         40 * 25400)  # 为指定层填充铜物件，将原点设置为step边缘的(0.0)
-
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         82 * 25400, 42 * 25400, True, False, False, False, 0, Ture, 0,
-                                         40 * 25400)#为指定层填充铜物件，铜面以指定的距离间隔的符号的填充,轮廓线转换极性
-
-        Layers.use_pattern_fill_contours(job_ep, step, 'l2', 'r39.37',
-                                         85 * 25400, 45 * 25400, True, False, False, False, 0, False, 0,
-                                         40 * 25400)#为指定层填充铜物件，铜面以指定的距离间隔的符号的填充,轮廓线不转换极性
 
         #添加正极性圆形surface
         Application.add_round_surface_jwApp(job_ep, step, ['l2'], True, {'.bga': '', '.cm': ''},68 * 1000000, 8 * 1000000, 50 * 25400)
@@ -222,11 +192,37 @@ class TestGraphicEditFeatureIndex:
                                             5 * 1000000, 30 * 25400)
         #GUI.show_layer(job_ep, step, 'l2')
 
+
+        # 选中一个铜物件，使用线填充铜物件,不足的地方不使用弧线填充
+        points_location = []
+        points_location.append([66 * 1000000, 12 * 1000000])
+        points_location.append([66 * 1000000, 18 * 1000000])
+        points_location.append([71 * 1000000, 18 * 1000000])
+        points_location.append([71 * 1000000, 12 * 1000000])
+        points_location.append([66 * 1000000, 12 * 1000000])
+        Layers.add_surface(job_ep, step, ['l2'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)#先添加一块正极性铜皮
+        Selection.select_feature_by_id(job_ep, step, 'l2', [927])#选中刚添加的铜皮
+        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 5 * 254000, False)#使用线填充，线的最小间距为5Mil,弧度不足的地方不使用弧线填充
+        Selection.select_feature_by_id(job_ep, step, 'l2', [936])#选中其中一个线将其删除，以证明铜面被打散了
+        Layers.delete_feature(job_ep, step, ['l2'])
+        #GUI.show_layer(job_ep, step, 'l2')
+
+        #选中一个圆形铜物件，使用线填充铜物件,不足的地方使用弧线填充
+        Selection.select_feature_by_id(job_ep, step, 'l2', [925])#选中一个圆形铜皮
+        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 5 * 254000, True)  #使用线填充，线的最小间距为5Mil,弧度不足的地方使用弧线填充
+        Selection.select_feature_by_id(job_ep, step, 'l2', [927])  #选中其中一个弧线线将其删除，以证明铜面打散时不足的地方用弧线补充了
+        Layers.delete_feature(job_ep, step, ['l2'])
+        #GUI.show_layer(job_ep, step, 'l2')
+
+
+
+
         #4增加pad
         '''
         测试用例名称:添加不同形状大小的正、负极性Pad
         预期结果: 正确添加
-        执行测试用例数: 70个
+        执行测试用例数: 66个
         '''
         points_location = []
         points_location.append([1 * 1000000, 29 * 1000000])
@@ -236,12 +232,10 @@ class TestGraphicEditFeatureIndex:
         points_location.append([1 * 1000000, 29 * 1000000])
         Layers.add_surface(job_ep, step, ['l5'], True,
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)  # 先添加一块正极性大同皮，后面在铜皮上添加负极性pad
-        Layers.add_pad(job_ep, step, ['l2'], "s100", 25400000, 25400000, True,
-                       9, [{'.drill': 'via'}, {'.drill_first_last': 'first'}], 0)
         symbols = ['r50', 's50', 'rect50x50', 'rect50x50xr25x2', 'rect50x50xr25x12', 'rect50x50xr25x123', 'rect50x50xr25',  'rect50x50','rect50x50xc25x2',
                    'rect50x50xc25x12', 'rect50x50xc25x123', 'rect50x50xc25', 'oval50x50', 'di50x50', 'oct50x50x10', 'donut_r50x30', 'donut_s50x30',
                    'hex_l50x50x10', 'hex_s50x30x10', 'bfr50', 'bfs50', 'tri50x30', 'oval_h50x30', 'thr60x30x1x3x10', 'ths60x30x1x3x10', 'sr_ths60x30x1x3x10',
-                   'rc_ths60x30x1x3x10x10', 'el50x20', 'moire60x30x1x30x10x10', 'hole20xvx1x1', 'hole50xnx2x2', 'hole80xpx2x2', 'null50000']  #设置pad形状大小(共35种类型)}
+                   'rc_ths60x30x1x3x10x10', 'el50x20', 'moire60x30x1x30x10x10', 'hole20xvx1x1', 'hole50xnx2x2', 'hole80xpx2x2', 'null50000']  #设置pad形状大小(共33种类型)}
         #s_tho60x30x1x3x10", 'rc_tho60x30x1x3x10x6这两种Pad，G软件不识别，会报错（已提交bug）
         polaritys = [True, False]  # 设置pad极性
         num_x3 = 1  # x轴坐标
@@ -254,9 +248,43 @@ class TestGraphicEditFeatureIndex:
                 num_x3 = num_x3 + 3
                 num_y5 = num_y5 + 8
 
+        '''
+        测试用例名称:添加不同镜像和角度Pad
+        预期结果: 均正确添加
+        执行测试用例数: 10个
+        '''
+        points_location = []
+        points_location.append([1 * 1000000, 42 * 1000000])
+        points_location.append([1 * 1000000, 48 * 1000000])
+        points_location.append([208 * 1000000, 48 * 1000000])
+        points_location.append([208 * 1000000, 42 * 1000000])
+        points_location.append([1 * 1000000, 42 * 1000000])
+        Layers.add_surface(job_ep, step, ['l5'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)  # 先添加一块正极性大同皮，后面在铜皮上添加负极性的不同镜像和角度的Pad
+
+        orients=[0 ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9]
+        polaritys = [True, False]  # 设置pad极性
+        num_x4 = 1# x轴坐标
+        attributes = [{'.drill': 'via'}, {'.drill_first_last': 'first'}]  # 定义线段属性
+        for orient in orients:
+            num_y6 = 40  # y轴坐标
+            for polarity in polaritys:
+                Layers.add_pad(job_ep, step, ['l5'],"rect50x100", num_x4 * 1000000, num_y6 * 1000000, polarity,
+                       orient, attributes, 66)
+                num_x4 = num_x4 + 3
+                num_y6 = num_y6 + 6
+        GUI.show_layer(job_ep, step, 'l5')
+
+
+
+
+
+
+
+
         #顺时针填加一个正极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
-        Layers.add_arc(job_ep, step, ['l7'],'r10', 1*1000000, 26*1000000,
+        Layers.add_arc(job_ep, step, ['l7'], 'r10', 1*1000000, 26*1000000,
         9*1000000, 34*1000000, 5*1000000, 30*1000000, True, True, attributes)
 
         #顺时针填加一个负极性弧
@@ -272,7 +300,7 @@ class TestGraphicEditFeatureIndex:
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l7'], 'r10', 20 * 1000000, 9 * 1000000,
                        16 * 1000000, 11 * 1000000, 18 * 1000000, 10 * 1000000, False, False, attributes)
-        GUI.show_layer(job_ep, step, 'l7')
+        #GUI.show_layer(job_ep, step, 'l7')
 
 
         save_job(job_ep, temp_ep_path)
