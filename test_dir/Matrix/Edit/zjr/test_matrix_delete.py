@@ -107,6 +107,7 @@ class TestMatrixDelete:
         all_layers_list_job_ep = Information.get_layers(job_ep)  # 获取新的ep所有layer信息
         all_steps_list_job_ep = Information.get_steps(job_ep)  # 获取新的ep所有step信息
         Job.close_job(job_ep)
+        Job.close_job(job_g)
         print("test_cases：", test_cases) #统计覆盖场景数
         # ----------------------------------------开始验证结果：G与EP---------------------------------------------------------
         Print.print_with_delimiter('断言--开始')

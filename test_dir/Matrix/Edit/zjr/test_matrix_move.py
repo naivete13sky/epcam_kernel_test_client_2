@@ -87,6 +87,7 @@ class TestMatrixMove:
         informatitons_g = Information.get_layer_information(job_g)
 
         Job.close_job(job_ep)
+        Job.close_job(job_g)
         print("test_cases：", test_cases)
 
 
