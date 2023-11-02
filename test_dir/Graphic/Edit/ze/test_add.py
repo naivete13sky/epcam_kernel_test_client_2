@@ -69,7 +69,7 @@ class TestGraphicEditFeatureIndex:
                         5 * 1000000, 32 * 1000000, True, 0, attributes, 0)
         #4.验证Line Width栏的正确性
         attributes = [{'.text': '2'}]  # 定义文字属性
-        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
+        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./ ', 20 * 25400, 20 * 25400, 3 * 25400,
                         5 * 1000000, 34 * 1000000, True, 0, attributes, 0)
         #5.，验证旋转角度功能正确性（不镜像）
         attributes = [{'.text': '2'}]  # 定义文字属性
@@ -184,16 +184,16 @@ class TestGraphicEditFeatureIndex:
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)
 
 
-        #添加正极性圆形surface
+        #4.添加正极性圆形surface
         Application.add_round_surface_jwApp(job_ep, step, ['l2'], True, {'.bga': '', '.cm': ''},68 * 1000000, 8 * 1000000, 50 * 25400)
         #GUI.show_layer(job_ep, step, 'l2')
-        #添加负极性圆形surface
+        #5.添加负极性圆形surface
         Application.add_round_surface_jwApp(job_ep, step, ['l2'], False, {'.bga': '', '.cm': ''}, 67 * 1000000,
                                             5 * 1000000, 30 * 25400)
         #GUI.show_layer(job_ep, step, 'l2')
 
 
-        # 选中一个铜物件，使用线填充铜物件,不足的地方不使用弧线填充
+        #5. 选中一个铜物件，使用线填充铜物件,不足的地方不使用弧线填充
         points_location = []
         points_location.append([66 * 1000000, 12 * 1000000])
         points_location.append([66 * 1000000, 18 * 1000000])
@@ -208,7 +208,7 @@ class TestGraphicEditFeatureIndex:
         Layers.delete_feature(job_ep, step, ['l2'])
         #GUI.show_layer(job_ep, step, 'l2')
 
-        #选中一个圆形铜物件，使用线填充铜物件,不足的地方使用弧线填充
+        #6.选中一个圆形铜物件，使用线填充铜物件,不足的地方使用弧线填充
         Selection.select_feature_by_id(job_ep, step, 'l2', [925])#选中一个圆形铜皮
         Layers.use_solid_fill_contours(job_ep, step, ['l2'], 5 * 254000, True)  #使用线填充，线的最小间距为5Mil,弧度不足的地方使用弧线填充
         Selection.select_feature_by_id(job_ep, step, 'l2', [927])  #选中其中一个弧线线将其删除，以证明铜面打散时不足的地方用弧线补充了
@@ -249,15 +249,15 @@ class TestGraphicEditFeatureIndex:
                 num_y5 = num_y5 + 8
 
         '''
-        测试用例名称:添加不同镜像和角度Pad
+        测试用例名称:添加不同镜像和角度的正负极性Pad
         预期结果: 均正确添加
-        执行测试用例数: 10个
+        执行测试用例数: 20个
         '''
         points_location = []
         points_location.append([1 * 1000000, 42 * 1000000])
         points_location.append([1 * 1000000, 48 * 1000000])
-        points_location.append([208 * 1000000, 48 * 1000000])
-        points_location.append([208 * 1000000, 42 * 1000000])
+        points_location.append([72 * 1000000, 48 * 1000000])
+        points_location.append([72 * 1000000, 42 * 1000000])
         points_location.append([1 * 1000000, 42 * 1000000])
         Layers.add_surface(job_ep, step, ['l5'], True,
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)  # 先添加一块正极性大同皮，后面在铜皮上添加负极性的不同镜像和角度的Pad
