@@ -1,12 +1,11 @@
 import pytest, os, time, json, shutil, sys
 from config import RunConfig
-from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
+from cc.cc_method import GetTestData, DMS, Print
 from epkernel import Input, GUI, BASE
 from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
-from config_g.g_cc_method import G
-from epkernel.Edition import Matrix
+
 
 # @pytest.mark.Fill_Profile_left_panel
 class TestGraphicFillProfilePanel:
@@ -55,18 +54,25 @@ class TestGraphicFillProfilePanel:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        # 1.验证填充方式为实铜，其余参数默认
+        # 1.验证填充方式为实铜，依据父profile线x方向涨缩值，外扩为负数
         Layers.fill_profile(job_ep, step, ['gtl'], 0, False, [],
-                            -5080000, -5080000, 0, 0, 2000000, 2000000, 0, 0, 0, 0, 0, True)
+                            -50800000, -50800000, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gtl')
 
-        # Layers.fill_profile(job, step, layers, fill_type=0, step_repeat_nesting=True, nesting_child_steps=[],
-        #                     step_margin_x=0, step_margin_y=0, max_distance_x=0, max_distance_y=0, SR_step_margin_x=0,
-        #                     SR_step_margin_y=0, SR_max_distance_x=0, SR_max_distance_y=0, avoid_drill=0, avoid_rout=0,
-        #                     avoid_feature=0, polarity=True)
+        # 2.验证填充方式为实铜，依据父profile线x方向涨缩值，内缩为正数
+        Layers.fill_profile(job_ep, step, ['l2'], 0, False, [],
+                            5080000, 12700000, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'l2')
 
-        # GUI.show_layer(job_ep, step, 'l1')
+        # 3.验证填充方式为实铜，铺的铜从父Margin线边缘算起x、y方向最大的铺铜距离
+        Layers.fill_profile(job_ep, step, ['l3'], 0, False, [],
+                            0, 0, 203200000, 127000000, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'l3')
 
-
+        # 4.验证填充方式为实铜，依据子profile线x、y方向涨缩值，内缩为负数
+        Layers.fill_profile(job_ep, step, ['gbl'], 0, False, [],
+                            0, 0, 0, 0, -25400000, -50800000, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gbl')
 
         save_job(job_ep, temp_ep_path)
         # GUI.show_layer(job_case,step,'drl1-10')
@@ -92,7 +98,7 @@ class TestGraphicFillProfilePanel:
 
         print("layerInfo:", layerInfo)
         job1, job2 = job_g, job_ep
-        step1, step2 = 'prepare', 'prepare'
+        step1, step2 = 'panel', 'panel'
         g.layer_compare_g_open_2_job(job1=job1, step1=step1, job2=job2, step2=step2)
 
         # 校正孔用

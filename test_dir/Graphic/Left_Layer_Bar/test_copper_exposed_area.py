@@ -1,8 +1,6 @@
 import pytest, os, time, json, shutil, sys
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print, getFlist, CompressTool
-from config_ep.epcam_cc_method import MyInput, MyOutput
-from config_g.g_cc_method import GInput
 from epkernel import Input, GUI, BASE
 from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers
@@ -21,14 +19,26 @@ class TestGraphicCopper_Exposed_Area:
 
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
-        vs_time_g = str(int(time.time()))  # 比对时间
-        data["vs_time_g"] = vs_time_g  # 比对时间存入字典
-        data["job_id"] = job_id
         step = 'prepare'  # 定义需要执行比对的step名
         # layers = ['l1']  # 定义需要比对的层
         # layers = ['l1++', 'l2', 'l4', 'l6']
         # 取到临时目录
-        temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
+        temp_path = RunConfig.temp_path_base
+        if os.path.exists(temp_path):
+            if RunConfig.gSetupType == 'local':
+                # os.remove(self.tempGerberPath)#此方法容易因权限问题报错
+                shutil.rmtree(temp_path)
+            if RunConfig.gSetupType == 'vmware':
+                # 使用PsExec通过命令删除远程机器的文件
+                from cc.cc_method import RemoteCMD
+                myRemoteCMD = RemoteCMD(psexec_path='cc', computer='192.168.1.3',
+                                        username='administrator',
+                                        password='cc')
+                command_operator = 'rd /s /q'
+                command_folder_path = os.path.join(RunConfig.temp_path_g)
+                command = r'cmd /c {} "{}"'.format(command_operator, command_folder_path)
+                myRemoteCMD.run_cmd(command)
+                print("remote delete finish")
         temp_compressed_path = os.path.join(temp_path, 'compressed')
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
