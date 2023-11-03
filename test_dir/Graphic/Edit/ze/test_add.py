@@ -50,7 +50,34 @@ class TestGraphicEditFeatureIndex:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep,temp_compressed_path)  # 用悦谱CAM打开料号
 
+        '''
+        测试用例名称:添加不同镜像和角度的正负极性的text
+        预期结果: 均正确添加
+        执行测试用例数: 20个
+        '''
+        points_location = []
+        points_location.append([1 * 1000000, 42 * 1000000])
+        points_location.append([1 * 1000000, 50 * 1000000])
+        points_location.append([72 * 1000000, 50 * 1000000])
+        points_location.append([72 * 1000000, 42 * 1000000])
+        points_location.append([1 * 1000000, 42 * 1000000])
+        Layers.add_surface(job_ep, step, ['l1'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}],
+                           points_location)  # 先添加一块正极性大同皮，方便后面在铜皮上添加正负极性的不同镜像和角度的text
 
+        orients = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        polaritys = [True, False]  # 设置text极性
+        num_x5 = 1  # x轴坐标
+        attributes=[{'.text':'2'},{'.text_88':''}]  # 定义text属性
+        for orient in orients:
+            num_y7 = 40  # y轴坐标
+            for polarity in polaritys:
+                Layers.add_text(job_ep, step, ['l1'], 'standard', 'GBhf689', 20 * 25400, 20 * 25400,
+                                2 * 25400,
+                                num_x5 * 1000000, num_y7 * 1000000, polarity, orient, attributes, 56)
+                num_x5 = num_x5 + 3
+                num_y7 = num_y7 + 6
+        GUI.show_layer(job_ep, step, 'l1')
 
 
         #1.增加正极性文字，字体为suntak_date(动态文字，为了不让其变化频率过高，该用例使用动态年份)
@@ -239,7 +266,7 @@ class TestGraphicEditFeatureIndex:
         #s_tho60x30x1x3x10", 'rc_tho60x30x1x3x10x6这两种Pad，G软件不识别，会报错（已提交bug）
         polaritys = [True, False]  # 设置pad极性
         num_x3 = 1  # x轴坐标
-        attributes = [{'.drill': 'via'}, {'.drill_first_last': 'first'}]  # 定义线段属性
+        attributes = [{'.drill': 'via'}, {'.drill_first_last': 'first'}]  # 定义pad属性
         for symbol in symbols:
             num_y5 = 25  # y轴坐标
             for polarity in polaritys:
@@ -260,26 +287,20 @@ class TestGraphicEditFeatureIndex:
         points_location.append([72 * 1000000, 42 * 1000000])
         points_location.append([1 * 1000000, 42 * 1000000])
         Layers.add_surface(job_ep, step, ['l5'], True,
-                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)  # 先添加一块正极性大同皮，后面在铜皮上添加负极性的不同镜像和角度的Pad
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)  # 先添加一块正极性大同皮，方便后面在铜皮上添加正负极性的不同镜像和角度的Pad
 
         orients=[0 ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9]
         polaritys = [True, False]  # 设置pad极性
         num_x4 = 1# x轴坐标
-        attributes = [{'.drill': 'via'}, {'.drill_first_last': 'first'}]  # 定义线段属性
+        attributes = [{'.drill': 'via'}, {'.drill_first_last': 'first'}]  # 定义pad属性
         for orient in orients:
             num_y6 = 40  # y轴坐标
             for polarity in polaritys:
-                Layers.add_pad(job_ep, step, ['l5'],"rect50x100", num_x4 * 1000000, num_y6 * 1000000, polarity,
+                Layers.add_pad(job_ep, step, ['l5'],"rect50x100xr25x2", num_x4 * 1000000, num_y6 * 1000000, polarity,
                        orient, attributes, 66)
                 num_x4 = num_x4 + 3
                 num_y6 = num_y6 + 6
-        GUI.show_layer(job_ep, step, 'l5')
-
-
-
-
-
-
+        #GUI.show_layer(job_ep, step, 'l5')
 
 
         #顺时针填加一个正极性弧
