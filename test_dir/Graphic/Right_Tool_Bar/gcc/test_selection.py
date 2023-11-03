@@ -164,6 +164,20 @@ class TestGraphicSelection:
         Layers.delete_feature(job_ep, step, ['l9'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
+        # 16、筛选包含单属性的symbol
+        Selection.set_include_symbol_filter(['r15.748'])
+        Selection.set_attribute_filter(0, [{'.bga': ''}])
+        Selection.select_features_by_filter(job_ep, step, ['bot'])
+        Layers.delete_feature(job_ep, step, ['bot'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
+        # 17、筛选不包含bga属性的pad
+        Selection.set_featuretype_filter(True, False, False, False, False, False, True)
+        Selection.set_attribute_filter(0, [{'.bga': ''}])
+        Selection.select_features_by_filter(job_ep, step, ['bot+1'])
+        Layers.delete_feature(job_ep, step, ['bot+1'])  # 通过删除来验证是否选中
+        Selection.reset_select_filter()
+
         # GUI.show_layer(job_ep, step, 'l3+4')
         save_job(job_ep, temp_ep_path)
         Job.close_job(job_ep)
