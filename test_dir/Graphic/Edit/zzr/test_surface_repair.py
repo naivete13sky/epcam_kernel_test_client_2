@@ -5,6 +5,7 @@ from epkernel import Input, GUI, BASE
 from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers
 from epkernel.Output import save_job
+from epkernel.Edition import Matrix
 
 # @pytest.mark.Remove Copper Wire
 class TestGraphicEditRemove_Copper_Wire:
@@ -19,9 +20,9 @@ class TestGraphicEditRemove_Copper_Wire:
         data = {}  # 存放比对结果信息
 
         step = 'prepare'  # 定义需要执行比对的step名
-        layers = ['l1', 'l1-c', 'l2', 'l2-c', 'l4', 'l4-c', 'l10', 'l10-c', 'l3', 'l3-c', 'l5', 'l5-c',
-                  'l6', 'l6-c', 'l7', 'l7-c']  # 定义需要比对的层
-        # layers = ['l7-c']
+        # layers = ['l1', 'l1-c', 'l2', 'l2-c', 'l4', 'l4-c', 'l10', 'l10-c', 'l3', 'l3-c', 'l5', 'l5-c',
+        #           # 'l6', 'l6-c', 'l7', 'l7-c']  # 定义需要比对的层
+        # layers = ['l3', 'l3-c']
         # 取到临时目录
         temp_path = RunConfig.temp_path_base
         if os.path.exists(temp_path):
@@ -66,28 +67,30 @@ class TestGraphicEditRemove_Copper_Wire:
         # 4.整层surface去尖角，模式：1-remove tip,圆角化为True,pass
         Layers.surface_repair(job_ep, step, ['l2-c'], 1, 177800, 1, True)
 
-        # 5.整层surface去尖角，模式：2-bridge,圆角化为False,pass
+        # # 5.整层surface去尖角，模式：2-bridge,圆角化为False,pass
         Layers.surface_repair(job_ep, step, ['l4'], 1, 127000, 2, False)
-
-        # 6.整层surface去尖角，模式：2-bridge,圆角化为True,pass    ---待补充用例
+        #
+        # # 6.整层surface去尖角，模式：2-bridge,圆角化为True,pass    ---待补充用例
         Layers.surface_repair(job_ep, step, ['l4-c'], 1, 127000, 2, True)
 
         # 7.整层surface去尖角，模式：3-fix sliver,圆角化为False,pass
-        Layers.surface_repair(job_ep, step, ['l10'], 1, 152400, 3, False)
+        Layers.surface_repair(job_ep, step, ['l10'], 1, 406400, 3, False)
 
-        # 8.整层surface去尖角，模式：3-fix sliver,圆角化为False,pass    ---待补充用例
-        Layers.surface_repair(job_ep, step, ['l10-c'], 1, 152400, 3, True)
+        # 8.整层surface去尖角，模式：3-fix sliver,圆角化为True,pass    ---待补充用例
+        Layers.surface_repair(job_ep, step, ['l10-c'], 1, 406400, 3, True)
 
         # 9.单选surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为False,pass
-        Selection.select_feature_by_id(job_ep, step, 'l3', [2293])
+        Selection.select_feature_by_id(job_ep, step, 'l3', [2279])
         Layers.surface_repair(job_ep, step, ['l3'], 0, 101600, 0, False)
+        # Matrix.delete_layer(job_ep, 'l3_remove_sharp_angle')
+        # GUI.show_layer(job_ep, step, 'l3')
 
         # 10.单选surface去尖角，模式：0-Simplify(简易栅格化)，圆角化为True,pass，---待补充用例
-        Selection.select_feature_by_id(job_ep, step, 'l3-c', [2279, 2288, 2262, 2278])
+        Selection.select_feature_by_id(job_ep, step, 'l3-c', [2288, 2262, 2278, 2263])
         Layers.surface_repair(job_ep, step, ['l3-c'], 0, 152400, 0, True)
 
         # 11.单选surface去尖角，模式：1-remove tip,圆角化为False,pass
-        Selection.select_feature_by_id(job_ep, step, 'l5', [1810, 1809, 1796, 1808])
+        Selection.select_feature_by_id(job_ep, step, 'l5', [1796, 1807, 1809, 1808])
         Layers.surface_repair(job_ep, step, ['l5'], 0, 152400, 1, False)
 
         # 12.单选surface去尖角，模式：1-remove tip,圆角化为True,pass   ---待补充用例
@@ -104,11 +107,11 @@ class TestGraphicEditRemove_Copper_Wire:
 
         # 15.单选surface去尖角，模式：3-fix sliver,圆角化为False,pass
         Selection.select_feature_by_id(job_ep, step, 'l7', [2139, 2137])
-        Layers.surface_repair(job_ep, step, ['l7'], 0, 101600, 3, False)
+        Layers.surface_repair(job_ep, step, ['l7'], 0, 457200, 3, False)
 
         # 16.单选surface去尖角，模式：3-fix sliver,圆角化为True,pass  ---待补充用例
-        Selection.select_feature_by_id(job_ep, step, 'l7-c', [2140, 2116, 2137])
-        Layers.surface_repair(job_ep, step, ['l7-c'], 0, 101600, 3, True)
+        Selection.select_feature_by_id(job_ep, step, 'l7-c', [2140, 2139, 2137])
+        Layers.surface_repair(job_ep, step, ['l7-c'], 0, 406400, 3, True)
 
         # GUI.show_layer(job_ep, step, 'l7-c')
         save_job(job_ep, temp_ep_path)
@@ -127,6 +130,7 @@ class TestGraphicEditRemove_Copper_Wire:
         layerInfo = []
         Input.open_job(job_g, temp_g_path)  # 用悦谱CAM打开料号
         all_layers_list_job_g = Information.get_layers(job_g)
+        # for each in ['l3', 'l3-c']:
         for each in all_layers_list_job_g:
             each_dict = {}
             each_dict["layer"] = each.lower()
