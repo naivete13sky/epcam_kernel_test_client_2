@@ -599,7 +599,7 @@ class TestOutputGerber274XParas():
                 job1, job2 = job_g2,job
             # 根据输出的gerber并导入G的tgz来判断有哪些层
             layerInfo = []
-            info_layer_path = os.path.join(temp_path,'info_layer',job1)
+            info_layer_path = os.path.join(temp_path, 'info_layer', job_g2)
             if not os.path.exists(info_layer_path):
                 # os.mkdir(info_layer_path)
                 os.makedirs(info_layer_path, exist_ok=True)# 创建多级目录，如果不存在
