@@ -603,9 +603,9 @@ class TestOutputGerber274XParas():
             if not os.path.exists(info_layer_path):
                 # os.mkdir(info_layer_path)
                 os.makedirs(info_layer_path, exist_ok=True)# 创建多级目录，如果不存在
-            job1_layer_list = g.get_layer_list_by_step(job1,dict_job_step[job1],
-                                                       os.path.join(RunConfig.temp_path_g,'info_layer',job1),
-                                                       os.path.join(RunConfig.temp_path_base,'info_layer',job1))
+            job1_layer_list = g.get_layer_list_by_step(job_g2,dict_job_step[job_g2],
+                                                       os.path.join(RunConfig.temp_path_g,'info_layer',job_g2),
+                                                       os.path.join(RunConfig.temp_path_base,'info_layer',job_g2))
             for each in job1_layer_list:
                 each_dict = {}
                 each_dict["layer"] = each.lower()
