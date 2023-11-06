@@ -573,13 +573,11 @@ class Pretreatment(object):
         BASE.save_job(job)
 
 
+class GetInfo:
+    pass
+
 
 if __name__ == "__main__":
-    folder_path = r"C:\Users\cheng.chen\Desktop\760"
-    job = r'test'
-    step = r'orig'
-    save_path = r'C:\job\test\odb'
-    my_input = MyInput(folder_path, job, step)
-    my_input.fix_layer_name_same_to_g()
-    my_input.input_folder()
+    pass
+
 
