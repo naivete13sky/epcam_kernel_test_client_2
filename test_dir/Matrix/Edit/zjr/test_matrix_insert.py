@@ -1,19 +1,19 @@
 import pytest, os, shutil
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
-from epkernel import Input, GUI
+from epkernel import Input, GUI, BASE
 from epkernel.Action import Information
-from epkernel.Edition import Matrix, Job
+from epkernel.Edition import Matrix, Job, Layers
 from epkernel.Output import save_job
 
-class TestMatrixMove:
+class TestMatrixInsert:
     '''
-    id:36900,共执行1个测试用例，实现3个方法，覆盖3个测试场景
+    id:，39595,共执行1个测试用例，实现2个方法，覆盖2个测试场景
     '''
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Matrix_Move'))
-    def test_matrix_move(self, job_id):
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Matrix_Insert'))
+    def test_matrix_insert(self, job_id):
         '''
-        本用例测试Matrix窗口的Move
+        本用例测试Matrix窗口的Insert
         '''
         g = RunConfig.driver_g  # 拿到G软件
         test_cases = 0  # 用户统计执行了多少条测试用例
@@ -48,61 +48,71 @@ class TestMatrixMove:
         # --------------------------------下载yg转图tgz，并解压好，获取到文件夹名称，作为g料号名称-------------------------------
         job_g = DMS().get_file_from_dms_db(temp_path, job_id, field='file_odb_g', decompress='tgz')
         Input.open_job(job_g,temp_g_path)
+        all_steps_list_job_g = Information.get_steps(job_g)
         all_layers_list_job_g = Information.get_layers(job_g)
+
 
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_gerber_path)
         '''
-        用例名称：一次move单个layer到指定位置
-        预期1：move成功
+        用例名称：insert一个step
+        预期1：insert成功
         执行场景数：1个
         '''
-        row = 5
-        Matrix.move_layer(job_ep,row,1)
+        steps = Information.get_steps(job_ep)
+        print("steps1", steps)
+        Matrix.create_step(job_ep,'test_insert',2)
+        steps = Information.get_steps(job_ep)
+        print("steps2",steps)
         test_cases = test_cases + 1
 
+        # BASE.insert_layer(job_ep,7)
         '''
-        用例名称：一次move多个layer到指定位置
-        预期1：move成功
+        用例名称：insert一个layer
+        预期1：insert成功
         执行场景数：1个
         '''
-        row_list = [7,8]
-        for row in row_list:
-            Matrix.move_layer(job_ep,row,4)
-        test_cases = test_cases + 1
-        '''
-        用例名称：将目标层move超出
-        预期1：move失败
-        执行场景数：1个
-        '''
-        row = 9
-        tar_row = len(Information.get_layer_information(job_ep)) + 1
-        Matrix.move_layer(job_ep,row,tar_row)
+        Matrix.create_layer(job_ep,'test_insert',7)
         test_cases = test_cases + 1
 
         # GUI.show_matrix(job_ep)
+
         save_job(job_ep, temp_ep_path)
         all_layers_list_job_ep = Information.get_layers(job_ep)
-        informatitons_ep = Information.get_layer_information(job_ep)
-        informatitons_g = Information.get_layer_information(job_g)
+        all_steps_list_job_ep = Information.get_steps(job_ep)
+        layer_informations_ep = Information.get_layer_information(job_ep)
+        layer_informations_g = Information.get_layer_information(job_g)
+
         print("test_cases：", test_cases)
 
         # ----------------------------------------开始验证结果--------------------------------------------------------
         dict_layer_row_ep = {}
         for layer_ep in all_layers_list_job_ep:
-            for information in informatitons_ep:
+            for information in layer_informations_ep:
                 if information['name'] == layer_ep:
                     row = information['row']
                     dict_layer_row_ep[layer_ep] = row
 
         dict_layer_row_g = {}
         for layer_g in all_layers_list_job_g:
-            for information in informatitons_g:
+            for information in layer_informations_g:
                 if information['name'] == layer_g:
                     row = information['row']
                     dict_layer_row_g[layer_g] = row
         assert dict_layer_row_ep == dict_layer_row_g
-        Print.print_with_delimiter("断言--结束")
 
+        column_ep = 1
+        dict_step_column_ep = {}
+        for step_ep in all_steps_list_job_ep:
+            dict_step_column_ep[step_ep] = column_ep
+            column_ep = column_ep + 1
+
+        column_g = 1
+        dict_step_column_g = {}
+        for step_g in all_steps_list_job_g:
+            dict_step_column_g[step_g] = column_g
+            column_g = column_g + 1
+        assert dict_step_column_ep == dict_step_column_g
+        Print.print_with_delimiter("断言--结束")
         Job.close_job(job_ep)
         Job.close_job(job_g)

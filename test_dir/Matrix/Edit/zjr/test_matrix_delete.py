@@ -8,12 +8,12 @@ from epkernel.Output import save_job
 
 class TestMatrixDelete:
     '''
-    id:30872
+    id:30872,共执行1个测试用例，实现4个方法，覆盖6个测试场景
     '''
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Matrix_Delete'))
-    def test_matrix_delete (self, job_id):
+    def test_matrix_delete(self, job_id):
         '''
-        本用例测试Matrix窗口的Delete，共执行1个测试用例，实现4个方法，覆盖6个测试场景
+        本用例测试Matrix窗口的Delete
         '''
         g = RunConfig.driver_g  # 拿到G软件
         test_cases = 0  # 用户统计执行了多少条测试用例
@@ -106,8 +106,7 @@ class TestMatrixDelete:
         save_job(job_ep, temp_ep_path)
         all_layers_list_job_ep = Information.get_layers(job_ep)  # 获取新的ep所有layer信息
         all_steps_list_job_ep = Information.get_steps(job_ep)  # 获取新的ep所有step信息
-        Job.close_job(job_ep)
-        Job.close_job(job_g)
+
         print("test_cases：", test_cases) #统计覆盖场景数
         # ----------------------------------------开始验证结果：G与EP---------------------------------------------------------
         Print.print_with_delimiter('断言--开始')
@@ -120,4 +119,5 @@ class TestMatrixDelete:
         for step_g in all_steps_list_job_g:
             assert step_g in all_steps_list_job_ep
         Print.print_with_delimiter("断言--结束")
-
+        Job.close_job(job_ep)
+        Job.close_job(job_g)
