@@ -8,12 +8,12 @@ from epkernel.Output import save_job
 
 class TestMatrixCopy:
     '''
-    id:37292
+    id:37292,共执行1个测试用例，实现4个方法，覆盖8个测试场景
     '''
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Matrix_Copy'))
-    def test_matrix_copy (self, job_id):
+    def test_matrix_copy(self, job_id):
         '''
-        本用例测试Matrix窗口的Copy，共执行1个测试用例，实现4个方法，覆盖8个测试场景
+        本用例测试Matrix窗口的Copy
         '''
         g = RunConfig.driver_g  # 拿到G软件
         test_cases = 0  # 用户统计执行了多少条测试用例
