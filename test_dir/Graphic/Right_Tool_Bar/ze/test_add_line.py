@@ -54,13 +54,11 @@ class TestGraphicEditFeatureIndex:
 
         '''
         测试用例名称: 单层添加不同形状、大小的正、负极性线段
-        预期结果: 正确添加
-        执行测试用例数: 20个
+        预期结果: r-1和s-1的正负极性line由于超出边界值不能添加，其他均可正确添加
+        执行测试用例数: 12个
         '''
-        symbols = ['r0', 'r-1', 'r50','s0', 's-1', 's10','rect50x50', 'rect50x50xr25x2', 'rect50x50xr25x12', 'rect50x50xr25x123', 'rect50x50xr25',  'rect50x50','rect50x50xc25x2',
-                   'rect50x50xc25x12', 'rect50x50xc25x123', 'rect50x50xc25', 'oval50x50', 'di50x50', 'oct50x50x10', 'donut_r50x30', 'donut_s50x30',
-                   'hex_l50x50x10', 'hex_s50x30x10', 'bfr50', 'bfs50', 'tri50x30', 'oval_h50x30', 'thr60x30x1x3x10', 'ths60x30x1x3x10', 'sr_ths60x30x1x3x10',
-                   'rc_ths60x30x1x3x10x10', 'el50x20', 'moire60x30x1x30x10x10', 'hole20xvx1x1', 'hole50xnx2x2', 'hole80xpx2x2', 'null50000']#根据边界值法设置不同类型线段的大小
+        symbols = ['r0', 'r-1', 'r20', 's0', 's-1', 's20']#根据边界值法设置不同类型线段的大小
+        #1.在正极性铜皮上添加负极性的r0或s0线段，UI上不显示添加的负极性线段(BugID：5560)
         polaritys = [True ,False]  # 设置线段的两种极性
         num_x1 = 43  # x轴坐标
         attributes = [{'.fiducial_name': '0'}, {'.area': ''}]  # 定义线段属性
@@ -74,25 +72,18 @@ class TestGraphicEditFeatureIndex:
                 num_x1 = num_x1 + 1
                 num_y1 = num_y1 - 10
                 num_y2 = num_y2 - 10
-        GUI.show_layer(job_ep, step, 'l2')
+        #GUI.show_layer(job_ep, step, 'l2')
 
-        Layers.add_line(job_ep, step, ['l3'], 'r50000',0, 0, 25400000, 25400000,
-        True, [{'.fiducial_name': '0'},{'.area':''}])   # 单层增加r50000的正极性线条
 
-        Layers.add_line(job_ep, step, ['l3'], 'r50000', 0, 0, 25400000, 25400000,
-                        False, [{'.fiducial_name': '0'}, {'.area': ''}])  # 单层增加r50000的负极性线条
-        GUI.show_layer(job_ep, step, 'l3')
 
-        Layers.add_line(job_ep, step, ['l5'], 'r50000', 0, 0, 25400000, 25400000,
-                        True, [{'.fiducial_name': '0'}, {'.area': ''}])  # 单层增加s50000线条
 
 
         '''
         测试用例名称: 多层添加不同形状大小的正、负极性线段
-        预期结果: 正确添加
-        执行测试用例数: 8个
+        预期结果: r-1和s-1由于超出边界值不能添加，其他大小正确添加
+        执行测试用例数: 12个
         '''
-        symbols = ['r8', 's8','r20', 's20']  # 设置线段形状大小
+        symbols = ['r0', 'r-1', 'r20','s0', 's-1', 's20']  # 设置线段形状大小
         polaritys = [True, False]  # 线段极性
         num_x2 = 43  # x轴坐标
         attributes = [{'.fiducial_name': '0'}, {'.area': ''}]  # 定义线段属性
@@ -107,7 +98,7 @@ class TestGraphicEditFeatureIndex:
                 num_y3 = num_y3 - 10
                 num_y4 = num_y4 - 10
 
-        GUI.show_layer(job_ep, step, 'l6')
+        #GUI.show_layer(job_ep, step, 'l6')
 
 
 
@@ -123,7 +114,7 @@ class TestGraphicEditFeatureIndex:
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         layerInfo = []
-        for each in ['l2','l3','l4']:
+        for each in ['l2','l4','l6']:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''
