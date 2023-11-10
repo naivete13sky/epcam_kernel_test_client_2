@@ -54,25 +54,78 @@ class TestGraphicFillProfilePanel:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        # 1.验证填充方式为实铜，依据父profile线x方向涨缩值，外扩为负数
+        # 1.验证填充方式为实铜，依据父profile线x方向涨缩值，margin外扩为负数
         Layers.fill_profile(job_ep, step, ['gtl'], 0, False, [],
                             -50800000, -50800000, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
-        GUI.show_layer(job_ep, step, 'gtl')
+        # GUI.show_layer(job_ep, step, 'gtl')
 
-        # 2.验证填充方式为实铜，依据父profile线x方向涨缩值，内缩为正数
+        # 2.验证填充方式为实铜，依据父profile线x方向涨缩值，margin内缩为正数
         Layers.fill_profile(job_ep, step, ['l2'], 0, False, [],
                             5080000, 12700000, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
-        GUI.show_layer(job_ep, step, 'l2')
+        # GUI.show_layer(job_ep, step, 'l2')
 
-        # 3.验证填充方式为实铜，铺的铜从父Margin线边缘算起x、y方向最大的铺铜距离
+        # 3.验证填充方式为实铜，铺的铜从父Margin线边缘算起Max Distancee的x、y方向最大的铺铜距离
         Layers.fill_profile(job_ep, step, ['l3'], 0, False, [],
                             0, 0, 203200000, 127000000, 0, 0, 0, 0, 0, 0, 0, True)
-        GUI.show_layer(job_ep, step, 'l3')
+        # GUI.show_layer(job_ep, step, 'l3')
 
-        # 4.验证填充方式为实铜，依据子profile线x、y方向涨缩值，内缩为负数
+        # 4.验证填充方式为实铜，依据子profile线x、y方向涨缩值，S&R的Margin内缩为负数
         Layers.fill_profile(job_ep, step, ['gbl'], 0, False, [],
                             0, 0, 0, 0, -25400000, -50800000, 0, 0, 0, 0, 0, True)
-        GUI.show_layer(job_ep, step, 'gbl')
+        # GUI.show_layer(job_ep, step, 'gbl')
+
+        # 5.验证填充方式为实铜，依据子profile线x、y方向涨缩值，S&R的Margin外扩为正数
+        Layers.fill_profile(job_ep, step, ['gts'], 0, False, [],
+                            0, 0, 0, 0, 10160000, 5080000, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'gts')
+
+        # 6.验证填充方式为实铜，铺的铜从子Margin线边缘算起SR_max_distance的x、y方向最大的铺铜距离
+        Layers.fill_profile(job_ep, step, ['gbs'], 0, False, [],
+                            0, 0, 0, 0, 0, 0, 12700000, 25400000, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'gbs')
+
+        # 7.验证填充方式为实铜，依据父profile线x方向涨缩值，margin内缩并计算最大的铺铜距离
+        Layers.fill_profile(job_ep, step, ['gbo'], 0, False, [],
+                            12700000, 20320000, 76200000, 127000000, 0, 0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'gbo')
+
+        # 8.验证填充方式为实铜，依据父profile线x方向涨缩值，margin外扩并计算最大的铺铜距离
+        Layers.fill_profile(job_ep, step, ['gto'], 0, False, [],
+                            -15240000, -12700000, 101600000, 127000000, 0, 0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'gto')
+
+        # 9.验证填充方式为实铜，依据子profile线x、y方向涨缩值，S&R的Margin外扩为正数并计算子Margin线边缘
+        Layers.fill_profile(job_ep, step, ['gtl+1'], 0, False, [],
+                            0, 0, 0, 0, 5080000, 15240000, 101600000, 76200000, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'gtl+1')
+
+        # 10.验证填充方式为实铜，依据子profile线x、y方向涨缩值，S&R的Margin内缩为负数并计算子Margin线边缘
+        Layers.fill_profile(job_ep, step, ['l2+1'], 0, False, [],
+                            0, 0, 0, 0, -12700000, -20320000, 25400000, 5080000, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l2+1')
+
+        # 11.验证填充方式为实铜，需避的子step列表
+        Layers.fill_profile(job_ep, step, ['l3+1'], 0, True, ['set46'],
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'l3+1')
+
+        # 12.验证填充方式为实铜，需避的子step列表并避孔外扩0.3inch
+        Layers.fill_profile(job_ep, step, ['gbl+1'], 0, True, ['set033'],
+                            0, 0, 0, 0, 0, 0, 0, 0, 7620000, 0, 0, True)
+        # GUI.show_layer(job_ep, step, 'gbl+1')
+
+        # 13.验证填充方式为实铜，需避的子step列表并避rout层时外扩值0.08inch
+        Layers.fill_profile(job_ep, step, ['rout'], 0, True, ['set033'],
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 2032000, 0, True)
+        # GUI.show_layer(job_ep, step, 'rout')
+
+        # 14.验证填充方式为实铜,避同层物件外扩值
+        Layers.fill_profile(job_ep, step, ['gtl+2'], 0, True, ['set46'],
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7620000, True)
+        GUI.show_layer(job_ep, step, 'gtl+2')
+
+
+
 
         save_job(job_ep, temp_ep_path)
         # GUI.show_layer(job_case,step,'drl1-10')
