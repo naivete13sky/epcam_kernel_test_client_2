@@ -161,20 +161,20 @@ class TestGraphicFillProfile:
                             0, 0, 0, 0, 762000, 0, True)
         GUI.show_layer(job_ep, step, 'spt')
 
-        # 15.验证填充方式为实铜，避rout层时外扩值0.1inch,极性为负
+        # 16.验证填充方式为实铜，避rout层时外扩值0.1inch,极性为负
         Layers.delete_feature(job_ep, step, ['spb'])
         Layers.fill_profile(job_ep, step, ['spb'], 0, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 2540000, 0, False)
         Layers.change_polarity(job_ep, step, ['spb'], 2, 1)
         GUI.show_layer(job_ep, step, 'spb')
 
-        # 16.验证填充方式为实铜，避同层物件外扩值0.01inch
+        # 17.验证填充方式为实铜，避同层物件外扩值0.01inch
         # Layers.delete_feature(job_ep, step, ['smt+1'])
         Layers.fill_profile(job_ep, step, ['smt+1'], 0, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 254000, True)
         GUI.show_layer(job_ep, step, 'smt+1')
 
-        # 17.验证填充方式为指定symbol，避同层物件外扩值0.002inch并反转极性
+        # 18.验证填充方式为指定symbol，避同层物件外扩值0.002inch并反转极性
         # Layers.delete_feature(job_ep, step, ['smb+1'])
         Layers.set_fill_pattern_param('donut_r80x60', False, False, 2540000,
                                       2540000, True, False, False, 0, 0, 0, 0)
