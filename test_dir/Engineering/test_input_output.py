@@ -634,6 +634,7 @@ class TestOutputGerber274XParas():
                                                 job2=job2, step2=step2,
                                                 layerInfo=layerInfo,
                                                 adjust_position=True, jsonPath=r'my_config.json',
+                                            save_job='no',  # save_job='no'表示比对完不保存料号，其实此参数默认就是no。yes则保存。
                                             map_layer = 'with_step',
                                             layer2_ext= '_'+step1+'_'+'copy')
             print('compareResult_input_vs:', compareResult)

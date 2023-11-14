@@ -488,7 +488,7 @@ class G():
         time.sleep(1)
 
     def layer_compare(self,*args,temp_path,temp_path_g,job1,step1='orig',job2,step2='orig',layerInfo,
-                      adjust_position=False,jsonPath,
+                      adjust_position=False,jsonPath, save_job='no',
                       **kwargs):
         global g_vs_total_result_flag
         adjust_position = adjust_position
@@ -544,8 +544,9 @@ class G():
 
         data_g['all_result_g'] = all_result_g
         data_g['g_vs_total_result_flag'] = g_vs_total_result_flag
-        self.save_job(job1)
-        self.save_job(job2)
+        if save_job == 'yes':
+            self.save_job(job1)
+            self.save_job(job2)
         self.layer_compare_close_job(job1=job1, job2=job2)
 
         return data_g
