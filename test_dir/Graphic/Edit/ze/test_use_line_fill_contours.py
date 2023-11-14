@@ -6,10 +6,9 @@ from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 
-class TestGraphicEditFeatureIndex:
-    # @pytest.mark.Feature index
+class TestGraphicEditLine_fill_contours:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Line_fill_contours'))
-    def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
+    def testLine_fill_contours(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Use_line_fill_contours填充功能（ID：18646）
         '''

@@ -6,10 +6,9 @@ from epkernel.Action import Information, Selection
 from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
 
-class TestGraphicEditFeatureIndex:
-    # @pytest.mark.Feature index
+class TestGraphicActionReverse_select:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Reverse_select'))
-    def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
+    def testReverse_select(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Reverse_select功能（ID：12811）
         '''

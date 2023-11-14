@@ -7,10 +7,9 @@ from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 
 
-class TestGraphicEditFeatureIndex:
-    # @pytest.mark.Feature index
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break'))
-    def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
+class TestGraphicEditBreak_feature:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break_feature'))
+    def testBreak_feature(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Break_features删除物件功能（ID：17486）
         '''

@@ -7,10 +7,9 @@ from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 
 
-class TestGraphicEditFeatureIndex:
-    # @pytest.mark.Feature index
+class TestGraphicEditContour2pad:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Contour2pad'))
-    def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
+    def testContour2pad(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Contour2pad铜皮转pad功能（ID: 17870）
         '''

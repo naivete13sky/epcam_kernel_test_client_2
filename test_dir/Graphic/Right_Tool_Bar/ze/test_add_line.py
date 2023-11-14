@@ -7,10 +7,9 @@ from epkernel.Output import save_job
 from epkernel import Application
 from epkernel.Action import Information, Selection
 
-class TestGraphicEditFeatureIndex:
-    # @pytest.mark.Feature index
+class TestGraphicAdd_line:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Add_line'))
-    def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
+    def testAdd_line(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Add_line功能（ID:12812）
         '''

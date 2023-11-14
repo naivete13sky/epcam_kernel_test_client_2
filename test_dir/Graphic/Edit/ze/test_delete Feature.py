@@ -7,10 +7,9 @@ from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
 
 
-class TestGraphicEditFeatureIndex:
-    # @pytest.mark.Feature index
+class TestGraphicEditDelete_feature:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Delete_feature'))
-    def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
+    def testDelete_feature(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Delete_feature功能（ID：13593）
         '''

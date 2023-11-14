@@ -7,10 +7,9 @@ from epkernel.Output import save_job
 from epkernel import Application
 from epkernel.Action import Information, Selection
 
-class TestGraphicEditFeatureIndex:
-    # @pytest.mark.Feature index
+class TestGraphicAdd_pad:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Add_pad'))
-    def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
+    def testAdd_pad(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Add_pad功能（ID:39608）
         '''

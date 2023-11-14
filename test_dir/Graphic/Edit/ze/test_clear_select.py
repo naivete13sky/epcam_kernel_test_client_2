@@ -7,10 +7,9 @@ from epkernel.Edition import Layers, Job, Matrix
 from epkernel.Output import save_job
 
 
-class TestGraphicEditFeatureIndex:
-    # @pytest.mark.Feature index
+class TestGraphicActionClear_select:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Clear_select'))
-    def testFeatureIndex(self, job_id, g, prepare_test_job_clean_g):
+    def testClear_select(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Clear_select功能（ID：13935）
         '''
