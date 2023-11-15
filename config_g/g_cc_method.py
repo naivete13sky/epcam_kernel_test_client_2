@@ -544,10 +544,18 @@ class G():
 
         data_g['all_result_g'] = all_result_g
         data_g['g_vs_total_result_flag'] = g_vs_total_result_flag
+
+        # 不管理比对是否通过，都保存一下料号1和料号2
         if save_job == 'yes':
             self.save_job(job1)
             self.save_job(job2)
+
+        # 如果比对失败就保存一下料号1
+        if not g_vs_total_result_flag:
+            self.save_job(job1)
+
         self.layer_compare_close_job(job1=job1, job2=job2)
+
 
         return data_g
 

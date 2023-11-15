@@ -652,7 +652,6 @@ class TestOutputGerber274XParas():
                 print("恭喜您！料号导入比对通过！")
             if data['g_vs_total_result_flag'] == False:
                 print("Sorry！料号导入比对未通过，请人工检查！")
-                g.save_job(job1)
             print('分割线'.center(192, '-'))
             print('G转图的层：', data["all_result_g"])
 
