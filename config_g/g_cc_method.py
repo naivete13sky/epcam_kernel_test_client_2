@@ -618,20 +618,18 @@ class G():
             print(cmd)
             self.exec_cmd(cmd)
 
-    def get_copper_area(self, layer, copper_area_file_name, get_result_file_name):
+    def get_copper_area(self,layer,temp_path,remote_temp_g_path,copper_area_file_name,get_result_file_name):
         # 使用PsExec通过命令在远程机器执行cmd操作
         from cc.cc_method import RemoteCMD
         myRemoteCMD = RemoteCMD(psexec_path='cc', computer='192.168.1.3',
                                 username='administrator',
                                 password='cc')
-        text_content = "COM copper_area,layer1={},layer2=,drills=yes,consider_rout=no,ignore_pth_no_pad=no,drills_source=matrix,thickness=0,resolution_value=1,x_boxes=3,y_boxes=3,area=no,dist_map=yes\n".format(
-            layer)
+        text_content = "COM copper_area,layer1={},layer2=,drills=yes,consider_rout=no,ignore_pth_no_pad=no,drills_source=matrix,thickness=0,resolution_value=1,x_boxes=3,y_boxes=3,area=no,dist_map=yes\n".format(layer)
         text_content += r"echo $COMANS >> Z:/share/epcam_kernel/{}".format(get_result_file_name)
-        temp_path_base = os.path.join(RunConfig.temp_path_base)
-        copper_area_file_path = os.path.join(temp_path_base, copper_area_file_name)
-        with open(copper_area_file_path, 'w') as f:
-            f.write(text_content)  # 在指定路径下创建一个.txt文件，并向该文件写入text_content内容
-        command_folder_path = os.path.join(RunConfig.temp_path, 'script_run.py')
+        copper_area_file_path = os.path.join(temp_path,copper_area_file_name)
+        with open(copper_area_file_path,'w') as f:
+            f.write(text_content) #在指定路径下创建一个.txt文件，并向该文件写入text_content内容
+        command_folder_path = os.path.join(remote_temp_g_path,'script_run.py')
         command = r'cmd /c python "{}"'.format(command_folder_path)
         myRemoteCMD.run_cmd(command)
 
