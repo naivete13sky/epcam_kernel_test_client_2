@@ -59,6 +59,6 @@ class TestGraphicCopper_Exposed_Area:
                         # ----------------------------------------开始验证结果------------------------------------------------
                         print("copper_area_ep:",copper_area_ep)
                         print("copper_area_g:", copper_area_g)
-                        assert copper_area_ep - copper_area_g < 0.03
+                        assert abs(copper_area_ep - copper_area_g) < 0.03
         Job.close_job(job_ep)
 
