@@ -39,26 +39,26 @@ class TestGraphicCopper_Exposed_Area:
         all_step_list_ep = Information.get_steps(job_ep)  # 得到所有step
         out_layer_list = Information.get_outer_layers(job_ep)  # 得到外层
         remote_temp_g_path = Path(RunConfig.temp_path_g).parent # 得到虚拟机中的share路径
-        copper_area_file_name = 'copper_area.txt'  # 存放执行copper_area指令的文本名
-        get_result_file_name = 'result_file_name.txt'  # 存放copper_area结果的文本名
-        get_result_file_path = os.path.join(temp_path, get_result_file_name)  # copper_area结果文件路径
-        if out_layer_list:
-            for step in all_step_list_ep:
-                if step == 'panel':  # 如果是拼版，则计算外层的残铜率
-                    job_g_remote_path = os.path.join(RunConfig.temp_path_g, 'compressed', job_ep)  # 要比图的资料路径
-                    g.import_odb_folder(job_g_remote_path)  # g导入要比图的资料
-                    g.open_job(job_ep, step)  # 用g打开里料号
-                    for layer in out_layer_list:
-                        copper_area_ep = Information.get_rest_cu_rate(job_ep, step, layer, 0, 0)  # 得到ep的copper_area
-                        g.get_copper_area(layer, temp_path, remote_temp_g_path, copper_area_file_name, get_result_file_name)
-                        with open(get_result_file_path, 'r') as file:
-                            content = file.readlines()
-                        last_line = content[-1]
-                        print("last_line", last_line)
-                        copper_area_g = float(last_line.split(" ")[1]) / 100
-                        # ----------------------------------------开始验证结果------------------------------------------------
-                        print("copper_area_ep:",copper_area_ep)
-                        print("copper_area_g:", copper_area_g)
-                        assert abs(copper_area_ep - copper_area_g) < 0.03
+        copper_area_file_name_g = 'copper_area.txt'  # 存放g软件执行copper_area脚本指令的文件名
+        get_result_file_name_g = 'result_file_name.txt'  # 存放g软件的残铜率结果文件名
+        get_result_file_path_g = os.path.join(temp_path, get_result_file_name_g)  # 存放g软件的残铜率结果文件路径
+        step = [step for step in all_step_list_ep if step == 'panel'] #得到panel的step
+        if step and out_layer_list: # 如果有panel和外层，则计算外层的残铜率
+            job_g_remote_path = os.path.join(RunConfig.temp_path_g, 'compressed', job_ep)  # 要比图的资料路径
+            g.import_odb_folder(job_g_remote_path)  # 用g导入要比图的资料
+            g.open_job(job_ep, step[0])  # 用g打开料号
+            for layer in out_layer_list: #逐个获取ep-cam和g的外层残铜率，并对结果进行断言
+                copper_area_ep = Information.get_rest_cu_rate(job_ep, step[0], layer, 0, 0)  # 得到ep的残铜率
+                # 获取g的残铜率（通过虚拟机使用cmd操作g软件执行run脚本，将结果数据保存到文件中）
+                g.get_copper_area(layer, temp_path, remote_temp_g_path, copper_area_file_name_g, get_result_file_name_g)
+                with open(get_result_file_path_g, 'r') as file: #打开文件
+                    content = file.readlines() #读取文件中的内容（g的残铜率）
+                last_line = content[-1] #获取最后一列内容
+                print("last_line", last_line)
+                copper_area_g = float(last_line.split(" ")[1]) / 100
+                # ----------------------------------------开始验证结果------------------------------------------------
+                print("copper_area_ep:",copper_area_ep)
+                print("copper_area_g:", copper_area_g)
+                assert abs(copper_area_ep - copper_area_g) < 0.03 #断言ep-cam和g的残铜率，差值在0.03以内则通过
         Job.close_job(job_ep)
 
