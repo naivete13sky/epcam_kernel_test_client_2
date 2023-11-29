@@ -53,7 +53,7 @@ class TestGraphicCopper_Exposed_Area:
                 g.get_copper_area(layer, temp_path, remote_temp_g_path, copper_area_file_name_g, get_result_file_name_g)
                 with open(get_result_file_path_g, 'r') as file: #打开文件
                     content = file.readlines() #读取文件中的内容（g的残铜率）
-                last_line = content[-1] #获取最后一列内容
+                last_line = content[-1] #获取最后一行内容
                 print("last_line", last_line)
                 copper_area_g = float(last_line.split(" ")[1]) / 100
                 # ----------------------------------------开始验证结果------------------------------------------------
