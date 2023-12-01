@@ -8,7 +8,7 @@ from epkernel.Output import save_job
 
 
 # @pytest.mark.Attributes
-class TestGraphicFillProfile:
+class TestGraphicFillProfileprepare:
     # @pytest.mark.Attributes
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_Profile_left'))
     def testfill_profile(self, job_id, g, prepare_test_job_clean_g):
@@ -72,21 +72,21 @@ class TestGraphicFillProfile:
         Layers.set_fill_grid_param(45, 15240000, 10160000, 508000, 0, 0)
         Layers.fill_profile(job_ep, step, ['l10'], 2, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, True)
-        GUI.show_layer(job_ep, step, 'l10')
+        # GUI.show_layer(job_ep, step, 'l10')
 
         # 4.验证填充方式为网格铜，x_offset偏移1inch
         Layers.delete_feature(job_ep, step, ['smb'])
         Layers.set_fill_grid_param(0, 15240000, 10160000, 508000, 25400000, 0)
         Layers.fill_profile(job_ep, step, ['smb'], 2, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, True)
-        GUI.show_layer(job_ep, step, 'smb')
+        # GUI.show_layer(job_ep, step, 'smb')
 
         # 5.验证填充方式为网格铜，y_offset偏移3inch
         Layers.delete_feature(job_ep, step, ['smt'])
         Layers.set_fill_grid_param(0, 10160000, 10160000, 508000, 0, 76200000 )
         Layers.fill_profile(job_ep, step, ['smt'], 2, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, True)
-        GUI.show_layer(job_ep, step, 'smt')
+        # GUI.show_layer(job_ep, step, 'smt')
 
         # 6.验证填充方式为line填充。不使用arc，其余参数默认
         Layers.delete_feature(job_ep, step, ['l3'])
@@ -134,10 +134,10 @@ class TestGraphicFillProfile:
                             0, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'l8')
 
-        # 12.验证填充方式为指定symbol，break_partial为false
+        # 12.验证填充方式为指定特殊symbol，break_partial为True，kerner版本1.1.9
         Layers.delete_feature(job_ep, step, ['l9'])
-        Layers.set_fill_pattern_param('el100x60', False, False, 15240000,
-                                      10160000, True, False, False, 0, 0, 0, 0)
+        Layers.set_fill_pattern_param('0.12x0.28', True, False, 2540000,
+                                      2540000, True, False, False, 0, 0, 0, 0)
         Layers.fill_profile(job_ep, step, ['l9'], 3, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, True)
         GUI.show_layer(job_ep, step, 'l9')
@@ -146,33 +146,33 @@ class TestGraphicFillProfile:
         Layers.delete_feature(job_ep, step, ['sst'])
         Layers.fill_profile(job_ep, step, ['sst'], 0, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 254000, 0, 0, True)
-        GUI.show_layer(job_ep, step, 'sst')
+        # GUI.show_layer(job_ep, step, 'sst')
 
         # 14.验证填充方式为实铜，避孔时外扩值0.008inch,极性为负
         Layers.delete_feature(job_ep, step, ['ssb'])
         Layers.fill_profile(job_ep, step, ['ssb'], 0, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 203200, 0, 0, False)
         Layers.change_polarity(job_ep, step, ['ssb'], 2, 1)
-        GUI.show_layer(job_ep, step, 'ssb')
+        # GUI.show_layer(job_ep, step, 'ssb')
 
         # 15.验证填充方式为实铜，避rout层时外扩值0.03inch
         Layers.delete_feature(job_ep, step, ['spt'])
         Layers.fill_profile(job_ep, step, ['spt'], 0, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 762000, 0, True)
-        GUI.show_layer(job_ep, step, 'spt')
+        # GUI.show_layer(job_ep, step, 'spt')
 
         # 16.验证填充方式为实铜，避rout层时外扩值0.1inch,极性为负
         Layers.delete_feature(job_ep, step, ['spb'])
         Layers.fill_profile(job_ep, step, ['spb'], 0, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 2540000, 0, False)
         Layers.change_polarity(job_ep, step, ['spb'], 2, 1)
-        GUI.show_layer(job_ep, step, 'spb')
+        # GUI.show_layer(job_ep, step, 'spb')
 
         # 17.验证填充方式为实铜，避同层物件外扩值0.01inch
         # Layers.delete_feature(job_ep, step, ['smt+1'])
         Layers.fill_profile(job_ep, step, ['smt+1'], 0, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 254000, True)
-        GUI.show_layer(job_ep, step, 'smt+1')
+        # GUI.show_layer(job_ep, step, 'smt+1')
 
         # 18.验证填充方式为指定symbol，避同层物件外扩值0.002inch并反转极性
         # Layers.delete_feature(job_ep, step, ['smb+1'])
@@ -181,9 +181,7 @@ class TestGraphicFillProfile:
         Layers.fill_profile(job_ep, step, ['smb+1'], 3, False, [], 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 50800, False)
         Layers.change_polarity(job_ep, step, ['smb+1'], 2, 1)
-        GUI.show_layer(job_ep, step, 'smb+1')
-
-
+        # GUI.show_layer(job_ep, step, 'smb+1')
 
 
         save_job(job_ep, temp_ep_path)
@@ -312,24 +310,24 @@ class TestGraphicFillProfilePanel:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)  # 用悦谱CAM打开料号
 
-        # 1.验证填充方式为实铜，依据父profile线x方向涨缩值，margin外扩为负数
+        # 1.验证填充方式为实铜，依据父profile线x、y方向涨缩值，margin外扩为负数
         Layers.fill_profile(job_ep, step, ['gtl'], 0, False, [],
                             -50800000, -50800000, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'gtl')
 
-        # 2.验证填充方式为实铜，依据父profile线x方向涨缩值，margin内缩为正数
+        # 2.验证填充方式为实铜，依据父profile线x、y方向涨缩值，margin内缩为正数
         Layers.fill_profile(job_ep, step, ['l2'], 0, False, [],
                             5080000, 12700000, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'l2')
 
         # 3.验证填充方式为实铜，铺的铜从父Margin线边缘算起Max Distancee的x、y方向最大的铺铜距离
         Layers.fill_profile(job_ep, step, ['l3'], 0, False, [],
-                            0, 0, 203200000, 127000000, 0, 0, 0, 0, 0, 0, 0, True)
+                            0, 0, 76200000, 76200000, 0, 0, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'l3')
 
         # 4.验证填充方式为实铜，依据子profile线x、y方向涨缩值，S&R的Margin内缩为负数
         Layers.fill_profile(job_ep, step, ['gbl'], 0, False, [],
-                            0, 0, 0, 0, -25400000, -50800000, 0, 0, 0, 0, 0, True)
+                            0, 0, 0, 0, -20320000, -12700000, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'gbl')
 
         # 5.验证填充方式为实铜，依据子profile线x、y方向涨缩值，S&R的Margin外扩为正数
@@ -342,12 +340,12 @@ class TestGraphicFillProfilePanel:
                             0, 0, 0, 0, 0, 0, 12700000, 25400000, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'gbs')
 
-        # 7.验证填充方式为实铜，依据父profile线x方向涨缩值，margin内缩并计算最大的铺铜距离
+        # 7.验证填充方式为实铜，依据父profile线x、y方向涨缩值，margin内缩并计算最大的铺铜距离
         Layers.fill_profile(job_ep, step, ['gbo'], 0, False, [],
                             12700000, 20320000, 76200000, 127000000, 0, 0, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'gbo')
 
-        # 8.验证填充方式为实铜，依据父profile线x方向涨缩值，margin外扩并计算最大的铺铜距离
+        # 8.验证填充方式为实铜，依据父profile线x、y方向涨缩值，margin外扩并计算最大的铺铜距离
         Layers.fill_profile(job_ep, step, ['gto'], 0, False, [],
                             -15240000, -12700000, 101600000, 127000000, 0, 0, 0, 0, 0, 0, 0, True)
         # GUI.show_layer(job_ep, step, 'gto')
@@ -377,23 +375,95 @@ class TestGraphicFillProfilePanel:
                             0, 0, 0, 0, 0, 0, 0, 0, 0, 2032000, 0, True)
         # GUI.show_layer(job_ep, step, 'rout')
 
-        # 14.验证填充方式为实铜,需避的子step列表并避同层物件外扩值0.3inch
+        # 14.验证填充方式为实铜,需避的子step列表并避同层物件外扩值0.3inch,fail
         Layers.fill_profile(job_ep, step, ['gtl+2'], 0, True, ['set46'],
                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7620000, True)
         # GUI.show_layer(job_ep, step, 'gtl+2')
 
-        # 15.验证填充方式为指定符号填充,依据父profile线x方向外扩为负，填充为负极性
+        # 15.验证填充方式为指定标准符号填充,依据父profile线x、y方向外扩为负，填充为负极性
         Layers.set_fill_pattern_param('tri50x80', True, False, 2540000,
                                       2540000, True, False, False, 0, 0, 0, 0)
         Layers.fill_profile(job_ep, step, ['l2+2'], 3, False, [],
                             -25400000, -38100000, 0, 0, 0, 0, 0, 0, 0, 0, 0, False)
         # GUI.show_layer(job_ep, step, 'gtl+2')
 
-        # 16.验证填充方式为网格铜,依据父profile线x方向内缩为正，依据子profile线x、y方向外扩为正
+        # 16.验证填充方式为网格铜,依据父profile线x、Y方向内缩为正，依据子profile线x、y方向外扩为正
         Layers.set_fill_grid_param(0, 2540000, 2540000, 508000, 0, 0)
         Layers.fill_profile(job_ep, step, ['l3+2'], 2, False, [],
                             2540000, 7620000, 0, 0, 12700000, 5080000, 0, 0, 0, 0, 0, True)
-        # GUI.show_layer(job_ep, step, 'gtl+2')
+
+
+        # 17.验证填充方式为指定特殊符号,break_partial为True（默认），dx和dy为0.5、0.3；其余参数默认，需要1.9.0的kernel
+        Layers.set_fill_pattern_param('21n', True, False, 12700000,
+                                      7620000, True, False, False, 0, 0, 0, 0)
+        Layers.fill_profile(job_ep, step, ['gbl+2'], 3, False, [],
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gbl+2')
+
+        # 18.验证填充方式为指定特殊符号,break_partial为False，其余参数默认，需要1.9.0的kernel
+        Layers.set_fill_pattern_param('21n', False, False, 12700000,
+                                      7620000, True, False, False, 0, 0, 0, 0)
+        Layers.fill_profile(job_ep, step, ['gto+1'], 3, False, [],
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gto+1')
+
+        # 19.验证填充方式为指定特殊符号,break_partial为True，dx和dy为0.3、0.2；odd_offset位置偏移0.3inch，角度选择15；需要1.9.0的kernel
+        Layers.set_fill_pattern_param('auto_dateb', True, False, 7620000,
+                                      5080000, True, False, False, 0, 0, 7620000, 15)
+        Layers.fill_profile(job_ep, step, ['gts+1'], 3, False, [],
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gts+1')
+
+        # 20.验证填充方式为指定特殊符号,break_partial为True，dx和dy为0.3、0.2；even_offset位置偏移0.1inch，角度选择10；需要1.9.0的kernel
+        Layers.set_fill_pattern_param('auto_dateb', True, False, 7620000,
+                                      5080000, True, False, False, 0, 2540000, 0, 10)
+        Layers.fill_profile(job_ep, step, ['gbs+1'], 3, False, [],
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gbs+1')
+
+        # 21.验证填充方式为指定特殊符号,break_partial为False，dx和dy为0.3；even_offset位置偏移0.1inch，角度选择10；需要1.9.0的kernel
+        Layers.set_fill_pattern_param('auto_dateb', False, False, 7620000,
+                                      7620000, True, False, False, 0, 2540000, 0, 10)
+        Layers.fill_profile(job_ep, step, ['gbo+1'], 3, False, [],
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gbo+1')
+
+        # 22.验证填充方式为指定特殊符号,break_partial为False，dx和dy为0.3；odd_offset位置偏移0.3inch，角度选择15；需要1.9.0的kernel
+        Layers.set_fill_pattern_param('auto_dateb', False, False, 7620000,
+                                      7620000, True, False, False, 0, 0, 7620000, 15)
+        Layers.fill_profile(job_ep, step, ['gto+2'], 3, False, [],
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gto+2')
+
+        # 23.验证填充方式为指定标准符号,break_partial为True，step_margin_x外扩-0.1inch，step_margin_y外扩-0.2inch
+        Layers.set_fill_pattern_param('s80', True, False, 2540000,
+                                      2540000, True, False, False, 0, 0, 0, 0)
+        Layers.fill_profile(job_ep, step, ['gts+2'], 3, False, [],
+                            -2540000, -5080000, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gts+2')
+
+        # 24.验证填充方式为指定标准符号,break_partial为True，step_margin_x内缩0.1inch，step_margin_y内缩0.2inch
+        Layers.set_fill_pattern_param('s80', True, False, 2540000,
+                                      2540000, True, False, False, 0, 0, 0, 0)
+        Layers.fill_profile(job_ep, step, ['gtl+3'], 3, False, [],
+                            2540000, 5080000, 0, 0, 0, 0, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'gtl+3')
+
+        # 25.验证填充方式为指定标准符号,break_partial为True，SR_step_margin_x外扩0.3inch，SR_step_margin_y外扩0.5inch
+        Layers.set_fill_pattern_param('s80', True, False, 2540000,
+                                      2540000, True, False, False, 0, 0, 0, 0)
+        Layers.fill_profile(job_ep, step, ['l2+3'], 3, False, [],
+                            0, 0, 0, 0, 7620000, 12700000, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'l2+3')
+
+        # 26.验证填充方式为指定标准符号,break_partial为True，SR_step_margin_x内缩-0.3inch，SR_step_margin_y内缩-0.5inch
+        Layers.set_fill_pattern_param('s80', True, False, 2540000,
+                                      2540000, True, False, False, 0, 0, 0, 0)
+        Layers.fill_profile(job_ep, step, ['l3+3'], 3, False, [],
+                            0, 0, 0, 0, -7620000, -12700000, 0, 0, 0, 0, 0, True)
+        GUI.show_layer(job_ep, step, 'l3+3')
+
+
 
 
 
