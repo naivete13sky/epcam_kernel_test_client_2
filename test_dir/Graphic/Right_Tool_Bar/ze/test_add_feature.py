@@ -8,7 +8,7 @@ from epkernel import Application
 from epkernel.Action import Information, Selection
 
 '''
-本用例测试Add_line功能，共覆盖25个场景（ID:12812）
+本用例测试Add_line功能，共覆盖24个场景（ID:12812）
 '''
 class TestGraphicAdd_line:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Add_line'))
@@ -54,7 +54,8 @@ class TestGraphicAdd_line:
 
         '''
         测试用例名称: 单层添加不同形状、大小的正、负极性线段
-        预期结果: r-1和s-1的正负极性line由于超出边界值不能添加，其他均可正确添加
+        预期结果1:大小在取值范围内[0,50000]的正负极性line均可正确添加
+        预期结果2:r-1和s-1的正负极性line由于超出边界值不能添加
         覆盖用例场景数: 12个
         '''
         symbols = ['r0', 'r-1', 'r20', 's0', 's-1', 's20']#根据边界值法设置不同类型线段的大小
@@ -80,7 +81,8 @@ class TestGraphicAdd_line:
 
         '''
         测试用例名称: 多层添加不同形状大小的正、负极性线段
-        预期结果: r-1和s-1由于超出边界值不能添加，其他大小正确添加
+        预期结果1:大小在取值范围内[0,50000]的正负极性line均可在多层正确添加
+        预期结果2:r-1和s-1的正负极性line由于超出边界值不能添加
         执行测试用例数: 12个
         '''
         symbols = ['r0', 'r-1', 'r20','s0', 's-1', 's20']  # 设置线段形状大小
@@ -159,16 +161,14 @@ class TestGraphicAdd_line:
 
 
 
-
+'''
+本用例测试Add_pad功能，共覆盖108个场景（ID:39608）
+'''
 class TestGraphicAdd_pad:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Add_pad'))
     def testAdd_pad(self, job_id, g, prepare_test_job_clean_g):
-        '''
-        本用例测试Add_pad功能（ID:39608）
-        '''
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
-
         step = 'orig'  # 定义需要执行比对的step名
         # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
@@ -204,7 +204,7 @@ class TestGraphicAdd_pad:
 
 
 
-        #增加pad
+
         '''
         测试用例名称:添加不同形状大小的正、负极性Pad
         预期结果: 均可正确添加
@@ -265,7 +265,8 @@ class TestGraphicAdd_pad:
 
         '''
         测试用例名称:添加不同大小的正负极性Pad
-        预期结果: r-1和s-1的正负极性pad由于超出边界值不能添加，其他均可正确添加
+        预期结果1: 'r0', 'r50', 's0', 's50的正负极性Pad可正确添加
+        预期结果2:  r-1和s-1的正负极性pad由于超出边界值不能添加
         执行测试用例数: 12个
         '''
         points_location = []
@@ -278,7 +279,7 @@ class TestGraphicAdd_pad:
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}],
                            points_location)  # 先添加一块正极性大同皮，方便后面在铜皮上添加正负极性的不同镜像和角度的Pad
 
-        symbols = ['r0', 'r-1', 'r50', 's0', 's-1', 's50']#根据边界值法设置不同类型pad的大小
+        symbols = ['s0', 's-1', 's50', 'r0', 'r-1', 'r50']#根据边界值法设置不同类型pad的大小
         polaritys = [True, False]  # 设置pad极性
         num_x3 = 1  # x轴坐标
         attributes = [{'.drill': 'via'}, {'.drill_first_last': 'first'}]  # 定义pad属性
@@ -286,15 +287,16 @@ class TestGraphicAdd_pad:
             num_y3 = 25  # y轴坐标
             for polarity in polaritys:
                 Layers.add_pad(job_ep, step, ['l3'], symbol, num_x3 * 1000000, num_y3 * 1000000, polarity,
-                               orient, attributes, 66)
+                               0, attributes, 66)
                 num_x3 = num_x3 + 3
                 num_y3 = num_y3 + 6
-        GUI.show_layer(job_ep, step, 'l3')
+        #GUI.show_layer(job_ep, step, 'l3')
 
 
         '''
         测试用例名称:添加不同角度的正负极性Pad
-        预期结果: pad无法旋转-1度和361度，其他角度均可正确旋转
+        预期结果1: pad正确添加，但无法旋转-1度和361度，角度取值范围[0,360]
+        预期结果2: pad正确添加，可旋转[0,360]取值范围内的任一角度，角度取值范围[0,360]
         执行测试用例数: 10个
         '''
         points_location = []
@@ -321,7 +323,7 @@ class TestGraphicAdd_pad:
                                orient, attributes, special_angle)
                     num_x4 = num_x4 + 3
                     num_y4 = num_y4 + 6
-        GUI.show_layer(job_ep, step, 'l3')
+        #GUI.show_layer(job_ep, step, 'l3')
 
 
         save_job(job_ep, temp_ep_path)
@@ -336,7 +338,7 @@ class TestGraphicAdd_pad:
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         layerInfo = []
-        for each in ['l2','l3']:
+        for each in ['l2', 'l3']:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''
@@ -384,13 +386,12 @@ class TestGraphicAdd_pad:
 
 
 
-
+'''
+本用例测试Add_surface功能，共覆盖7个场景（ID:39611）
+'''
 class TestGraphicAdd_surface:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Add_surface'))
     def testAdd_surface(self, job_id, g, prepare_test_job_clean_g):
-        '''
-        本用例测试Add_surface功能（ID:39611）
-        '''
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
 
@@ -428,7 +429,7 @@ class TestGraphicAdd_surface:
         Input.open_job(job_ep,temp_compressed_path)  # 用悦谱CAM打开料号
 
 
-        #3.增加正极性surface
+        #1.验证可正确添加正极性surface
         points_location = []
         points_location.append([66 * 1000000, 1* 1000000])
         points_location.append([66 * 1000000, 6 * 1000000])
@@ -438,7 +439,7 @@ class TestGraphicAdd_surface:
         Layers.add_surface(job_ep, step, ['l2'], True,
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)
 
-        # 3.增加负极性surface
+        #2.验证可正确添加负极性surface
         points_location = []
         points_location.append([68 * 1000000, 3 * 1000000])
         points_location.append([68 * 1000000, 4 * 1000000])
@@ -449,10 +450,11 @@ class TestGraphicAdd_surface:
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)
 
 
-        #4.添加正极性圆形surface
+        #3.验证可正确添加正极性圆形surface
         Application.add_round_surface_jwApp(job_ep, step, ['l2'], True, {'.bga': '', '.cm': ''},68 * 1000000, 8 * 1000000, 50 * 25400)
         #GUI.show_layer(job_ep, step, 'l2')
-        #5.添加负极性圆形surface
+
+        #4.验证可正确添加负极性圆形surface
         Application.add_round_surface_jwApp(job_ep, step, ['l2'], False, {'.bga': '', '.cm': ''}, 67 * 1000000,
                                             5 * 1000000, 30 * 25400)
         #GUI.show_layer(job_ep, step, 'l2')
@@ -475,10 +477,20 @@ class TestGraphicAdd_surface:
 
         #6.选中一个圆形铜物件，使用线填充铜物件,不足的地方使用弧线填充
         Selection.select_feature_by_id(job_ep, step, 'l2', [925])#选中一个圆形铜皮
-        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 5 * 254000, True)  #使用线填充，线的最小间距为5Mil,弧度不足的地方使用弧线填充
+        Layers.use_solid_fill_contours(job_ep, step, ['l2'], 5 * 254000, True)  #使用线填充，线的最小间距为5Mil,弧度不足的地方使用弧线正确填充
         Selection.select_feature_by_id(job_ep, step, 'l2', [927])  #选中其中一个弧线线将其删除，以证明铜面打散时不足的地方用弧线补充了
         Layers.delete_feature(job_ep, step, ['l2'])
         #GUI.show_layer(job_ep, step, 'l2')
+
+        #7.验证可多层舔加surface
+        points_location = []
+        points_location.append([66 * 1000000, 1 * 1000000])
+        points_location.append([66 * 1000000, 6 * 1000000])
+        points_location.append([71 * 1000000, 6 * 1000000])
+        points_location.append([71 * 1000000, 1 * 1000000])
+        points_location.append([66 * 1000000, 1 * 1000000])
+        Layers.add_surface(job_ep, step, ['l3', 'l4'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)#多层添加正极性Surface
 
 
         save_job(job_ep, temp_ep_path)
@@ -493,7 +505,7 @@ class TestGraphicAdd_surface:
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         layerInfo = []
-        for each in ['l2']:
+        for each in ['l2', 'l3', 'l4']:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''
@@ -538,12 +550,13 @@ class TestGraphicAdd_surface:
         Print.print_with_delimiter("断言--结束")
 
 
+'''
+本用例测试Add_arc功能,共覆盖5个场景（ID:39612）
+'''
 class TestGraphicAdd_arc:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Add_arc'))
     def testAdd_arc(self, job_id, g, prepare_test_job_clean_g):
-        '''
-        本用例测试Add_arc功能（ID:39612）
-        '''
+
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
 
@@ -580,26 +593,29 @@ class TestGraphicAdd_arc:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep,temp_compressed_path)  # 用悦谱CAM打开料号
 
-
-
-        #顺时针填加一个正极性弧
+        #1.验证可以在多层正确添加弧线
+        attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
+        Layers.add_arc(job_ep, step, ['l2', 'l3'], 'r10', 1 * 1000000, 26 * 1000000,
+                       9 * 1000000, 34 * 1000000, 5 * 1000000, 30 * 1000000, True, True, attributes)
+        #2.验证可顺时针填加一个正极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l7'], 'r10', 1*1000000, 26*1000000,
         9*1000000, 34*1000000, 5*1000000, 30*1000000, True, True, attributes)
 
-        #顺时针填加一个负极性弧
+        #3.验证可顺时针填加一个负极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l7'], 'r10', 1 * 1000000, 7 * 1000000,
                        5 * 1000000, 11 * 1000000, 3 * 1000000, 9 * 1000000, True, False, attributes)
 
-        #逆时针填加一个正极性弧
+        #4.验证可逆时针填加一个正极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l7'], 'r10', 39 * 1000000, 26 * 1000000,
                        25 * 1000000, 34 * 1000000, 32 * 1000000, 30 * 1000000, False, True, attributes)
-        #逆时针填加一个负极性弧
+        #5.验证可逆时针填加一个负极性弧
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l7'], 'r10', 20 * 1000000, 9 * 1000000,
                        16 * 1000000, 11 * 1000000, 18 * 1000000, 10 * 1000000, False, False, attributes)
+
         #GUI.show_layer(job_ep, step, 'l7')
 
 
@@ -617,7 +633,7 @@ class TestGraphicAdd_arc:
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         layerInfo = []
-        for each in ['l7']:
+        for each in ['l2', 'l3', 'l7']:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''
@@ -663,13 +679,13 @@ class TestGraphicAdd_arc:
 
 
 
-
+'''
+本用例测试Add_text功能,,共覆盖55个场景（ID:39614）
+'''
 class TestGraphicAdd_text:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Add_text'))
     def testAdd_text(self, job_id, g, prepare_test_job_clean_g):
-        '''
-        本用例测试Add_text功能（ID:39614）
-        '''
+
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
 
@@ -712,11 +728,11 @@ class TestGraphicAdd_text:
         执行测试用例数: 20个
         '''
         points_location = []
-        points_location.append([1 * 1000000, 42 * 1000000])
-        points_location.append([1 * 1000000, 50 * 1000000])
-        points_location.append([72 * 1000000, 50 * 1000000])
-        points_location.append([72 * 1000000, 42 * 1000000])
-        points_location.append([1 * 1000000, 42 * 1000000])
+        points_location.append([1 * 1000000, 45 * 1000000])
+        points_location.append([1 * 1000000, 53 * 1000000])
+        points_location.append([72 * 1000000, 53 * 1000000])
+        points_location.append([72 * 1000000, 45 * 1000000])
+        points_location.append([1 * 1000000, 45 * 1000000])
         Layers.add_surface(job_ep, step, ['l1'], True,
                            [{'.out_flag': '233'}, {'.pattern_fill': ''}],
                            points_location)  # 先添加一块正极性大同皮，方便后面在铜皮上添加正负极性的不同镜像和角度的text
@@ -732,44 +748,25 @@ class TestGraphicAdd_text:
                                 2 * 25400,
                                 num_x5 * 1000000, num_y7 * 1000000, polarity, orient, attributes, 56)
                 num_x5 = num_x5 + 3
-                num_y7 = num_y7 + 6
-        GUI.show_layer(job_ep, step, 'l1')
+                num_y7 = num_y7 + 9
+        #GUI.show_layer(job_ep, step, 'l1')
 
 
-        #1.增加正极性文字，字体为suntak_date(动态文字，为了不让其变化频率过高，该用例使用动态年份)
-        attributes = [{'.text': '2'}]  # 定义文字属性
-        Layers.add_text(job_ep, step, ['l2'], 'suntak_date', '$$YYYY', 20 * 25400, 20 * 25400,
-                        2 * 25400,
-                        5 * 1000000, 29 * 1000000, True, 0, attributes, 0)#添加动态年份（'$$YYYY'）
 
-        #2.验证X size栏的正确性
+        #1.验证X_size栏的正确性（X_size栏输入40mil）
         attributes = [{'.text': '2'}]  # 定义文字属性
         Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 40*25400, 20*25400, 2 * 25400,
-                        5*1000000, 30*1000000, True, 0, attributes, 0)
-        #3.验证Y size栏的正确性
+                        5*1000000, 30*1000000, True, 0, attributes, 0)#X_size栏输入40mil
+
+        #2.验证Y_size栏的正确性（Y_size栏输入40mil）
         attributes = [{'.text': '2'}]  # 定义文字属性
         Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 40 * 25400, 2 * 25400,
-                        5 * 1000000, 32 * 1000000, True, 0, attributes, 0)
-        #4.验证Line Width栏的正确性
+                        5 * 1000000, 32 * 1000000, True, 0, attributes, 0)#Y_size栏输入40mil
+        #3.验证Line_Width栏的正确性（Line_Width栏输入3mil）
         attributes = [{'.text': '2'}]  # 定义文字属性
         Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./ ', 20 * 25400, 20 * 25400, 3 * 25400,
-                        5 * 1000000, 34 * 1000000, True, 0, attributes, 0)
-        #5.，验证旋转角度功能正确性（不镜像）
-        attributes = [{'.text': '2'}]  # 定义文字属性
-        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
-                        5 * 1000000, 35 * 1000000, True, 2, attributes, 0)#文字旋转180度，不镜像
-        #6.验证镜像功能的正确性（文字旋转180度，同时镜像）
-        attributes = [{'.text': '2'}]  # 定义文字属性
-        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
-                        5 * 1000000, 35 * 1000000, True, 6, attributes, 0)  # 文字旋转180度，同时镜像
-        #7.验证不镜像情况下自定义旋转角度（文字自定义旋转30度，不镜像）
-        attributes = [{'.text': '2'}]  # 定义文字属性
-        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
-                        60 * 1000000, 26 * 1000000, True, 8, attributes, 30)  # 文字自定义旋转30度，不镜像
-        #8.验证镜像情况下自定义旋转角度（文字自定义旋转66度，镜像）
-        attributes = [{'.text': '2'}]  # 定义文字属性
-        Layers.add_text(job_ep, step, ['l2'], 'standard', 'Gh6-=,./<>!@#$%^&*()_,./', 20 * 25400, 20 * 25400, 3 * 25400,
-                        60 * 1000000, 36 * 1000000, True, 9, attributes, 66)  # 文文字自定义旋转66度，镜像
+                        5 * 1000000, 34 * 1000000, True, 0, attributes, 0)#Line_Width栏输入3mil
+
         #GUI.show_layer(job_ep, step, 'l2')
 
         '''
@@ -796,10 +793,33 @@ class TestGraphicAdd_text:
                             num_X*1000000, num_y*1000000, polarity,0, attributes, 0)
                 num_X = 26
             num_y=num_y + 1
-        #GUI.show_layer(job_ep, step, 'l3')
 
-
-
+        '''
+        测试用例名称: 多层添加不同类型的正负动态文字
+        预期结果: 均可正确添加
+        执行测试用例数: 20个
+        '''
+        points_location = []
+        points_location.append([24 * 1000000, 23 * 1000000])
+        points_location.append([24 * 1000000, 45 * 1000000])
+        points_location.append([33 * 1000000, 45 * 1000000])
+        points_location.append([33 * 1000000, 23 * 1000000])
+        points_location.append([24 * 1000000, 23 * 1000000])
+        Layers.add_surface(job_ep, step, ['l4', 'l5'], True,
+                           [{'.out_flag': '233'}, {'.pattern_fill': ''}], points_location)#先添加一块正极性大同皮，方便后面在铜皮上添加负极性文字
+        texts = ['$$DATE', '$$DATE-MMDDYY', '$$DATE-DDMMYY', '$$DATE-MMDDYYYY', '$$DATE-DDMMYYYY', '$$DD', '$$WEEK-DAY', '$$MM',
+                 '$$YY', '$$YYYY', '$$WW', '$$WK/YY', '$$YY/WK', '$$TIME', '$$STEP', '$$LAYER', '$$X', '$$Y', '$$X_MM', '$$Y_MM']#设置不同类型的动态文字，共20种
+        polaritys = [True,False]  # 物件极性属性
+        num_y = 24  # Y轴坐标
+        attributes = [{'.text': '2'}]  # 定义文字属性
+        for text in texts:
+            num_X = 5  # X轴坐标
+            for polarity in polaritys:
+                Layers.add_text(job_ep, step, ['l4', 'l5'], 'standard',text,20* 25400,20 * 25400,2 * 25400,
+                            num_X*1000000, num_y*1000000, polarity,0, attributes, 0)
+                num_X = 26
+            num_y=num_y + 1
+        #GUI.show_layer(job_ep, step, 'l5')
 
         save_job(job_ep, temp_ep_path)
 
@@ -813,7 +833,7 @@ class TestGraphicAdd_text:
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         layerInfo = []
-        for each in ['l1','l2','l3','l4','l5','l6','l7']:
+        for each in ['l1', 'l2', 'l3', 'l4', 'l5']:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''
