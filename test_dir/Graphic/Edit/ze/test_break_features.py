@@ -8,7 +8,7 @@ from epkernel.Output import save_job
 
 
 class TestGraphicEditBreak_feature:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break_feature'))
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Break'))
     def testBreak_feature(self, job_id, g, prepare_test_job_clean_g):
         '''
         本用例测试Break_features删除物件功能（ID：17486）
@@ -133,14 +133,14 @@ class TestGraphicEditBreak_feature:
         #GUI.show_layer(job_ep, step, 'l6')
 
         '''
-        验证所选物件不属于可被打散物件时，执行Break操作后取消被选中状态
+        验证所选物件不属于可被打散物件时，执行Break操作后会取消被选中状态
         bug编号：4428
         功能用例ID：3588
         影响版本号：1.1.6.8
         '''
         Selection.select_feature_by_id(job_ep, step, 'l7', [721,244,251],)#选中几个正极性普通pad
         Layers.break_features(job_ep, step, ['l7'], 0)  # 打散选中物件
-        Layers.delete_feature(job_ep, step, ['l7'])#如果整层物件被删除，则说明执行Break操作后取消被选中状态了
+        Layers.delete_feature(job_ep, step, ['l7'])#预期：如果整层物件被删除，则说明执行Break操作后取消被选中状态了
         #GUI.show_layer(job_ep, step, 'l7')
 
         '''

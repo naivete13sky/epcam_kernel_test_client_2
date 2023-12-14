@@ -58,13 +58,11 @@ class TestGraphicEditLine_fill_contours:
         #2.整合一层的正负极性铜皮填充,按照设置的参数正确执行
         Selection.set_featuretype_filter(True, True, False, True, False, False, False)#筛选正极性和负极性的铜皮
         Selection.select_features_by_filter(job_ep, step, ['l2'])
-        Layers.contourize(job_ep, step, ['l2'], 6350, True, 3*25400, 1)#按照界面默认属性进行填充
+        Layers.contourize(job_ep, step, ['l2'], 6350, True, 3*25400, 1)#按照UI界面默认属性进行填充
         Selection.select_feature_by_id(job_ep, step, 'l2', [0])#选中整块铜皮，证明铜皮整合正确
-        Layers.use_line_fill_contours(job_ep, step, 'l2', 20*25400, 15*25400, 10*25400, 30*25400, 30*25400, 89)
+        Layers.use_line_fill_contours(job_ep, step, 'l2', 20*25400, 15*25400, 10*25400, 30*25400, 30*25400, 60)
         # 设置网格X方向间距为20mil,Y方向间距为15mil,
-        # 网格线宽为10mil,首根网格线X方向偏置30mil,首根网格线Y方向偏置30mil,网格线旋转顺时针角度89度
-        Layers.use_line_fill_contours(job_ep, step, 'l2', 20 * 25400, 15 * 25400, 10 * 25400, 30 * 25400, 30 * 25400,
-                                      90)
+        # 网格线宽为10mil,首根网格线X方向偏置30mil,首根网格线Y方向偏置30mil,网格线旋转顺时针角度60度
         Selection.reset_selection()     # 重置筛选器，不影响后续功能使用
         Selection.reset_select_filter()
         #GUI.show_layer(job_ep, step, 'l2')

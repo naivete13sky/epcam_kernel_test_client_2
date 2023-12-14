@@ -177,7 +177,7 @@ class TestGraphicEditContour2pad:
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         layerInfo = []
-        for each in ['l1', 'l2', 'l3', 'l4', 'l5', 'l6','l6bf', 'l7']:
+        for each in ['l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l6bf', 'l7', 'xqy_top', 'p1_pre_smb']:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''

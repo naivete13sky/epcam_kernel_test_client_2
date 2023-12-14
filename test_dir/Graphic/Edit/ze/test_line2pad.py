@@ -102,14 +102,14 @@ class TestGraphicEditLine2pad:
         Selection.reset_select_filter()
         #GUI.show_layer(job_ep, step, 'l4')
 
-        #5.验证单层状态下不选择任何物件，使用Line to Pad功能(只对线有作用)
+        #5.验证单层状态下不选择任何物件，使用Line to Pad功能(预期：只对线有作用，其他物件转不了pad)
         Layers.delete_feature(job_ep, step,['l5'])#先删除L5层的整层物件
         Layers.add_line(job_ep, step, ['l5'], 'r5', 10000000, 30000000, 30000000, 30000000,
                         True, [{'.fiducial_name': '0'}, {'.area': ''}])
         Layers.delete_feature(job_ep, step, ['l5'])  # 先删除L5层的整层物件
         Layers.add_line(job_ep, step, ['l5'], 'r5', 10000000, 50000000, 30000000, 50000000,
-                        True, [{'.fiducial_name': '0'}, {'.area': ''}])
-        # 增加两条线
+                        True, [{'.fiducial_name': '0'}, {'.area': ''}])#先增加两条线
+
         points_location = []
         points_location.append([50 * 1000000, 25 * 1000000])
         points_location.append([55 * 1000000, 25 * 1000000])
@@ -121,20 +121,19 @@ class TestGraphicEditLine2pad:
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l5'], 'r7.874', 40 * 1000000, 25 * 1000000,
                        40 * 1000000, 31 * 1000000, 40 * 1000000, 28 * 1000000, True, True, attributes)  # 添加弧
-        Layers.line2pad(job_ep, step, ['l5'])#不选中任何物件，直接使用Line to Pad功能
+        Layers.line2pad(job_ep, step, ['l5'])#不选中任何物件，直接使用Line to Pad功能（预期：只对线有作用，其他物件转不了pad）
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
-        Selection.select_features_by_filter(job_ep, step, ['l5'])  # 选中已转为pad的物件，并删除
+        Selection.select_features_by_filter(job_ep, step, ['l5'])  # 选中已转为pad的物件并删除，因而之前添加的面、弧全部保留
         Layers.delete_feature(job_ep, step, ['l5'])
         #GUI.show_layer(job_ep, step, 'l5')
 
 
-        # 6.验证多层状态下不选择任何物件，使用Line to Pad功能(只对线有作用)
+        #7..验证多层状态下不选择任何物件，使用Line to Pad功能(预期：只对线有作用，其他物件转不了pad)
         Layers.delete_feature(job_ep, step, ['l6','l7'])  # 先删除L6和L7层的整层物件
         Layers.add_line(job_ep, step, ['l6','l7'], 'r5', 10000000, 30000000, 30000000, 30000000,
                         True, [{'.fiducial_name': '0'}, {'.area': ''}])
         Layers.add_line(job_ep, step, ['l6','l7'], 'r5', 10000000, 50000000, 30000000, 50000000,
-                        True, [{'.fiducial_name': '0'}, {'.area': ''}])
-        # 增加两条线
+                        True, [{'.fiducial_name': '0'}, {'.area': ''}])# 增加两条线
 
         points_location = []
         points_location.append([50 * 1000000, 25 * 1000000])
@@ -147,9 +146,9 @@ class TestGraphicEditLine2pad:
         attributes = [{'.comment': '3pin'}, {'.aoi': ''}]
         Layers.add_arc(job_ep, step, ['l6','l7'], 'r7.874', 40 * 1000000, 25 * 1000000,
                        40 * 1000000, 31 * 1000000, 40 * 1000000, 28 * 1000000, True, True, attributes)  # 添加弧
-        Layers.line2pad(job_ep, step, ['l6','l7'])  # 不选中任何物件，直接使用Line to Pad功能，作用于l6层和l7层
+        Layers.line2pad(job_ep, step, ['l6','l7'])  # 不选中任何物件，直接使用Line to Pad功能，作用于l6层和l7层(预期：只对线有作用，其他物件转不了pad)
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
-        Selection.select_features_by_filter(job_ep, step, ['l6','l7'])  # 选中l6层和l7层已转为pad的物件，并删除
+        Selection.select_features_by_filter(job_ep, step, ['l6','l7'])  # 选中l6层和l7层已转为pad的物件并删除，，因而这两层之前添加的面、弧全部保留
         Layers.delete_feature(job_ep, step, ['l6','l7'])
         #GUI.show_layer(job_ep, step, 'l7')
 

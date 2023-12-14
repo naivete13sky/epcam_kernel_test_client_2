@@ -49,28 +49,29 @@ class TestGraphicActionClear_select:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep,temp_compressed_path)  # 用悦谱CAM打开料号
 
-        #1.没有选中物件时，使用清除选中功能
+        #1.验证没有选中物件时，可正确使用清除选中功能
         Selection.clear_select(job_ep, step, 'l2')
-        Layers.delete_feature(job_ep, step,['l2']) #删除所选物件
+        Layers.delete_feature(job_ep, step,['l2']) #删除所选物件，预期全部删除
 
 
-        #2.有选中的物件时，使用清除选中功能
+        #2.验证单层有选中的物件时，可正确使用清除选中功能
         Selection.select_feature_by_id(job_ep, step, 'l3', [697])
         Selection.clear_select(job_ep, step, 'l3')
-        Layers.delete_feature(job_ep, step, ['l3'])  # 删除所选物件
+        Layers.delete_feature(job_ep, step, ['l3'])  #删除所选物件，预期全部删除
 
 
-        #3.整层物件被选中时，使用清除选中功能
+        #3.验证整层物件被选中时，可正确使用清除选中功能
         Selection.select_features_by_filter(job_ep, step,['l4'])
         Selection.clear_select(job_ep, step, 'l4')
-        Layers.delete_feature(job_ep, step, ['l4'])  # 删除所选物件
+        Layers.delete_feature(job_ep, step, ['l4'])  #删除所选物件，预期全部删除
 
 
-        #4.打开多层，选中多个物件，使用清除选中功能
-        Selection.select_feature_by_id(job_ep, step, 'l5', [702])
-        Selection.select_feature_by_id(job_ep, step, 'l6', [10])
-        Selection.clear_select(job_ep, step,)#清空指定工作单元下所有层别选中状态
-        Layers.delete_feature(job_ep,step,['l5','l6'])# 删除所选物件
+        #4.验证打开多层、选中多个物件时，可正确使用清除选中功能
+        Selection.select_feature_by_id(job_ep, step, 'l5', [2])
+        Selection.select_feature_by_id(job_ep, step, 'l6', [3])
+        Selection.clear_select(job_ep, step, )#清空指定工作单元下所有层别选中状态，
+        Layers.delete_feature(job_ep,step,['l5', 'l6'])#删除所选物件，预期全部删除
+        #GUI.show_layer(job_ep, step, 'l5')
 
 
         save_job(job_ep, temp_ep_path)
@@ -85,7 +86,7 @@ class TestGraphicActionClear_select:
         g.import_odb_folder(job_yg_remote_path)
         g.import_odb_folder(job_ep_remote_path)
         layerInfo = []
-        for each in ['l2','l3','l4','l5','l6']:
+        for each in ['l2', 'l3', 'l4', 'l5', 'l6']:
             each_dict = {}
             each_dict["layer"] = each.lower()
             each_dict['layer_type'] = ''
