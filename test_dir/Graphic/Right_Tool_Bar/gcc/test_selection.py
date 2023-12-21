@@ -1,7 +1,7 @@
 import pytest, os, shutil
 from config import RunConfig
 from cc.cc_method import GetTestData, DMS, Print
-from epkernel import Input, GUI
+from epkernel import Input
 from epkernel.Action import Selection
 from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
@@ -19,7 +19,7 @@ class TestGraphicSelection:
         g = RunConfig.driver_g  # 拿到G软件
         data = {}  # 存放比对结果信息
         step = 'orig'
-        layers = ['top', 'l2', 'l3', 'l3+1', 'l3+2', 'l3+3', 'l3+4', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'bot']
+        layers = ['top', 'l2', 'l3', 'l3+1', 'l3+2', 'l3+3', 'l3+4', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9', 'bot', 'smb']
 
         # 取到临时目录，如果存在旧目录，则删除
         temp_path = RunConfig.temp_path_base
@@ -173,9 +173,9 @@ class TestGraphicSelection:
 
         # 17、筛选不包含bga属性的pad
         Selection.set_featuretype_filter(True, False, False, False, False, False, True)
-        Selection.set_attribute_filter(0, [{'.bga': ''}])
-        Selection.select_features_by_filter(job_ep, step, ['bot+1'])
-        Layers.delete_feature(job_ep, step, ['bot+1'])  # 通过删除来验证是否选中
+        Selection.set_exclude_attr_filter([{'.bga': ''}])
+        Selection.select_features_by_filter(job_ep, step, ['smb'])
+        Layers.delete_feature(job_ep, step, ['smb'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
         # GUI.show_layer(job_ep, step, 'l3+4')

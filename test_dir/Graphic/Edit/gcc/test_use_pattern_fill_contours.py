@@ -7,9 +7,9 @@ from epkernel.Edition import Layers, Job
 from epkernel.Output import save_job
 
 
-class TestGraphicEditUse_pattern_fill_contours:
+class TestGraphicEditUsepatternfillcontours:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Fill_pattern'))
-    def testUse_pattern_fill_contours (self, job_id, g, prepare_test_job_clean_g):
+    def test_use_pattern_fill_contours(self, job_id, g, prepare_test_job_clean_g):
 
         '''
         本用例测试Use_pattern_fill_contours填充功能，用例数：6

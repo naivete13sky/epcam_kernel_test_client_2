@@ -52,37 +52,37 @@ class TestGraphicSelectFeatureSymbol:
         # 用悦谱CAM打开料号
         Input.open_job(job_ep, temp_compressed_path)
 
-        # 1、筛选单个symbol（第一种方法）
+        # 1、筛选单个类型的symbol（第一种方法）
         Selection.set_include_symbol_filter(['r5'])
         Selection.select_features_by_filter(job_ep, step, ['spt'])
         Layers.delete_feature(job_ep, step, ['spt'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 2、筛选单个symbol（第二种方法）
+        # 2、筛选单个类型的symbol（第二种方法）
         Selection.set_symbol_filter(True, ['r5'])
         Selection.select_features_by_filter(job_ep, step, ['smt'])
         Layers.delete_feature(job_ep, step, ['smt'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 3、筛选多个symbol（第一种方法）
+        # 3、筛选多个类型的symbol（第一种方法）
         Selection.set_include_symbol_filter(['r5', 'r4'])
         Selection.select_features_by_filter(job_ep, step, ['top'])
         Layers.delete_feature(job_ep, step, ['top'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 4、筛选多个symbol（第二种方法）
+        # 4、筛选多个类型的symbol（第二种方法）
         Selection.set_symbol_filter(True, ['s31.496', 'r15.748'])
         Selection.select_features_by_filter(job_ep, step, ['l2'])
         Layers.delete_feature(job_ep, step, ['l2'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 5、筛选单个symbol以外的物件
+        # 5、筛选单个类型的symbol以外的物件
         Selection.set_exclude_symbol_filter(['r15.748'])
         Selection.select_features_by_filter(job_ep, step, ['l4'])
         Layers.delete_feature(job_ep, step, ['l4'])  # 通过删除来验证是否选中
         Selection.reset_select_filter()
 
-        # 6、筛选多个symbol以外的物件
+        # 6、筛选多个类型的symbol以外的物件
         Selection.set_exclude_symbol_filter(['r5', 'r8'])
         Selection.select_features_by_filter(job_ep, step, ['l6'])
         Layers.delete_feature(job_ep, step, ['l6'])  # 通过删除来验证是否选中
